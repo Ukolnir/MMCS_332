@@ -1,0 +1,9 @@
+D:\_Desktop\MMCS_332\Module1\task3\bin\Debug\task3.exe.config
+D:\_Desktop\MMCS_332\Module1\task3\bin\Debug\task3.exe
+D:\_Desktop\MMCS_332\Module1\task3\bin\Debug\task3.pdb
+D:\_Desktop\MMCS_332\Module1\task3\obj\Debug\task3.csprojResolveAssemblyReference.cache
+D:\_Desktop\MMCS_332\Module1\task3\obj\Debug\task3.Form1.resources
+D:\_Desktop\MMCS_332\Module1\task3\obj\Debug\task3.Properties.Resources.resources
+D:\_Desktop\MMCS_332\Module1\task3\obj\Debug\task3.csproj.GenerateResource.Cache
+D:\_Desktop\MMCS_332\Module1\task3\obj\Debug\task3.exe
+D:\_Desktop\MMCS_332\Module1\task3\obj\Debug\task3.pdb
