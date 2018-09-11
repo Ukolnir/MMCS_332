@@ -20,13 +20,14 @@ namespace Task2
         private static Bitmap image2, image3, image4;
         private void button1_Click(object sender, EventArgs e)
         {
-            if (openFileDialog1.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            openFileDialog1.ShowDialog();
+            /*if (openFileDialog1.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
                 System.IO.StreamReader sr = new
                    System.IO.StreamReader(openFileDialog1.FileName, Encoding.Default);
                 MessageBox.Show(sr.ReadToEnd());
                 sr.Close();
-            }
+            }*/
             pictureBox1.Image = Image.FromFile(openFileDialog1.FileName);
             pictureBox1.SizeMode = PictureBoxSizeMode.StretchImage;
             pictureBox2.SizeMode = PictureBoxSizeMode.StretchImage;
