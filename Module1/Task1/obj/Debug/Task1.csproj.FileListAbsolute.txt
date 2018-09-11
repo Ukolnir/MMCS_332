@@ -1,9 +1,9 @@
-D:\_Documents\task 1\bin\Debug\Task1.exe.config
-D:\_Documents\task 1\bin\Debug\Task1.exe
-D:\_Documents\task 1\bin\Debug\Task1.pdb
-D:\_Documents\task 1\obj\Debug\Task1.csprojResolveAssemblyReference.cache
-D:\_Documents\task 1\obj\Debug\Alex.Form1.resources
-D:\_Documents\task 1\obj\Debug\Task1.Properties.Resources.resources
-D:\_Documents\task 1\obj\Debug\Task1.csproj.GenerateResource.Cache
-D:\_Documents\task 1\obj\Debug\Task1.exe
-D:\_Documents\task 1\obj\Debug\Task1.pdb
+d:\_documents\visual studio 2017\CG\Task1\bin\Debug\Task1.exe.config
+d:\_documents\visual studio 2017\CG\Task1\bin\Debug\Task1.exe
+d:\_documents\visual studio 2017\CG\Task1\bin\Debug\Task1.pdb
+d:\_documents\visual studio 2017\CG\Task1\obj\Debug\Task1.csprojResolveAssemblyReference.cache
+d:\_documents\visual studio 2017\CG\Task1\obj\Debug\Task1.Form1.resources
+d:\_documents\visual studio 2017\CG\Task1\obj\Debug\Task1.Properties.Resources.resources
+d:\_documents\visual studio 2017\CG\Task1\obj\Debug\Task1.csproj.GenerateResource.Cache
+d:\_documents\visual studio 2017\CG\Task1\obj\Debug\Task1.exe
+d:\_documents\visual studio 2017\CG\Task1\obj\Debug\Task1.pdb
