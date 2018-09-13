@@ -24,7 +24,7 @@ namespace Task1
 
         OpenFileDialog open_dialog;
 
-		private void simple_grey(Bitmap bmp)
+        private void simple_grey(Bitmap bmp)
 		{
 			pictureBox2.Image = bmp;
 			pictureBox2.SizeMode = PictureBoxSizeMode.StretchImage;
