@@ -17,12 +17,8 @@ namespace Task1
 			InitializeComponent();
 		}
 
-		private void label1_Click(object sender, EventArgs e)
-		{
-
-		}
-
         OpenFileDialog open_dialog;
+        long g1, g2, g3;
 
         private void simpleGrey(Bitmap bmp)
 		{
@@ -34,11 +30,12 @@ namespace Task1
                 {
                     Color pixelColor = bmp.GetPixel(i, j);
                     byte c = (byte)(((float)pixelColor.R + (float)pixelColor.B + (float)pixelColor.G) / 3.0f);
+                    g1 += c;
                     Color newColor = Color.FromArgb(c, c, c);
                     bmp.SetPixel(i, j, newColor);
                 }
-
-		}
+            g1 = g1 / bmp.Height / bmp.Width;
+        }
 
         //HDTV Model
         private void intensiveGrey(Bitmap bmp)
@@ -51,10 +48,12 @@ namespace Task1
                 {
                     Color pixelColor = bmp.GetPixel(i, j);
                     byte c = (byte)(0.2126 * pixelColor.R + 0.7152 * pixelColor.G + 0.0722 * pixelColor.B);
+                    g2 += c;
                     Color newColor = Color.FromArgb(c, c, c);
                     bmp.SetPixel(i, j, newColor);
                 }
 
+            g2 = g2 / bmp.Height / bmp.Width;
         }
 
         private void imageDifference(Bitmap bmp1, Bitmap bmp2)
@@ -68,15 +67,30 @@ namespace Task1
                 {
                     Color pixC1 = bmp1.GetPixel(i, j);
                     Color pixC2 = bmp2.GetPixel(i, j);
-                    byte d = (byte)(pixC2.R - pixC1.R + pixC2.G - pixC1.G + pixC2.B - pixC1.B);
+                    int d1 = pixC2.R - pixC1.R + pixC2.G - pixC1.G + pixC2.B - pixC1.B;
+                    int d2 = pixC1.R - pixC2.R + pixC1.G - pixC2.G + pixC1.B - pixC2.B;
+                    byte d = (byte)Math.Max(d1, d2);
+                    g3 += d;
                     Color newColor = Color.FromArgb(d, d, d);
                     bmp3.SetPixel(i, j, newColor);
                 }
+
+            g3 = g3 / bmp3.Height / bmp3.Width;
         }
 
+        private void Histogram()
+        {
+            chart1.Series["Series1"].Points.Clear();
+            chart1.Series["Series1"].Points.AddY(g1);
+            chart1.Series["Series1"].Points[0].Color = Color.LightGray;
+            chart1.Series["Series1"].Points.AddY(g2);
+            chart1.Series["Series1"].Points[1].Color = Color.DarkGray;
+            chart1.Series["Series1"].Points.AddY(g3);
+            chart1.Series["Series1"].Points[2].Color = Color.Gray;
+            chart1.Update();
+        }
 
-
-private void ChangePicture(DialogResult res)
+        private void ChangePicture(DialogResult res)
 		{
 
 			if (res == DialogResult.OK) //если в окне была нажата кнопка "ОК"
@@ -84,25 +98,26 @@ private void ChangePicture(DialogResult res)
 				try
 				{
 					Bitmap bmp = new Bitmap(open_dialog.FileName);
-
+                    g1 = g2 = g3 = 0;
 
 					pictureBox1.Image = bmp;
 					pictureBox1.SizeMode = PictureBoxSizeMode.StretchImage;
-
                     Bitmap bmp1 = (Bitmap)bmp.Clone();
                     Bitmap bmp2 = (Bitmap)bmp.Clone();
 
                     simpleGrey(bmp1);
                     intensiveGrey(bmp2);
-                    imageDifference(bmp1, bmp2);
-
+                    imageDifference((Bitmap)bmp1.Clone(), (Bitmap)bmp2.Clone());
+                    Histogram();
                 }
 				catch
 				{
 					DialogResult rezult = MessageBox.Show("Невозможно открыть выбранный файл",
 					"Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
 				}
-			}
+
+                
+            }
 		}
 
 		private void button1_Click(object sender, EventArgs e)
@@ -114,5 +129,6 @@ private void ChangePicture(DialogResult res)
 
             ChangePicture(dr);
 		}
-	}
+
+    }
 }
