@@ -97,11 +97,10 @@
 			this.label3.Size = new System.Drawing.Size(55, 13);
 			this.label3.TabIndex = 5;
 			this.label3.Text = "Разность";
-			// 
-			// openFileDialog1
-			// 
-			this.openFileDialog1.FileName = "openFileDialog1";
-			this.openFileDialog1.FileOk += new System.ComponentModel.CancelEventHandler(this.openFileDialog1_FileOk);
+            // 
+            // openFileDialog1
+            // 
+            this.openFileDialog1.FileName = "openFileDialog1";
 			// 
 			// button1
 			// 

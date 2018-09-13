@@ -22,49 +22,28 @@ namespace Task1
 
 		}
 
-		byte[] rgbValues;
+        OpenFileDialog open_dialog;
 
 		private void simple_grey(Bitmap bmp)
 		{
 			pictureBox2.Image = bmp;
 			pictureBox2.SizeMode = PictureBoxSizeMode.StretchImage;
 
-			// Lock the bitmap's bits.  
-			Rectangle rect = new Rectangle(0, 0, bmp.Width, bmp.Height);
-			System.Drawing.Imaging.BitmapData bmpData =
-				bmp.LockBits(rect, System.Drawing.Imaging.ImageLockMode.ReadWrite,
-				bmp.PixelFormat);
+            for (int i = 0; i < bmp.Width; ++i)
+                for (int j = 0; j < bmp.Height; ++j)
+                {
+                    Color pixelColor = bmp.GetPixel(i, j);
+                    byte c = (byte)(((float)pixelColor.A + (float)pixelColor.B + (float)pixelColor.G) / 3.0f);
+                    Color newColor = Color.FromArgb(c, c, c);
+                    bmp.SetPixel(i, j, newColor);
+                }
 
-			// Get the address of the first line.
-			IntPtr ptr = bmpData.Scan0;
-
-			// Declare an array to hold the bytes of the bitmap.
-			int bytes = Math.Abs(bmpData.Stride) * bmp.Height;
-			rgbValues = new byte[bytes];
-
-			// Copy the RGB values into the array.
-			System.Runtime.InteropServices.Marshal.Copy(ptr, rgbValues, 0, bytes);
-
-			// Set every third value to 255. A 24bpp bitmap will look red.  
-			for (int counter = 0; counter < rgbValues.Length; counter += 2)
-			{
-				rgbValues[counter + 1] = 255;
-			}
-			// Copy the RGB values back to the bitmap
-			System.Runtime.InteropServices.Marshal.Copy(rgbValues, 0, ptr, bytes);
-
-			// Unlock the bits.
-			bmp.UnlockBits(bmpData);
 		}
 
-		private void openFileDialog1_FileOk(object sender, CancelEventArgs e)
+		private void ChangePicture(DialogResult res)
 		{
 
-
-			OpenFileDialog open_dialog = new OpenFileDialog(); //создание диалогового окна для выбора файла
-			open_dialog.Filter = "Image Files(*.BMP;*.JPG;**.PNG)|*.BMP;*.JPG;**.PNG|All files (*.*)|*.*"; //формат загружаемого файла
-
-			if (open_dialog.ShowDialog() == DialogResult.OK) //если в окне была нажата кнопка "ОК"
+			if (res == DialogResult.OK) //если в окне была нажата кнопка "ОК"
 			{
 				try
 				{
@@ -88,15 +67,12 @@ namespace Task1
 
 		private void button1_Click(object sender, EventArgs e)
 		{
-			
-			if (openFileDialog1.ShowDialog() == System.Windows.Forms.DialogResult.OK)
-			{
-				System.IO.StreamReader sr = new
-					System.IO.StreamReader(openFileDialog1.FileName);
-				//MessageBox.Show(sr.ReadToEnd());
-				sr.Close();
-			}
-			
+            open_dialog = new OpenFileDialog(); //создание диалогового окна для выбора файла
+            open_dialog.Filter = "Image Files(*.BMP;*.JPG;**.PNG)|*.BMP;*.JPG;**.PNG|All files (*.*)|*.*"; //формат загружаемого файла
+            DialogResult dr = open_dialog.ShowDialog();
+         
+
+            ChangePicture(dr);
 		}
 	}
 }
