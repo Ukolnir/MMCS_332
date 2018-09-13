@@ -33,14 +33,31 @@ namespace Task1
                 for (int j = 0; j < bmp.Height; ++j)
                 {
                     Color pixelColor = bmp.GetPixel(i, j);
-                    byte c = (byte)(((float)pixelColor.A + (float)pixelColor.B + (float)pixelColor.G) / 3.0f);
+                    byte c = (byte)(((float)pixelColor.R + (float)pixelColor.B + (float)pixelColor.G) / 3.0f);
                     Color newColor = Color.FromArgb(c, c, c);
                     bmp.SetPixel(i, j, newColor);
                 }
 
 		}
 
-		private void ChangePicture(DialogResult res)
+        //HDTV Model
+        private void intensive_grey(Bitmap bmp)
+        {
+            pictureBox3.Image = bmp;
+            pictureBox3.SizeMode = PictureBoxSizeMode.StretchImage;
+
+            for (int i = 0; i < bmp.Width; ++i)
+                for (int j = 0; j < bmp.Height; ++j)
+                {
+                    Color pixelColor = bmp.GetPixel(i, j);
+                    byte c = (byte)(0.2126 * pixelColor.R + 0.7152 * pixelColor.G + 0.0722 * pixelColor.B);
+                    Color newColor = Color.FromArgb(c, c, c);
+                    bmp.SetPixel(i, j, newColor);
+                }
+
+        }
+
+        private void ChangePicture(DialogResult res)
 		{
 
 			if (res == DialogResult.OK) //если в окне была нажата кнопка "ОК"
@@ -53,8 +70,11 @@ namespace Task1
 					pictureBox1.Image = bmp;
 					pictureBox1.SizeMode = PictureBoxSizeMode.StretchImage;
 
-					simple_grey((Bitmap)bmp.Clone());
+                    Bitmap bmp1 = (Bitmap)bmp.Clone();
+                    Bitmap bmp2 = (Bitmap)bmp.Clone();
 
+                    simple_grey(bmp1);
+                    intensive_grey(bmp2);
 
 				}
 				catch
