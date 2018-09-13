@@ -50,34 +50,22 @@ namespace Task2
                 for (int y = 0; y < image2.Height; y++)
                 {
                     Color pixelColor = image2.GetPixel(x, y);
+
                     Color newColor = Color.FromArgb(pixelColor.R, 0, 0);
                     image2.SetPixel(x, y, newColor);
+
+                    newColor = Color.FromArgb(0, pixelColor.G, 0);
+                    image3.SetPixel(x, y, newColor);
+
+                    newColor = Color.FromArgb(0, 0, pixelColor.B);
+                    image4.SetPixel(x, y, newColor);
+
+
                     r += pixelColor.R;
                     g += pixelColor.G;
                     b += pixelColor.B;
                 }
             }
-
-            for (int x = 0; x < image3.Width; x++)
-            {
-                for (int y = 0; y < image3.Height; y++)
-                {
-                    Color pixelColor = image3.GetPixel(x, y);
-                    Color newColor = Color.FromArgb(0, pixelColor.G, 0);
-                    image3.SetPixel(x, y, newColor);
-                }
-            }
-
-            for (int x = 0; x < image4.Width; x++)
-            {
-                for (int y = 0; y < image4.Height; y++)
-                {
-                    Color pixelColor = image4.GetPixel(x, y);
-                    Color newColor = Color.FromArgb(0, 0, pixelColor.B);
-                    image4.SetPixel(x, y, newColor);
-                }
-            }
-
 
             long r1 = r / image2.Width / image2.Height;
             long g1 = g / image2.Width / image2.Height;
@@ -99,14 +87,7 @@ namespace Task2
         private void button1_Click(object sender, EventArgs e)
         {
             openFileDialog1.ShowDialog();
-            /*if (openFileDialog1.ShowDialog() == System.Windows.Forms.DialogResult.OK)
-            {
-                System.IO.StreamReader sr = new
-                   System.IO.StreamReader(openFileDialog1.FileName, Encoding.Default);
-                MessageBox.Show(sr.ReadToEnd());
-                sr.Close();
-            }*/
-
+            
             ShowPictures();
         }
        
