@@ -18,7 +18,7 @@ namespace Task1
 		}
 
         OpenFileDialog open_dialog;
-        long g1, g2, g3;
+        List<int> l1, l2;
 
         private void simpleGrey(Bitmap bmp)
 		{
@@ -29,12 +29,11 @@ namespace Task1
                 for (int j = 0; j < bmp.Height; ++j)
                 {
                     Color pixelColor = bmp.GetPixel(i, j);
-                    byte c = (byte)(((float)pixelColor.R + (float)pixelColor.B + (float)pixelColor.G) / 3.0f);
-                    g1 += c;
+                    int c = (int)(((float)pixelColor.R + (float)pixelColor.B + (float)pixelColor.G) / 3.0f);
+                    l1[c]++; 
                     Color newColor = Color.FromArgb(c, c, c);
                     bmp.SetPixel(i, j, newColor);
                 }
-            g1 = g1 / bmp.Height / bmp.Width;
         }
 
         //HDTV Model
@@ -47,13 +46,11 @@ namespace Task1
                 for (int j = 0; j < bmp.Height; ++j)
                 {
                     Color pixelColor = bmp.GetPixel(i, j);
-                    byte c = (byte)(0.2126 * pixelColor.R + 0.7152 * pixelColor.G + 0.0722 * pixelColor.B);
-                    g2 += c;
+                    int c = (int)(0.2126 * pixelColor.R + 0.7152 * pixelColor.G + 0.0722 * pixelColor.B);
+                    l2[c]++;
                     Color newColor = Color.FromArgb(c, c, c);
                     bmp.SetPixel(i, j, newColor);
                 }
-
-            g2 = g2 / bmp.Height / bmp.Width;
         }
 
         private void imageDifference(Bitmap bmp1, Bitmap bmp2)
@@ -70,23 +67,25 @@ namespace Task1
                     int d1 = pixC2.R - pixC1.R + pixC2.G - pixC1.G + pixC2.B - pixC1.B;
                     int d2 = pixC1.R - pixC2.R + pixC1.G - pixC2.G + pixC1.B - pixC2.B;
                     byte d = (byte)Math.Max(d1, d2);
-                    g3 += d;
                     Color newColor = Color.FromArgb(d, d, d);
                     bmp3.SetPixel(i, j, newColor);
                 }
 
-            g3 = g3 / bmp3.Height / bmp3.Width;
         }
 
         private void Histogram()
         {
-            chart1.Series["Series1"].Points.Clear();
-            chart1.Series["Series1"].Points.AddY(g1);
-            chart1.Series["Series1"].Points[0].Color = Color.LightGray;
-            chart1.Series["Series1"].Points.AddY(g2);
-            chart1.Series["Series1"].Points[1].Color = Color.DarkGray;
-            chart1.Series["Series1"].Points.AddY(g3);
-            chart1.Series["Series1"].Points[2].Color = Color.Gray;
+            
+            chart1.Series["image 1"].Points.Clear();
+            chart1.Series["image 2"].Points.Clear();
+
+            for (int i = 0; i < 256; ++i)
+            {
+                chart1.Series["image 1"].Points.AddY(l1[i]);
+                chart1.Series["image 1"].Points[i].Color = Color.Blue;
+                chart1.Series["image 2"].Points.AddY(l2[i]);
+                chart1.Series["image 2"].Points[i].Color = Color.Orange;
+            }
             chart1.Update();
         }
 
@@ -98,12 +97,21 @@ namespace Task1
 				try
 				{
 					Bitmap bmp = new Bitmap(open_dialog.FileName);
-                    g1 = g2 = g3 = 0;
+                    
 
 					pictureBox1.Image = bmp;
 					pictureBox1.SizeMode = PictureBoxSizeMode.StretchImage;
                     Bitmap bmp1 = (Bitmap)bmp.Clone();
                     Bitmap bmp2 = (Bitmap)bmp.Clone();
+
+                    l1 = new List<int>();
+                    l2 = new List<int>();
+ 
+                    for (int i = 0; i < 256; ++i)
+                    {
+                        l1.Add(0);
+                        l2.Add(0);
+                    }
 
                     simpleGrey(bmp1);
                     intensiveGrey(bmp2);
