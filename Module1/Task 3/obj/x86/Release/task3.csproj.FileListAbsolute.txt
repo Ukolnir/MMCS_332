@@ -1,0 +1,8 @@
+C:\Users\IRU\Documents\GitHub\MMCS_332\Module1\Task 3\bin\Release\task3.exe
+C:\Users\IRU\Documents\GitHub\MMCS_332\Module1\Task 3\bin\Release\task3.pdb
+C:\Users\IRU\Documents\GitHub\MMCS_332\Module1\Task 3\obj\x86\Release\task3.Form1.resources
+C:\Users\IRU\Documents\GitHub\MMCS_332\Module1\Task 3\obj\x86\Release\task3.Properties.Resources.resources
+C:\Users\IRU\Documents\GitHub\MMCS_332\Module1\Task 3\obj\x86\Release\task3.csproj.GenerateResource.Cache
+C:\Users\IRU\Documents\GitHub\MMCS_332\Module1\Task 3\obj\x86\Release\task3.exe
+C:\Users\IRU\Documents\GitHub\MMCS_332\Module1\Task 3\obj\x86\Release\task3.pdb
+C:\Users\IRU\Documents\GitHub\MMCS_332\Module1\Task 3\obj\x86\Release\task3.csprojResolveAssemblyReference.cache

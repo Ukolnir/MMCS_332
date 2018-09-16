@@ -31,13 +31,16 @@
             this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
             this.OpenFile = new System.Windows.Forms.MenuStrip();
             this.openPicture = new System.Windows.Forms.ToolStripMenuItem();
+            this.saveToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
-            this.преобразованияToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.сохранитьКартинкуToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.trackBar1 = new System.Windows.Forms.TrackBar();
             this.trackBar2 = new System.Windows.Forms.TrackBar();
             this.trackBar3 = new System.Windows.Forms.TrackBar();
-            this.rGBHSLToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.button1 = new System.Windows.Forms.Button();
+            this.label1 = new System.Windows.Forms.Label();
+            this.label2 = new System.Windows.Forms.Label();
+            this.label3 = new System.Windows.Forms.Label();
+            this.saveFileDialog1 = new System.Windows.Forms.SaveFileDialog();
             this.OpenFile.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.trackBar1)).BeginInit();
@@ -53,11 +56,10 @@
             // 
             this.OpenFile.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.openPicture,
-            this.преобразованияToolStripMenuItem,
-            this.сохранитьКартинкуToolStripMenuItem});
+            this.saveToolStripMenuItem});
             this.OpenFile.Location = new System.Drawing.Point(0, 0);
             this.OpenFile.Name = "OpenFile";
-            this.OpenFile.Size = new System.Drawing.Size(796, 24);
+            this.OpenFile.Size = new System.Drawing.Size(898, 24);
             this.OpenFile.TabIndex = 0;
             this.OpenFile.Text = "menuStrip1";
             // 
@@ -68,64 +70,103 @@
             this.openPicture.Text = "Открыть файл";
             this.openPicture.Click += new System.EventHandler(this.openPicture_Click);
             // 
+            // saveToolStripMenuItem
+            // 
+            this.saveToolStripMenuItem.Name = "saveToolStripMenuItem";
+            this.saveToolStripMenuItem.Size = new System.Drawing.Size(109, 20);
+            this.saveToolStripMenuItem.Text = "Сохранить файл";
+            this.saveToolStripMenuItem.Click += new System.EventHandler(this.saveToolStripMenuItem_Click);
+            // 
             // pictureBox1
             // 
             this.pictureBox1.BackColor = System.Drawing.SystemColors.ScrollBar;
             this.pictureBox1.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            this.pictureBox1.Location = new System.Drawing.Point(114, 58);
+            this.pictureBox1.Location = new System.Drawing.Point(153, 39);
             this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.Size = new System.Drawing.Size(579, 262);
+            this.pictureBox1.Size = new System.Drawing.Size(567, 353);
             this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
             this.pictureBox1.TabIndex = 0;
             this.pictureBox1.TabStop = false;
             // 
-            // преобразованияToolStripMenuItem
-            // 
-            this.преобразованияToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.rGBHSLToolStripMenuItem});
-            this.преобразованияToolStripMenuItem.Name = "преобразованияToolStripMenuItem";
-            this.преобразованияToolStripMenuItem.Size = new System.Drawing.Size(112, 20);
-            this.преобразованияToolStripMenuItem.Text = "Преобразования";
-            // 
-            // сохранитьКартинкуToolStripMenuItem
-            // 
-            this.сохранитьКартинкуToolStripMenuItem.Name = "сохранитьКартинкуToolStripMenuItem";
-            this.сохранитьКартинкуToolStripMenuItem.Size = new System.Drawing.Size(130, 20);
-            this.сохранитьКартинкуToolStripMenuItem.Text = "Сохранить картинку";
-            // 
             // trackBar1
             // 
-            this.trackBar1.Location = new System.Drawing.Point(32, 415);
+            this.trackBar1.Enabled = false;
+            this.trackBar1.Location = new System.Drawing.Point(38, 479);
+            this.trackBar1.Maximum = 360;
             this.trackBar1.Name = "trackBar1";
             this.trackBar1.Size = new System.Drawing.Size(170, 45);
             this.trackBar1.TabIndex = 1;
+            this.trackBar1.TickFrequency = 40;
             // 
             // trackBar2
             // 
-            this.trackBar2.Location = new System.Drawing.Point(287, 415);
+            this.trackBar2.Enabled = false;
+            this.trackBar2.Location = new System.Drawing.Point(326, 479);
+            this.trackBar2.Maximum = 100;
+            this.trackBar2.Minimum = -100;
             this.trackBar2.Name = "trackBar2";
             this.trackBar2.Size = new System.Drawing.Size(200, 45);
             this.trackBar2.TabIndex = 2;
+            this.trackBar2.TickFrequency = 10;
             // 
             // trackBar3
             // 
-            this.trackBar3.Location = new System.Drawing.Point(557, 415);
+            this.trackBar3.Enabled = false;
+            this.trackBar3.Location = new System.Drawing.Point(642, 479);
+            this.trackBar3.Maximum = 100;
+            this.trackBar3.Minimum = -100;
             this.trackBar3.Name = "trackBar3";
             this.trackBar3.Size = new System.Drawing.Size(212, 45);
             this.trackBar3.TabIndex = 3;
+            this.trackBar3.TickFrequency = 10;
             // 
-            // rGBHSLToolStripMenuItem
+            // button1
             // 
-            this.rGBHSLToolStripMenuItem.Name = "rGBHSLToolStripMenuItem";
-            this.rGBHSLToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
-            this.rGBHSLToolStripMenuItem.Text = "RGB -> HSL";
-            this.rGBHSLToolStripMenuItem.Click += new System.EventHandler(this.rGBHSLToolStripMenuItem_Click);
+            this.button1.Enabled = false;
+            this.button1.Location = new System.Drawing.Point(310, 411);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(230, 36);
+            this.button1.TabIndex = 4;
+            this.button1.Text = "Изменить";
+            this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += new System.EventHandler(this.button1_Click);
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(84, 527);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(49, 13);
+            this.label1.TabIndex = 5;
+            this.label1.Text = "Оттенок";
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(367, 527);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(85, 13);
+            this.label2.TabIndex = 6;
+            this.label2.Text = "Насыщенность";
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(720, 527);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(55, 13);
+            this.label3.TabIndex = 7;
+            this.label3.Text = "Значение";
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(796, 499);
+            this.ClientSize = new System.Drawing.Size(898, 569);
+            this.Controls.Add(this.label3);
+            this.Controls.Add(this.label2);
+            this.Controls.Add(this.label1);
+            this.Controls.Add(this.button1);
             this.Controls.Add(this.trackBar3);
             this.Controls.Add(this.trackBar2);
             this.Controls.Add(this.trackBar1);
@@ -153,12 +194,15 @@
         private System.Windows.Forms.MenuStrip OpenFile;
         private System.Windows.Forms.ToolStripMenuItem openPicture;
         private System.Windows.Forms.PictureBox pictureBox1;
-        private System.Windows.Forms.ToolStripMenuItem преобразованияToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem сохранитьКартинкуToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem rGBHSLToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem saveToolStripMenuItem;
         private System.Windows.Forms.TrackBar trackBar1;
         private System.Windows.Forms.TrackBar trackBar2;
         private System.Windows.Forms.TrackBar trackBar3;
+        private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.SaveFileDialog saveFileDialog1;
     }
 }
 
