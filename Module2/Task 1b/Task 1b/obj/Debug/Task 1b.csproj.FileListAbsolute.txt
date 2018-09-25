@@ -1,0 +1,9 @@
+D:\_Downloads\MMCS_332\Module2\Task 1b\Task 1b\bin\Debug\Task 1b.exe.config
+D:\_Downloads\MMCS_332\Module2\Task 1b\Task 1b\bin\Debug\Task 1b.exe
+D:\_Downloads\MMCS_332\Module2\Task 1b\Task 1b\bin\Debug\Task 1b.pdb
+D:\_Downloads\MMCS_332\Module2\Task 1b\Task 1b\obj\Debug\Task 1b.csprojResolveAssemblyReference.cache
+D:\_Downloads\MMCS_332\Module2\Task 1b\Task 1b\obj\Debug\Task_1b.Form1.resources
+D:\_Downloads\MMCS_332\Module2\Task 1b\Task 1b\obj\Debug\Task_1b.Properties.Resources.resources
+D:\_Downloads\MMCS_332\Module2\Task 1b\Task 1b\obj\Debug\Task 1b.csproj.GenerateResource.Cache
+D:\_Downloads\MMCS_332\Module2\Task 1b\Task 1b\obj\Debug\Task 1b.exe
+D:\_Downloads\MMCS_332\Module2\Task 1b\Task 1b\obj\Debug\Task 1b.pdb
