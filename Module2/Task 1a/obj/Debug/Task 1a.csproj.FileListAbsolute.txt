@@ -1,0 +1,9 @@
+D:\_Documents\GitHub\MMCS_332\Module2\Task 1a\obj\Debug\Task 1a.csprojResolveAssemblyReference.cache
+D:\_Documents\GitHub\MMCS_332\Module2\Task 1a\obj\Debug\Task_1a.Properties.Resources.resources
+D:\_Documents\GitHub\MMCS_332\Module2\Task 1a\obj\Debug\Task 1a.csproj.GenerateResource.Cache
+D:\_Documents\GitHub\MMCS_332\Module2\Task 1a\bin\Debug\Task 1a.exe.config
+D:\_Documents\GitHub\MMCS_332\Module2\Task 1a\bin\Debug\Task 1a.exe
+D:\_Documents\GitHub\MMCS_332\Module2\Task 1a\bin\Debug\Task 1a.pdb
+D:\_Documents\GitHub\MMCS_332\Module2\Task 1a\obj\Debug\Task_1a.Form1.resources
+D:\_Documents\GitHub\MMCS_332\Module2\Task 1a\obj\Debug\Task 1a.exe
+D:\_Documents\GitHub\MMCS_332\Module2\Task 1a\obj\Debug\Task 1a.pdb
