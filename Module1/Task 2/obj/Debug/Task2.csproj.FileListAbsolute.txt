@@ -39,3 +39,12 @@ C:\Users\Alex\Documents\GitHub\MMCS_332\Module1\Task 2\obj\Debug\Task2.csproj.Ge
 C:\Users\Alex\Documents\GitHub\MMCS_332\Module1\Task 2\obj\Debug\Task2.csproj.CoreCompileInputs.cache
 C:\Users\Alex\Documents\GitHub\MMCS_332\Module1\Task 2\obj\Debug\Task2.exe
 C:\Users\Alex\Documents\GitHub\MMCS_332\Module1\Task 2\obj\Debug\Task2.pdb
+C:\Users\user\Documents\GitHub\MMCS_332\Module1\Task 2\bin\Debug\Task2.exe.config
+C:\Users\user\Documents\GitHub\MMCS_332\Module1\Task 2\bin\Debug\Task2.exe
+C:\Users\user\Documents\GitHub\MMCS_332\Module1\Task 2\bin\Debug\Task2.pdb
+C:\Users\user\Documents\GitHub\MMCS_332\Module1\Task 2\obj\Debug\Task2.csprojResolveAssemblyReference.cache
+C:\Users\user\Documents\GitHub\MMCS_332\Module1\Task 2\obj\Debug\Task2.Form1.resources
+C:\Users\user\Documents\GitHub\MMCS_332\Module1\Task 2\obj\Debug\Task2.Properties.Resources.resources
+C:\Users\user\Documents\GitHub\MMCS_332\Module1\Task 2\obj\Debug\Task2.csproj.GenerateResource.Cache
+C:\Users\user\Documents\GitHub\MMCS_332\Module1\Task 2\obj\Debug\Task2.exe
+C:\Users\user\Documents\GitHub\MMCS_332\Module1\Task 2\obj\Debug\Task2.pdb

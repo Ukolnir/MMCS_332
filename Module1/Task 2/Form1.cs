@@ -19,19 +19,20 @@ namespace Task2
 
         private static Bitmap image2, image3, image4;
 
-        /*private void Form1_Load(object sender, EventArgs e)
+		/*private void Form1_Load(object sender, EventArgs e)
         {
 
         }*/
 
-        private void ShowPictures()
+		List<int> lr, lg, lb;
+
+		private void ShowPictures()
         {
             pictureBox1.Image = Image.FromFile(openFileDialog1.FileName);
             pictureBox1.SizeMode = PictureBoxSizeMode.StretchImage;
             pictureBox2.SizeMode = PictureBoxSizeMode.StretchImage;
             pictureBox3.SizeMode = PictureBoxSizeMode.StretchImage;
             pictureBox4.SizeMode = PictureBoxSizeMode.StretchImage;
-
 
             image2 = new Bitmap(openFileDialog1.FileName, true);
             pictureBox2.Image = image2;
@@ -40,7 +41,18 @@ namespace Task2
             image4 = new Bitmap(openFileDialog1.FileName, true);
             pictureBox4.Image = image4;
 
-            long r, g, b;
+			lr = new List<int>(); //инициализируем контейнеры для последующего построения гистограммы
+			lg = new List<int>();
+			lb = new List<int>();
+
+			for (int i = 0; i < 256; ++i)
+			{
+				lr.Add(0);
+				lg.Add(0);
+				lb.Add(0);
+			}
+
+			long r, g, b;
             r = 0;
             g = 0;
             b = 0;
@@ -60,8 +72,11 @@ namespace Task2
                     newColor = Color.FromArgb(0, 0, pixelColor.B);
                     image4.SetPixel(x, y, newColor);
 
+					++lr[pixelColor.R];
+					++lg[pixelColor.G];
+					++lb[pixelColor.B];
 
-                    r += pixelColor.R;
+					r += pixelColor.R;
                     g += pixelColor.G;
                     b += pixelColor.B;
                 }
@@ -74,15 +89,49 @@ namespace Task2
             label1.Text = "r = " + r1 + " | g = " + g1 + " | b = " + b1;
 
             chart1.Series["Series1"].Points.Clear();
+			chart2.Series["Series1"].Points.Clear();
+			chart2.Series["Series2"].Points.Clear();
+			chart2.Series["Series3"].Points.Clear();
 
-            chart1.Series["Series1"].Points.AddY(r1);
+			chart3.Series["Series1"].Points.Clear();
+			chart4.Series["Series1"].Points.Clear();
+			chart5.Series["Series1"].Points.Clear();
+
+
+
+			chart1.Series["Series1"].Points.AddY(r1);
             chart1.Series["Series1"].Points[0].Color = Color.Red;
             chart1.Series["Series1"].Points.AddY(g1);
             chart1.Series["Series1"].Points[1].Color = Color.Green;
             chart1.Series["Series1"].Points.AddY(b1);
             chart1.Series["Series1"].Points[2].Color = Color.Blue;
             chart1.Update();
-        }
+
+			chart2.Series["Series1"].Color = Color.Red;
+			chart2.Series["Series2"].Color = Color.Green;
+			chart2.Series["Series3"].Color = Color.Blue;
+			for (int i = 0; i < 256; ++i)
+			{
+				chart2.Series["Series1"].Points.AddY(lr[i]);
+				chart2.Series["Series1"].Points[i].Color = Color.Red;
+				chart2.Series["Series2"].Points.AddY(lg[i]);
+				chart2.Series["Series2"].Points[i].Color = Color.Green;
+				chart2.Series["Series3"].Points.AddY(lb[i]);
+				chart2.Series["Series3"].Points[i].Color = Color.Blue;
+
+				chart3.Series["Series1"].Points.AddY(lr[i]);
+				chart3.Series["Series1"].Points[i].Color = Color.Red;
+				chart4.Series["Series1"].Points.AddY(lg[i]);
+				chart4.Series["Series1"].Points[i].Color = Color.Green;
+				chart5.Series["Series1"].Points.AddY(lb[i]);
+				chart5.Series["Series1"].Points[i].Color = Color.Blue;
+			}
+			chart2.Update();
+			chart3.Update();
+			chart4.Update();
+			chart5.Update();
+
+		}
 
         private void button1_Click(object sender, EventArgs e)
         {
