@@ -79,11 +79,23 @@ namespace Task_2
             label1.Text += "CurrColor = " + currColor.ToString() + '\n';
         }
 
-        private Tuple<int, int> getNextPixel(int x, int y)
+        //1 2 3
+        //4 5 6
+        //7 8 9
+        //position relative to 5
+        private Tuple<int, int> getNextPixel(int x, int y, int position)
         {
             var currColor = image.GetPixel(x, y);
 
             Color nextColor;
+
+            switch (position)
+            {
+                case 3:
+                    nextColor = image.GetPixel(x + 1, y - 1);
+                    if (colorsEqual())
+                    break;
+            }
 
             nextColor = image.GetPixel(x, y - 1);
             if (colorsEqual(currColor, nextColor))
@@ -96,9 +108,7 @@ namespace Task_2
         {
             while (true)
             {
-                currColor = image.GetPixel(x, y + 1);
-                if (colorsEqual(currColor, innerColor))
-                    global;
+                
             }
         }
 
