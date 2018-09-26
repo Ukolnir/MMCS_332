@@ -18,35 +18,104 @@ namespace Task_2
 		}
 
 		private static Bitmap image;
+        private static Color borderColor;
 
-		private void button1_Click(object sender, EventArgs e)
+        public Bitmap ResizeBitmap(Bitmap bmp, int width, int height)
+        {
+            Bitmap result = new Bitmap(width, height);
+            using (Graphics g = Graphics.FromImage(result))
+            {
+                g.DrawImage(bmp, 0, 0, width, height);
+            }
+
+            return result;
+        }
+
+        private void button1_Click(object sender, EventArgs e)
 		{
 			openFileDialog1.ShowDialog();
 
-			pictureBox1.Image = Image.FromFile(openFileDialog1.FileName);
-			image = new Bitmap(openFileDialog1.FileName, true);
+            Bitmap imageSource = new Bitmap(openFileDialog1.FileName, true);
+            image = ResizeBitmap(imageSource, pictureBox1.Size.Width, pictureBox1.Size.Height);
+
+            pictureBox1.Image = image;
+            //pictureBox1.SizeMode = PictureBoxSizeMode.StretchImage;
+        
 		}
 
-		private void pictureBox1_MouseClick(object sender, MouseEventArgs e)
+        private int norma(Color c1, Color c2)
+        {
+            return (System.Math.Abs(c1.R - c2.R) +
+                System.Math.Abs(c1.G - c2.G) +
+                System.Math.Abs(c1.B - c2.B));
+        }
+
+        private bool colorsEqual(Color c1, Color c2)
+        {
+            return (norma(c1, c2) < 10);
+        }
+
+        private static int firstX;
+        private static int firstY;
+
+        private void getRightBorder(int x, int y)
+        {
+            Color pixelColor = image.GetPixel(x, y);
+            var innerColor = pixelColor;
+            var currColor = pixelColor;
+
+            borderColor = Color.FromArgb(pixelColor.R, 0, 0);
+            label1.Text += "CurrColor = " + currColor.ToString() + '\n';
+            while (colorsEqual(innerColor, currColor))
+            {
+                image.SetPixel(x, y, borderColor);
+                x += 1;
+                currColor = image.GetPixel(x, y);
+            }
+            firstX = x;
+            firstY = y;
+            image.SetPixel(x, y, borderColor);
+            label1.Text += "firstX = " + x + " firstY = " + y + "\n";
+            label1.Text += "CurrColor = " + currColor.ToString() + '\n';
+        }
+
+        private Tuple<int, int> getNextPixel(int x, int y)
+        {
+            var currColor = image.GetPixel(x, y);
+
+            Color nextColor;
+
+            nextColor = image.GetPixel(x, y - 1);
+            if (colorsEqual(currColor, nextColor))
+                x = 0;
+
+            return Tuple.Create(x, y);
+        }
+
+        private void getFullBorder(int x, int y)
+        {
+            while (true)
+            {
+                currColor = image.GetPixel(x, y + 1);
+                if (colorsEqual(currColor, innerColor))
+                    global;
+            }
+        }
+
+        private void pictureBox1_MouseClick(object sender, MouseEventArgs e)
 		{
-			var loc = e.Location;
-			var x = loc.X;
-			var y = loc.Y;
 
-			Color pixelColor = image.GetPixel(x, y);
-			Color newColor = Color.FromArgb(pixelColor.R, 0, 0);
-			image.SetPixel(x, y, newColor);
-			image.SetPixel(x+1, y, newColor);
-			image.SetPixel(x-1, y, newColor);
-			image.SetPixel(x, y+1, newColor);
-			image.SetPixel(x, y-1, newColor);
+            var loc = e.Location;
 
-			while (true)
-			{
-				break;
-			}
+            label1.Text = "Mouse x = " + loc.X + " | y = " + loc.Y + '\n';
 
+            var x = loc.X;
+            var y = loc.Y;
+
+            getRightBorder(x, y);
+            getFullBorder(firstX, firstY);              
+       
 			pictureBox1.Image = image;
 		}
-	}
+    }
 }
