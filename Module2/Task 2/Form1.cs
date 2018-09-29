@@ -50,9 +50,16 @@ namespace Task_2
                 System.Math.Abs(c1.B - c2.B));
         }
 
-        private int differenceBetweenColors = 100;
+        private int differenceBetweenColors = 125;
 
         private bool colorsEqual(Color c1, Color c2)
+        {
+            return (System.Math.Abs(c1.R - c2.R) < differenceBetweenColors &&
+                System.Math.Abs(c1.G - c2.G) < differenceBetweenColors &&
+                System.Math.Abs(c1.B - c2.B) < differenceBetweenColors);
+        }
+
+        private bool colorsEqual2(Color c1, Color c2)
         {
             return (norma(c1, c2) < differenceBetweenColors);
         }
@@ -74,7 +81,7 @@ namespace Task_2
 
             myBorderColor = Color.FromArgb(255, 0, 0);
             label1.Text += "CurrColor = " + currColor.ToString() + '\n';
-            while (colorsEqual(innerColor, currColor))
+            while (colorsEqual(innerColor, currColor) && x < image.Width)
             {
                 //image.SetPixel(x, y, myBorderColor);
                 x += 1;
@@ -135,22 +142,25 @@ namespace Task_2
 
         private void getNextPixel(ref int x, ref int y, ref int whereBorder)
         {
-            int d = whereBorder;
-            while (colorsEqual(borderColor, colorByDirection(x, y, d)))
-                d = (d + 2) % 8;
-            if (colorsEqual(borderColor, colorByDirection(x, y, (d - 1 + 8) % 8))) 
+            if (x > 0 && x < image.Width && y > 0 && y < image.Height)
             {
-                Tuple<int, int> t = moveByDirection(x, y, d);
-                x = t.Item1;
-                y = t.Item2;
-                whereBorder = (d + 8 - 2) % 8;
-            }
-            else
-            {
-                Tuple<int, int> t = moveByDirection(x, y, (d - 1 + 8) % 8);
-                x = t.Item1;
-                y = t.Item2;
-                whereBorder = (d-1 + 8 - 3) % 8;
+                int d = whereBorder;
+                while (colorsEqual(borderColor, colorByDirection(x, y, d)))
+                    d = (d + 2) % 8;
+                if (colorsEqual(borderColor, colorByDirection(x, y, (d - 1 + 8) % 8)))
+                {
+                    Tuple<int, int> t = moveByDirection(x, y, d);
+                    x = t.Item1;
+                    y = t.Item2;
+                    whereBorder = (d + 8 - 2) % 8;
+                }
+                else
+                {
+                    Tuple<int, int> t = moveByDirection(x, y, (d - 1 + 8) % 8);
+                    x = t.Item1;
+                    y = t.Item2;
+                    whereBorder = (d - 1 + 8 - 3) % 8;
+                }
             }
         }
 
@@ -159,13 +169,12 @@ namespace Task_2
         private void getFullBorder(int x, int y)
         {
             int whereBorder = 0;
-
             do
             {
                 points.AddLast(Tuple.Create(x, y));
                 getNextPixel(ref x, ref y, ref whereBorder);
                 //image.SetPixel(x, y, myBorderColor);
-            } while (x != firstX || y != firstY);
+            } while (((x != firstX) || (y != firstY)) && (points.Count() < (image.Width + image.Height) * 10));
         }
 
         private void fillMyBorderPoints()
@@ -189,7 +198,7 @@ namespace Task_2
             getRightBorder(x, y);
             getFullBorder(firstX, firstY);
             fillMyBorderPoints();
-
+            points.Clear();
 
             pictureBox1.Image = image;
 		}
