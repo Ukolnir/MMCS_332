@@ -10,14 +10,14 @@ using System.Windows.Forms;
 
 namespace Task_2
 {
-	public partial class Form1 : Form
-	{
-		public Form1()
-		{
-			InitializeComponent();
-		}
+    public partial class Form1 : Form
+    {
+        public Form1()
+        {
+            InitializeComponent();
+        }
 
-		private static Bitmap image;
+        private static Bitmap image;
         private static Color borderColor, innerColor, myBorderColor;
 
         public Bitmap ResizeBitmap(Bitmap bmp, int width, int height)
@@ -32,16 +32,16 @@ namespace Task_2
         }
 
         private void button1_Click(object sender, EventArgs e)
-		{
-			openFileDialog1.ShowDialog();
+        {
+            openFileDialog1.ShowDialog();
 
             Bitmap imageSource = new Bitmap(openFileDialog1.FileName, true);
             image = ResizeBitmap(imageSource, pictureBox1.Size.Width, pictureBox1.Size.Height);
 
             pictureBox1.Image = image;
             //pictureBox1.SizeMode = PictureBoxSizeMode.StretchImage;
-        
-		}
+
+        }
 
         private int norma(Color c1, Color c2)
         {
@@ -133,7 +133,7 @@ namespace Task_2
             }
             return Tuple.Create(x, y);
         }
-        
+
         private Color colorByDirection(int x, int y, int direction)
         {
             Tuple<int, int> t = moveByDirection(x, y, direction);
@@ -171,7 +171,9 @@ namespace Task_2
             int whereBorder = 0;
             do
             {
-                points.AddLast(Tuple.Create(x, y));
+                Tuple<int, int> newt = Tuple.Create(x, y);
+                if (points.Count() == 0 || points.Last() != newt)
+                    points.AddLast(newt);
                 getNextPixel(ref x, ref y, ref whereBorder);
                 //image.SetPixel(x, y, myBorderColor);
             } while (((x != firstX) || (y != firstY)) && (points.Count() < (image.Width + image.Height) * 10));
@@ -185,6 +187,35 @@ namespace Task_2
             }
         }
 
+        private void pointsToFile(ref LinkedList<Tuple<int, int>> points, string fname = "points.txt")
+        {
+            using (System.IO.StreamWriter writetext = new System.IO.StreamWriter(fname))
+            {
+                foreach (var t in points)
+                    writetext.WriteLine("x = " + t.Item1 + "| y = " + t.Item2);
+            }
+        }
+
+        private void pointsToFile(ref List<Tuple<int, int>> points, string fname = "points.txt")
+        {
+            using (System.IO.StreamWriter writetext = new System.IO.StreamWriter(fname))
+            {
+                foreach (var t in points)
+                    writetext.WriteLine("x = " + t.Item1 + "| y = " + t.Item2);
+            }
+        }
+
+        //Возвращает список, соедержаций след элементы:
+        //  Значение Y и список из пар границ (x1, x2), 
+        //      где каждая пара границ получена из следующей последовательности пикселей: 
+        //      (x1, y), (x1+1, y), ... , (x2, y).
+        //      Из-за того, что одному Y может соответствовать не одна пара границ (x1, x2), а несколько,
+        //      был использован двусвязный список.
+        private LinkedList<Tuple<int, LinkedList<Tuple<int, int>>>> getYandBorders(ref List<Tuple<int, int>> points)
+        {
+
+        }
+
         private void pictureBox1_MouseClick(object sender, MouseEventArgs e)
 		{
 
@@ -195,10 +226,14 @@ namespace Task_2
             var x = loc.X;
             var y = loc.Y;
 
+            points.Clear();
             getRightBorder(x, y);
             getFullBorder(firstX, firstY);
             fillMyBorderPoints();
-            points.Clear();
+
+            pointsToFile(ref points, "points1.txt");
+            List<Tuple<int, int>> pointsSorted = new List<Tuple<int, int>>(points.OrderBy(t => t.Item2).ThenBy(t => t.Item1).ToList());
+            pointsToFile(ref pointsSorted, "points2.txt");
 
             pictureBox1.Image = image;
 		}
