@@ -7,3 +7,12 @@ D:\_Downloads\MMCS_332\Module2\Task 1b\Task 1b\obj\Debug\Task_1b.Properties.Reso
 D:\_Downloads\MMCS_332\Module2\Task 1b\Task 1b\obj\Debug\Task 1b.csproj.GenerateResource.Cache
 D:\_Downloads\MMCS_332\Module2\Task 1b\Task 1b\obj\Debug\Task 1b.exe
 D:\_Downloads\MMCS_332\Module2\Task 1b\Task 1b\obj\Debug\Task 1b.pdb
+D:\Документы\OneDrive\Документы\7 семестр\комп. графика\MMCS_332\Module2\Task 1b\Task 1b\bin\Debug\Task 1b.exe.config
+D:\Документы\OneDrive\Документы\7 семестр\комп. графика\MMCS_332\Module2\Task 1b\Task 1b\obj\Debug\Task 1b.exe
+D:\Документы\OneDrive\Документы\7 семестр\комп. графика\MMCS_332\Module2\Task 1b\Task 1b\obj\Debug\Task 1b.pdb
+D:\Документы\OneDrive\Документы\7 семестр\комп. графика\MMCS_332\Module2\Task 1b\Task 1b\bin\Debug\Task 1b.exe
+D:\Документы\OneDrive\Документы\7 семестр\комп. графика\MMCS_332\Module2\Task 1b\Task 1b\bin\Debug\Task 1b.pdb
+D:\Документы\OneDrive\Документы\7 семестр\комп. графика\MMCS_332\Module2\Task 1b\Task 1b\obj\Debug\Task 1b.csprojResolveAssemblyReference.cache
+D:\Документы\OneDrive\Документы\7 семестр\комп. графика\MMCS_332\Module2\Task 1b\Task 1b\obj\Debug\Task_1b.Form1.resources
+D:\Документы\OneDrive\Документы\7 семестр\комп. графика\MMCS_332\Module2\Task 1b\Task 1b\obj\Debug\Task_1b.Properties.Resources.resources
+D:\Документы\OneDrive\Документы\7 семестр\комп. графика\MMCS_332\Module2\Task 1b\Task 1b\obj\Debug\Task 1b.csproj.GenerateResource.Cache
