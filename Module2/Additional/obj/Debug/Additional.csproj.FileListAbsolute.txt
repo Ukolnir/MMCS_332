@@ -1,0 +1,9 @@
+D:\Документы\OneDrive\Документы\7 семестр\комп. графика\MMCS_332\Module2\Additional\bin\Debug\Additional.exe.config
+D:\Документы\OneDrive\Документы\7 семестр\комп. графика\MMCS_332\Module2\Additional\bin\Debug\Additional.exe
+D:\Документы\OneDrive\Документы\7 семестр\комп. графика\MMCS_332\Module2\Additional\bin\Debug\Additional.pdb
+D:\Документы\OneDrive\Документы\7 семестр\комп. графика\MMCS_332\Module2\Additional\obj\Debug\Additional.csprojResolveAssemblyReference.cache
+D:\Документы\OneDrive\Документы\7 семестр\комп. графика\MMCS_332\Module2\Additional\obj\Debug\Additional.Form1.resources
+D:\Документы\OneDrive\Документы\7 семестр\комп. графика\MMCS_332\Module2\Additional\obj\Debug\Additional.Properties.Resources.resources
+D:\Документы\OneDrive\Документы\7 семестр\комп. графика\MMCS_332\Module2\Additional\obj\Debug\Additional.csproj.GenerateResource.Cache
+D:\Документы\OneDrive\Документы\7 семестр\комп. графика\MMCS_332\Module2\Additional\obj\Debug\Additional.exe
+D:\Документы\OneDrive\Документы\7 семестр\комп. графика\MMCS_332\Module2\Additional\obj\Debug\Additional.pdb
