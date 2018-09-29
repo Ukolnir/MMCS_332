@@ -213,7 +213,57 @@ namespace Task_2
         //      был использован двусвязный список.
         private LinkedList<Tuple<int, LinkedList<Tuple<int, int>>>> getYandBorders(ref List<Tuple<int, int>> points)
         {
+            LinkedList<Tuple<int, LinkedList<Tuple<int, int>>>> yBorders = new LinkedList<Tuple<int, LinkedList<Tuple<int, int>>>>();
+            int y = points.First().Item2;
+            int x = points.First().Item1;
+            int x_first = points.First().Item1;
+            LinkedList <Tuple<int, int>> borders = new LinkedList<Tuple<int, int>>();
 
+            foreach (var t in points)
+            {
+                if (t != points.First())
+                {
+                    int curry = t.Item2;
+                    int currx = t.Item1;
+
+                    if (curry == y)
+                    {
+                        if (currx == x + 1)
+                        {
+                            x += 1;
+                        }
+                        else
+                        {
+                            borders.AddLast(Tuple.Create(x_first, x));
+                            x_first = currx;
+                            x = currx;
+                        }
+                    }
+                    else
+                    {
+                        yBorders.AddLast(Tuple.Create(y, borders));
+                        borders = new LinkedList<Tuple<int, int>>();
+                        x_first = currx;
+                        y = curry;
+                    }
+                }
+            }
+
+            return yBorders;
+        }
+
+        private void yBordersToFile(ref LinkedList<Tuple<int, LinkedList<Tuple<int, int>>>> yBorders, string fname = "yBorders.txt")
+        {
+            using (System.IO.StreamWriter writetext = new System.IO.StreamWriter(fname))
+            {
+                foreach (var t1 in yBorders)
+                { 
+                    writetext.WriteLine("y = " + t1.Item1 + ": ");
+                    foreach (var t2 in t1.Item2)
+                        writetext.WriteLine("       (x1 = " + t2.Item1 + ", x2 = " + t2.Item2 + ") ");
+                    writetext.WriteLine();
+                }
+            }
         }
 
         private void pictureBox1_MouseClick(object sender, MouseEventArgs e)
@@ -234,6 +284,9 @@ namespace Task_2
             pointsToFile(ref points, "points1.txt");
             List<Tuple<int, int>> pointsSorted = new List<Tuple<int, int>>(points.OrderBy(t => t.Item2).ThenBy(t => t.Item1).ToList());
             pointsToFile(ref pointsSorted, "points2.txt");
+
+            LinkedList<Tuple<int, LinkedList<Tuple<int, int>>>> yBorders = getYandBorders(ref pointsSorted);
+            yBordersToFile(ref yBorders);
 
             pictureBox1.Image = image;
 		}
