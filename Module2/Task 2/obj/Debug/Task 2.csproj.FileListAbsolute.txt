@@ -17,3 +17,13 @@ C:\flash\PortableGit\MMCS_332\Module2\Task 2\obj\Debug\Task 2.csproj.GenerateRes
 C:\flash\PortableGit\MMCS_332\Module2\Task 2\obj\Debug\Task 2.csproj.CoreCompileInputs.cache
 C:\flash\PortableGit\MMCS_332\Module2\Task 2\obj\Debug\Task 2.exe
 C:\flash\PortableGit\MMCS_332\Module2\Task 2\obj\Debug\Task 2.pdb
+C:\Users\Alex\Documents\PortableGit\MMCS_332\Module2\Task 2\bin\Debug\Task 2.exe.config
+C:\Users\Alex\Documents\PortableGit\MMCS_332\Module2\Task 2\bin\Debug\Task 2.exe
+C:\Users\Alex\Documents\PortableGit\MMCS_332\Module2\Task 2\bin\Debug\Task 2.pdb
+C:\Users\Alex\Documents\PortableGit\MMCS_332\Module2\Task 2\obj\Debug\Task 2.csprojAssemblyReference.cache
+C:\Users\Alex\Documents\PortableGit\MMCS_332\Module2\Task 2\obj\Debug\Task_2.Form1.resources
+C:\Users\Alex\Documents\PortableGit\MMCS_332\Module2\Task 2\obj\Debug\Task_2.Properties.Resources.resources
+C:\Users\Alex\Documents\PortableGit\MMCS_332\Module2\Task 2\obj\Debug\Task 2.csproj.GenerateResource.cache
+C:\Users\Alex\Documents\PortableGit\MMCS_332\Module2\Task 2\obj\Debug\Task 2.csproj.CoreCompileInputs.cache
+C:\Users\Alex\Documents\PortableGit\MMCS_332\Module2\Task 2\obj\Debug\Task 2.exe
+C:\Users\Alex\Documents\PortableGit\MMCS_332\Module2\Task 2\obj\Debug\Task 2.pdb

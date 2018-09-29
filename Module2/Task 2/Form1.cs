@@ -164,10 +164,11 @@ namespace Task_2
             }
         }
 
-        LinkedList<Tuple<int, int>> points = new LinkedList<Tuple<int, int>>();
+        //LinkedList<Tuple<int, int>> points = new LinkedList<Tuple<int, int>>();
 
-        private void getFullBorder(int x, int y)
+        private LinkedList<Tuple<int, int>> getFullBorder(int x, int y)
         {
+            LinkedList<Tuple<int, int>> points = new LinkedList<Tuple<int, int>>();
             int whereBorder = 0;
             do
             {
@@ -177,9 +178,10 @@ namespace Task_2
                 getNextPixel(ref x, ref y, ref whereBorder);
                 //image.SetPixel(x, y, myBorderColor);
             } while (((x != firstX) || (y != firstY)) && (points.Count() < (image.Width + image.Height) * 10));
+            return points;
         }
 
-        private void fillMyBorderPoints()
+        private void fillMyBorderPoints(ref LinkedList<Tuple<int, int>> points)
         {
             foreach (var t in points)
             {
@@ -241,14 +243,18 @@ namespace Task_2
                     }
                     else
                     {
+                        borders.AddLast(Tuple.Create(x_first, x));
                         yBorders.AddLast(Tuple.Create(y, borders));
                         borders = new LinkedList<Tuple<int, int>>();
+
                         x_first = currx;
+                        x = currx;
                         y = curry;
                     }
                 }
             }
-
+            borders.AddLast(Tuple.Create(x_first, x));
+            yBorders.AddLast(Tuple.Create(y, borders));
             return yBorders;
         }
 
@@ -276,13 +282,13 @@ namespace Task_2
             var x = loc.X;
             var y = loc.Y;
 
-            points.Clear();
             getRightBorder(x, y);
-            getFullBorder(firstX, firstY);
-            fillMyBorderPoints();
+            LinkedList<Tuple<int, int>>  points = getFullBorder(firstX, firstY);
+            fillMyBorderPoints(ref points);
 
             pointsToFile(ref points, "points1.txt");
-            List<Tuple<int, int>> pointsSorted = new List<Tuple<int, int>>(points.OrderBy(t => t.Item2).ThenBy(t => t.Item1).ToList());
+            List<Tuple<int, int>> pointsSorted = new List<Tuple<int, int>>(
+                points.OrderBy(t => t.Item2).ThenBy(t => t.Item1).ToList().Distinct().ToList());
             pointsToFile(ref pointsSorted, "points2.txt");
 
             LinkedList<Tuple<int, LinkedList<Tuple<int, int>>>> yBorders = getYandBorders(ref pointsSorted);
