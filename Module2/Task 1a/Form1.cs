@@ -12,7 +12,6 @@ namespace Task_1a
 {
     public partial class Form1 : Form
     {
-
         Bitmap bmp;
         public Form1()
         {
@@ -30,7 +29,6 @@ namespace Task_1a
         }
 
         List<Point> list = new List<Point>();
-        List<Point> lstfill = new List<Point>();
         bool flag = false;
 
         Graphics g;
@@ -40,7 +38,8 @@ namespace Task_1a
             {
                 g = Graphics.FromImage(bmp);
                 list.Add(new Point(e.X, e.Y));
-                g.DrawLines(new Pen(Color.Black, 3), list.ToArray());
+                int val = trackBar1.Value;
+                g.DrawLines(new Pen(Color.Black,val), list.ToArray());
             }
             else
             {
@@ -50,30 +49,34 @@ namespace Task_1a
             pictureBox1.Image = bmp;
         }
         
-        Color formColor;
-        Pen needColor = new Pen(Color.Red);
+        //Color formColor;
+        Pen needColor = new Pen(Color.AliceBlue);
         private void pictureBox1_MouseDown2(object sender, MouseEventArgs e)
         {
             Point firstPoint = new Point(e.X, e.Y);
             fill(firstPoint);
         }
 
+        private bool equalColors(Color c1, Color c2)
+        {
+            return c1.R == c2.R && c1.G == c2.G && c1.B == c2.B;
+        }
+
         private void fill(Point p) {
-            formColor = bmp.GetPixel(p.X, p.Y);
-            if (0 < p.X && p.X < bmp.Width && 0 < p.Y && p.Y < bmp.Height &&
-                formColor.R != Color.Black.R && formColor.B != Color.Black.B && formColor.G != Color.Black.G &&
-                formColor.R != Color.Red.R && formColor.B != Color.Red.B && formColor.G != Color.Red.G)
+            Color formColor = bmp.GetPixel(p.X, p.Y);
+            if (0 < p.X && p.X < bmp.Width && 0 < p.Y && p.Y < bmp.Height && !equalColors(formColor,Color.Black) &&
+                !equalColors(formColor, needColor.Color))
             {
                 Point leftBound = new Point(p.X, p.Y);
                 Point rightBound = new Point(p.X, p.Y);
                 Color currentColor = formColor;
-                while (leftBound.X > 0 && currentColor.R != Color.Black.R && currentColor.B != Color.Black.B && currentColor.G != Color.Black.G)
+                while (leftBound.X > 0 && !equalColors(currentColor,Color.Black))
                 {
                     leftBound.X -= 1;
                     currentColor = bmp.GetPixel(leftBound.X, p.Y);
                 }
                 currentColor = formColor;
-                while (rightBound.X < pictureBox1.Width && currentColor.R != Color.Black.R && currentColor.B != Color.Black.B && currentColor.G != Color.Black.G)
+                while (rightBound.X < pictureBox1.Width && !equalColors(currentColor, Color.Black))
                 {
                     rightBound.X += 1;
                     currentColor = bmp.GetPixel(rightBound.X, p.Y);
@@ -94,6 +97,10 @@ namespace Task_1a
         {
             pictureBox1.MouseDown -= (MouseEventHandler)pictureBox1_MouseDown1;
             pictureBox1.MouseDown += new MouseEventHandler(pictureBox1_MouseDown2);
+            button3.Enabled = true;
+            button2.Enabled = false;
+            label2.Visible = true;
+            label3.Visible = false;
         }
 
         private void saveToolStripMenuItem_Click(object sender, EventArgs e)
@@ -106,6 +113,27 @@ namespace Task_1a
             {
                 pictureBox1.Image.Save(saveFileDialog1.FileName);
             }
+        }
+
+        private void radioButton1_CheckedChanged(object sender, EventArgs e)
+        {
+            needColor.Dispose();
+            if (radioButton1.Checked)
+                needColor = new Pen(Color.Red);
+            else if (radioButton2.Checked)
+                needColor = new Pen(Color.Green);
+            if (radioButton3.Checked)
+                needColor = new Pen(Color.Blue);   
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            pictureBox1.MouseDown -= (MouseEventHandler)pictureBox1_MouseDown2;
+            pictureBox1.MouseDown += new MouseEventHandler(pictureBox1_MouseDown1);
+            button3.Enabled = false;
+            button2.Enabled = true;
+            label3.Visible = true;
+            label2.Visible = false;
         }
     }
 }
