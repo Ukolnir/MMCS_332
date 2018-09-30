@@ -270,6 +270,67 @@ namespace Additional
             }
         }
 
+        //находим внут. границу
+        private void find_iner_right(Tuple<int, int> t2, int y, ref int n_x)
+        {
+            n_x = t2.Item1;
+
+            innerColor = ((Bitmap)pictureBox1.Image).GetPixel(n_x, y);
+            Color currColor = innerColor;
+
+            //пока нет границы идем вперед
+            while (colorsEqual(innerColor, currColor) && n_x < t2.Item2)
+            {
+                n_x++;
+                currColor = ((Bitmap)pictureBox1.Image).GetPixel(n_x, y);
+            }
+        }
+
+        //ищем, пока внут. граница не закончится и мы не выйдем на фон заново
+        private void find_our_start(Tuple<int, int> t2, int y, ref int n_x)
+        {
+            
+            n_x = t2.Item1;
+            Color currColor = ((Bitmap)pictureBox1.Image).GetPixel(n_x, y);
+
+            while (currColor != innerColor && n_x < t2.Item2)
+            {
+                n_x += 1;
+                currColor = ((Bitmap)pictureBox1.Image).GetPixel(n_x, y);
+            }
+        }
+
+        //создает новый список со всеми внут. границами
+        private LinkedList<Tuple<int, LinkedList<Tuple<int, int>>>> find_internal_borders(LinkedList<Tuple<int, LinkedList<Tuple<int, int>>>> yBorders)
+        {
+            LinkedList<Tuple<int, LinkedList<Tuple<int, int>>>> newBorders = new LinkedList<Tuple<int, LinkedList<Tuple<int, int>>>>();
+            foreach (Tuple<int, LinkedList<Tuple<int, int>>> t in yBorders)
+                foreach (Tuple<int, int> t2 in t.Item2)
+                {
+                    LinkedList<Tuple<int, int>> yList = new LinkedList<Tuple<int, int>>(); ;
+                    int new_x = t2.Item1;
+
+                    //находим внутр. границу
+                    find_iner_right(t2, t.Item1, ref new_x);
+                    if (new_x == t2.Item2) //если границы нет, то просто добавляем старый интервал
+                        yList.AddLast(Tuple.Create(t2.Item1, t2.Item2));
+                    else
+                    {
+                        yList.AddLast(Tuple.Create(t2.Item1, new_x)); //добавляем новый интервал
+                        int old_x = new_x + 1;
+                        while (new_x != t2.Item2) //пока не нашли самую правую границу
+                        {
+                            find_our_start(Tuple.Create(old_x, t2.Item2), t.Item1, ref new_x); //идем, пока не вылезем с внут. границы
+                            old_x = new_x;
+                            find_iner_right(t2, t.Item1, ref new_x); //ищем новую границу
+                            yList.AddLast(Tuple.Create(old_x, new_x)); // добавляем интервал
+                        }
+                    }
+
+                    newBorders.AddLast(Tuple.Create(t.Item1, yList)); // добавляем в новый список данные по у
+                }
+            return newBorders;
+        }
         private void pictureBox1_MouseClick(object sender, MouseEventArgs e)
         {
             var loc = e.Location;
@@ -287,6 +348,9 @@ namespace Additional
 
             //Получение У и соответствующих ему интервалов
             LinkedList<Tuple<int, LinkedList<Tuple<int, int>>>> yBorders = getYandBorders(ref pointsSorted);
+
+            //Получаем список со всеми внутр. границами
+            LinkedList<Tuple<int, LinkedList<Tuple<int, int>>>> newBorders = find_internal_borders(yBorders);
         }
     }
 }
