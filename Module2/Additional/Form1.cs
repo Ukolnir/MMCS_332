@@ -17,6 +17,7 @@ namespace Additional
         private static Bitmap image;
         private static Color borderColor, innerColor, myBorderColor;
 
+        //Изменение размера изображения
         public Bitmap ResizeBitmap(Bitmap bmp, int width, int height)
         {
             Bitmap result = new Bitmap(width, height);
@@ -30,6 +31,7 @@ namespace Additional
 
         private int differenceBetweenColors = 125;
 
+        //Эквивалентность цветов
         private bool colorsEqual(Color c1, Color c2)
         {
             return (System.Math.Abs(c1.R - c2.R) < differenceBetweenColors &&
@@ -40,6 +42,7 @@ namespace Additional
         private static int firstX;
         private static int firstY;
 
+        //Поиск правой границы
         private void getRightBorder(int x, int y)
         {
             Color pixelColor = image.GetPixel(x, y);
@@ -96,12 +99,14 @@ namespace Additional
             return Tuple.Create(x, y);
         }
 
+        //Цвет, который получится если сдвинуться в сторону direction
         private Color colorByDirection(int x, int y, int direction)
         {
             Tuple<int, int> t = moveByDirection(x, y, direction);
             return image.GetPixel(t.Item1, t.Item2);
         }
 
+        //Получение слудующего пикселя при обходе границы
         private void getNextPixel(ref int x, ref int y, ref int whereBorder)
         {
             if (x > 0 && x < image.Width && y > 0 && y < image.Height)
@@ -126,6 +131,7 @@ namespace Additional
             }
         }
 
+        //Получение всей границы
         private LinkedList<Tuple<int, int>> getFullBorder(int x, int y)
         {
             LinkedList<Tuple<int, int>> points = new LinkedList<Tuple<int, int>>();
@@ -140,29 +146,12 @@ namespace Additional
             return points;
         }
 
+        //Закраска границы
         private void fillMyBorderPoints(ref LinkedList<Tuple<int, int>> points)
         {
             foreach (var t in points)
             {
                 image.SetPixel(t.Item1, t.Item2, myBorderColor);
-            }
-        }
-
-        private void pointsToFile(ref LinkedList<Tuple<int, int>> points, string fname = "points.txt")
-        {
-            using (System.IO.StreamWriter writetext = new System.IO.StreamWriter(fname))
-            {
-                foreach (var t in points)
-                    writetext.WriteLine("x = " + t.Item1 + "| y = " + t.Item2);
-            }
-        }
-
-        private void pointsToFile(ref List<Tuple<int, int>> points, string fname = "points.txt")
-        {
-            using (System.IO.StreamWriter writetext = new System.IO.StreamWriter(fname))
-            {
-                foreach (var t in points)
-                    writetext.WriteLine("x = " + t.Item1 + "| y = " + t.Item2);
             }
         }
 
@@ -217,20 +206,6 @@ namespace Additional
             return yBorders;
         }
 
-        private void yBordersToFile(ref LinkedList<Tuple<int, LinkedList<Tuple<int, int>>>> yBorders, string fname = "yBorders.txt")
-        {
-            using (System.IO.StreamWriter writetext = new System.IO.StreamWriter(fname))
-            {
-                foreach (var t1 in yBorders)
-                {
-                    writetext.WriteLine("y = " + t1.Item1 + ": ");
-                    foreach (var t2 in t1.Item2)
-                        writetext.WriteLine("       (x1 = " + t2.Item1 + ", x2 = " + t2.Item2 + ") ");
-                    writetext.WriteLine();
-                }
-            }
-        }
-
         public Form1()
         {
             InitializeComponent();
@@ -263,7 +238,9 @@ namespace Additional
                 Bitmap b = new Bitmap(open_dialog.FileName);
                 pictureBox1.Image = new Bitmap(b, pictureBox1.Size);
 
+                //Для работы с Bitmap
                 Bitmap imageSource = new Bitmap(open_dialog.FileName, true);
+                //Изменение размера изображения до размера pictureBox
                 image = ResizeBitmap(imageSource, pictureBox1.Size.Width, pictureBox1.Size.Height);
             }
         }
@@ -274,12 +251,16 @@ namespace Additional
             var x = loc.X;
             var y = loc.Y;
 
+            //Получение правой точки границы
             getRightBorder(x, y);
+            //Получение всей границы
             LinkedList<Tuple<int, int>> points = getFullBorder(firstX, firstY);
 
+            //Отсортированные и уникальные точки
             List<Tuple<int, int>> pointsSorted = new List<Tuple<int, int>>(
                 points.OrderBy(t => t.Item2).ThenBy(t => t.Item1).ToList().Distinct().ToList());
 
+            //Получение У и соответствующих ему интервалов
             LinkedList<Tuple<int, LinkedList<Tuple<int, int>>>> yBorders = getYandBorders(ref pointsSorted);
         }
     }
