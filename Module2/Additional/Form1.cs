@@ -351,6 +351,22 @@ namespace Additional
 
             //Получаем список со всеми внутр. границами
             LinkedList<Tuple<int, LinkedList<Tuple<int, int>>>> newBorders = find_internal_borders(yBorders);
+
+            //Соединяем точки
+            fill(newBorders);
+        }
+
+        private void fill(LinkedList<Tuple<int, LinkedList<Tuple<int, int>>>> lst) {
+            Graphics g = Graphics.FromImage(pictureBox1.Image);
+            Pen col = new Pen(c, 4);
+            foreach (Tuple<int, LinkedList<Tuple<int, int>>> l in lst) {
+                int y = l.Item1;
+                foreach (Tuple<int, int> s in l.Item2) {
+                    g.DrawLine(col, s.Item1, y, s.Item2, y);
+                    pictureBox1.Image = pictureBox1.Image;
+                }
+            }
+            col.Dispose();
         }
     }
 }
