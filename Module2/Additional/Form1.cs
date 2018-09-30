@@ -15,6 +15,7 @@ namespace Additional
         Color c;
         OpenFileDialog open_dialog;
         private static Bitmap image;
+
         private static Color borderColor, innerColor, myBorderColor;
 
         //Изменение размера изображения
@@ -47,21 +48,24 @@ namespace Additional
         {
             Color pixelColor = image.GetPixel(x, y);
             Color currColor = pixelColor;
+            //Цвет на который указала мышка
             innerColor = pixelColor;
-
-            myBorderColor = Color.FromArgb(255, 0, 0);
+            //Движение вправо, пока не встретится другой цвет
             while (colorsEqual(innerColor, currColor) && x < image.Width)
             {
                 x += 1;
                 currColor = image.GetPixel(x, y);
             }
+            //Цвет границы - первый отличный от innerColor цвет
             borderColor = image.GetPixel(x, y);
+            //Точка начала обхода границы
             firstX = x - 1;
             firstY = y;
         }
 
+        //Движение по заданному направлению от точки Р
         //3 2 1
-        //4 X 0
+        //4 P 0
         //5 6 7
         private Tuple<int, int> moveByDirection(int x, int y, int direction)
         {
@@ -102,7 +106,9 @@ namespace Additional
         //Цвет, который получится если сдвинуться в сторону direction
         private Color colorByDirection(int x, int y, int direction)
         {
+            //Сдвиг по заданному направлению
             Tuple<int, int> t = moveByDirection(x, y, direction);
+            //Получение цвета
             return image.GetPixel(t.Item1, t.Item2);
         }
 
@@ -112,8 +118,11 @@ namespace Additional
             if (x > 0 && x < image.Width && y > 0 && y < image.Height)
             {
                 int d = whereBorder;
+
+                //Получение направления, на котором цвет отличается от цвета границы
                 while (colorsEqual(borderColor, colorByDirection(x, y, d)))
                     d = (d + 2) % 8;
+                //Выбор куда идти в зависимости от цвета по диагонали
                 if (colorsEqual(borderColor, colorByDirection(x, y, (d - 1 + 8) % 8)))
                 {
                     Tuple<int, int> t = moveByDirection(x, y, d);
@@ -134,13 +143,16 @@ namespace Additional
         //Получение всей границы
         private LinkedList<Tuple<int, int>> getFullBorder(int x, int y)
         {
+            //Список точек
             LinkedList<Tuple<int, int>> points = new LinkedList<Tuple<int, int>>();
             int whereBorder = 0;
             do
             {
+                //Добавление текущей точки
                 Tuple<int, int> newt = Tuple.Create(x, y);
                 if (points.Count() == 0 || points.Last() != newt)
                     points.AddLast(newt);
+                //Получение след пикселя
                 getNextPixel(ref x, ref y, ref whereBorder);
             } while (((x != firstX) || (y != firstY)) && (points.Count() < (image.Width + image.Height) * 10));
             return points;
@@ -149,6 +161,7 @@ namespace Additional
         //Закраска границы
         private void fillMyBorderPoints(ref LinkedList<Tuple<int, int>> points)
         {
+            myBorderColor = Color.FromArgb(255, 0, 0);
             foreach (var t in points)
             {
                 image.SetPixel(t.Item1, t.Item2, myBorderColor);
@@ -163,27 +176,37 @@ namespace Additional
         //      был использован двусвязный список.
         private LinkedList<Tuple<int, LinkedList<Tuple<int, int>>>> getYandBorders(ref List<Tuple<int, int>> points)
         {
-            LinkedList<Tuple<int, LinkedList<Tuple<int, int>>>> yBorders = new LinkedList<Tuple<int, LinkedList<Tuple<int, int>>>>();
+            LinkedList<Tuple<int, LinkedList<Tuple<int, int>>>> yBorders = 
+                new LinkedList<Tuple<int, LinkedList<Tuple<int, int>>>>();
+            //Предыдущее значение
             int y = points.First().Item2;
+            //Предыдущее значение
             int x = points.First().Item1;
+            //Начало интервала
             int x_first = points.First().Item1;
+            //Список интервалов для одного У
             LinkedList<Tuple<int, int>> borders = new LinkedList<Tuple<int, int>>();
 
             foreach (var t in points)
             {
+                //Первая точка уже просмотрена
                 if (t != points.First())
                 {
+                    //Текущие значения
                     int curry = t.Item2;
                     int currx = t.Item1;
 
+                    //У не изменился
                     if (curry == y)
                     {
+                        //текущее значение == предыдущее + 1
                         if (currx == x + 1)
                         {
                             x += 1;
                         }
                         else
                         {
+                            //Добавление интервала
                             borders.AddLast(Tuple.Create(x_first, x));
                             x_first = currx;
                             x = currx;
@@ -191,6 +214,7 @@ namespace Additional
                     }
                     else
                     {
+                        //Запоминание предыдущего интервала и всего списка интервалов для предыдущего У
                         borders.AddLast(Tuple.Create(x_first, x));
                         yBorders.AddLast(Tuple.Create(y, borders));
                         borders = new LinkedList<Tuple<int, int>>();
@@ -201,6 +225,7 @@ namespace Additional
                     }
                 }
             }
+            //Запоминание предыдущего интервала и всего списка интервалов для предыдущего У
             borders.AddLast(Tuple.Create(x_first, x));
             yBorders.AddLast(Tuple.Create(y, borders));
             return yBorders;
