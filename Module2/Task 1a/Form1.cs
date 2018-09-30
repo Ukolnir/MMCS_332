@@ -18,7 +18,12 @@ namespace Task_1a
             InitializeComponent();
             pictureBox1.Image = new Bitmap(pictureBox1.Width, pictureBox1.Height);
             bmp = (Bitmap)pictureBox1.Image;
-            Clear();    
+            Clear();
+            colorDialog1.Color = Color.Red;
+            label5.BackColor = colorDialog1.Color;
+            needColor = new Pen(colorDialog1.Color);
+            g = Graphics.FromImage(bmp);
+            pictureBox1.Image = bmp;
         }
 
         private void Clear()
@@ -36,7 +41,6 @@ namespace Task_1a
         {
             if (flag)
             {
-                g = Graphics.FromImage(bmp);
                 list.Add(new Point(e.X, e.Y));
                 int val = trackBar1.Value;
                 g.DrawLines(new Pen(Color.Black,val), list.ToArray());
@@ -50,7 +54,7 @@ namespace Task_1a
         }
         
         //Color formColor;
-        Pen needColor = new Pen(Color.AliceBlue);
+        Pen needColor;
         private void pictureBox1_MouseDown2(object sender, MouseEventArgs e)
         {
             Point firstPoint = new Point(e.X, e.Y);
@@ -64,34 +68,34 @@ namespace Task_1a
 
         private void fill(Point p) {
             Color formColor = bmp.GetPixel(p.X, p.Y);
-            if (0 < p.X && p.X < bmp.Width && 0 < p.Y && p.Y < bmp.Height && !equalColors(formColor,Color.Black) &&
-                !equalColors(formColor, needColor.Color))
-            {
+            if (0 <= p.X && p.X < bmp.Width && 0 <= p.Y && p.Y < bmp.Height-1 && !equalColors(formColor,Color.Black) &&
+                !equalColors(formColor, needColor.Color)){
                 Point leftBound = new Point(p.X, p.Y);
                 Point rightBound = new Point(p.X, p.Y);
                 Color currentColor = formColor;
-                while (leftBound.X > 0 && !equalColors(currentColor,Color.Black))
+                while (0 < leftBound.X && !equalColors(currentColor, Color.Black))
                 {
                     leftBound.X -= 1;
                     currentColor = bmp.GetPixel(leftBound.X, p.Y);
                 }
                 currentColor = formColor;
-                while (rightBound.X < pictureBox1.Width && !equalColors(currentColor, Color.Black))
+                while (rightBound.X < pictureBox1.Width-1 && !equalColors(currentColor, Color.Black))
                 {
                     rightBound.X += 1;
                     currentColor = bmp.GetPixel(rightBound.X, p.Y);
                 }
-                leftBound.X += 1;
+                if (leftBound.X!=0)
+                    leftBound.X += 1;
                 rightBound.X -= 1;
                 g.DrawLine(needColor, leftBound, rightBound);
                 pictureBox1.Image = bmp;
                 for (int i = leftBound.X; i < rightBound.X + 1; ++i)
                     fill(new Point(i, p.Y + 1));
                 for (int i = leftBound.X; i < rightBound.X + 1; ++i)
-                    fill(new Point(i, p.Y - 1));
+                    if (p.Y > 0)
+                        fill(new Point(i, p.Y - 1));
             }
         }
-
 
         private void button2_Click(object sender, EventArgs e)
         {
@@ -115,17 +119,6 @@ namespace Task_1a
             }
         }
 
-        private void radioButton1_CheckedChanged(object sender, EventArgs e)
-        {
-            needColor.Dispose();
-            if (radioButton1.Checked)
-                needColor = new Pen(Color.Red);
-            else if (radioButton2.Checked)
-                needColor = new Pen(Color.Green);
-            if (radioButton3.Checked)
-                needColor = new Pen(Color.Blue);   
-        }
-
         private void button3_Click(object sender, EventArgs e)
         {
             pictureBox1.MouseDown -= (MouseEventHandler)pictureBox1_MouseDown2;
@@ -134,6 +127,16 @@ namespace Task_1a
             button2.Enabled = true;
             label3.Visible = true;
             label2.Visible = false;
+        }
+
+        private void button4_Click(object sender, EventArgs e)
+        {
+            if (colorDialog1.ShowDialog() == DialogResult.Cancel)
+                return;           
+            Color c = colorDialog1.Color;
+            label5.BackColor = c;
+            needColor.Color = c;
+            button2_Click(sender, e);
         }
     }
 }

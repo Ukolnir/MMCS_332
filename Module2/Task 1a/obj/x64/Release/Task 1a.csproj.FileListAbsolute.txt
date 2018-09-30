@@ -6,3 +6,4 @@ C:\Users\IRU\Documents\GitHub\MMCS_332\Module2\Task 1a\obj\x64\Release\Task_1a.P
 C:\Users\IRU\Documents\GitHub\MMCS_332\Module2\Task 1a\obj\x64\Release\Task 1a.csproj.GenerateResource.Cache
 C:\Users\IRU\Documents\GitHub\MMCS_332\Module2\Task 1a\obj\x64\Release\Task 1a.exe
 C:\Users\IRU\Documents\GitHub\MMCS_332\Module2\Task 1a\obj\x64\Release\Task 1a.pdb
+C:\Users\IRU\Documents\GitHub\MMCS_332\Module2\Task 1a\obj\x64\Release\Task 1a.csprojResolveAssemblyReference.cache
