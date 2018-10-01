@@ -306,7 +306,7 @@ namespace Additional
             LinkedList<Tuple<int, LinkedList<Tuple<int, int>>>> newBorders = new LinkedList<Tuple<int, LinkedList<Tuple<int, int>>>>();
             foreach (Tuple<int, LinkedList<Tuple<int, int>>> t in yBorders)
             {
-                int cnt = 0;
+                int cnt = 0; //индекс четный - соед. линиями пред. и данную точку, иначе нет
                 int new_x = 0;
                 int old_x = 0;
 
@@ -314,44 +314,38 @@ namespace Additional
 
                 foreach (Tuple<int, int> t2 in t.Item2)
                 {
-
-                    if (cnt % 2 == 0)
+                    old_x = new_x; //new_x, оld_x используются для прохождения основных границ
+                    if (cnt == 0)
                     {
-                        old_x = new_x;
-                        if (cnt == 0)
-                            new_x = t2.Item2;
-                        else
-                          new_x = t2.Item1;
-                       // if (cnt != 0)
-                         //  yList.AddLast(Tuple.Create(old_x, new_x));
+                        new_x = t2.Item2;
                     }
                     else
                     {
-                        old_x = new_x;
-                        new_x = t2.Item2;
-
-                        int n_x = old_x;
+                        new_x = t2.Item1;
+                        int n_x = old_x; //n_x, o_x исользуются для поиска внутренних границ
                         //находим внутр. границу
                         find_iner_right(Tuple.Create(old_x, new_x), t.Item1, ref n_x);
                         if (n_x == new_x) //если границы нет, то просто добавляем старый интервал
-                            yList.AddLast(Tuple.Create(old_x, new_x - 1));
+                            yList.AddLast(Tuple.Create(old_x, new_x));
                         else
                         {
-                            yList.AddLast(Tuple.Create(old_x, n_x - 1)); //добавляем новый интервал
+                            yList.AddLast(Tuple.Create(old_x, n_x)); //добавляем новый интервал
                             cnt++;
                             while (n_x < new_x) //пока не нашли самую правую границу
                             {
                                 int o_x = n_x + 1;
                                 find_our_start(Tuple.Create(o_x, new_x), t.Item1, ref n_x); //идем, пока не вылезем с внут. границы
-                                int o_s = o_x; //костыль для проверки длнной границы посередине
                                 o_x = n_x;
 
                                 find_iner_right(Tuple.Create(o_x, new_x), t.Item1, ref n_x); //ищем новую границу
-                                if (cnt % 2 != 0 || o_x - o_s > 10 ) //если есть нечетный промежуток, значит - не закрашиваем
-                                    yList.AddLast(Tuple.Create(o_x, n_x - 1)); // добавляем интервал
+                                if (cnt % 2 != 0 || n_x == new_x) //если есть нечетный промежуток, значит - не закрашиваем
+                                    yList.AddLast(Tuple.Create(o_x, n_x)); // добавляем интервал
                                 cnt++;
                             }
                         }
+
+                        new_x = t2.Item2;
+                        cnt++;
                     }
                     cnt++;
                 }
