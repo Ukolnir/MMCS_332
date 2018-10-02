@@ -309,6 +309,7 @@ namespace Additional
                 int cnt = 0; //индекс четный - соед. линиями пред. и данную точку, иначе нет
                 int new_x = 0;
                 int old_x = 0;
+			//	bool old_xf = false;
 
                 LinkedList<Tuple<int, int>> yList = new LinkedList<Tuple<int, int>>();
 
@@ -325,7 +326,7 @@ namespace Additional
                         int n_x = old_x; //n_x, o_x исользуются для поиска внутренних границ
                         //находим внутр. границу
                         find_iner_right(Tuple.Create(old_x, new_x), t.Item1, ref n_x);
-                        if (n_x == new_x) //если границы нет, то просто добавляем старый интервал
+						if (n_x == new_x)// && new_x != t2.Item1) //если границы нет, то просто добавляем старый интервал
                             yList.AddLast(Tuple.Create(old_x, new_x));
                         else
                         {
@@ -338,13 +339,13 @@ namespace Additional
                                 o_x = n_x;
 
                                 find_iner_right(Tuple.Create(o_x, new_x), t.Item1, ref n_x); //ищем новую границу
-                                if (cnt % 2 != 0 || n_x == new_x) //если есть нечетный промежуток, значит - не закрашиваем
+                                  if (cnt % 2 != 0 || n_x == new_x) //если есть нечетный промежуток, значит - не закрашиваем
                                     yList.AddLast(Tuple.Create(o_x, n_x)); // добавляем интервал
                                 cnt++;
                             }
                         }
 
-                        new_x = t2.Item2;
+						new_x = t2.Item2;
                         cnt++;
                     }
                     cnt++;

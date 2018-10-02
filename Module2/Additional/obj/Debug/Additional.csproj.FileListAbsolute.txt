@@ -33,3 +33,12 @@ C:\Users\IRU\Documents\GitHub\MMCS_332\Module2\Additional\obj\Debug\Additional.c
 C:\Users\IRU\Documents\GitHub\MMCS_332\Module2\Additional\obj\Debug\Additional.Form1.resources
 C:\Users\IRU\Documents\GitHub\MMCS_332\Module2\Additional\obj\Debug\Additional.Properties.Resources.resources
 C:\Users\IRU\Documents\GitHub\MMCS_332\Module2\Additional\obj\Debug\Additional.csproj.GenerateResource.Cache
+D:\_Documents\GitHub\MMCS_332\Module2\Additional\bin\Debug\Additional.exe.config
+D:\_Documents\GitHub\MMCS_332\Module2\Additional\bin\Debug\Additional.exe
+D:\_Documents\GitHub\MMCS_332\Module2\Additional\bin\Debug\Additional.pdb
+D:\_Documents\GitHub\MMCS_332\Module2\Additional\obj\Debug\Additional.csprojResolveAssemblyReference.cache
+D:\_Documents\GitHub\MMCS_332\Module2\Additional\obj\Debug\Additional.Form1.resources
+D:\_Documents\GitHub\MMCS_332\Module2\Additional\obj\Debug\Additional.Properties.Resources.resources
+D:\_Documents\GitHub\MMCS_332\Module2\Additional\obj\Debug\Additional.csproj.GenerateResource.Cache
+D:\_Documents\GitHub\MMCS_332\Module2\Additional\obj\Debug\Additional.exe
+D:\_Documents\GitHub\MMCS_332\Module2\Additional\obj\Debug\Additional.pdb

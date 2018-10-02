@@ -15,9 +15,22 @@ namespace Task_1b
 	{	private Point start;
 		private bool drawing = false;
 		private Image orig;
+		int left, right, up, down;
 		Color c;
 		OpenFileDialog open_dialog;
         Bitmap back;
+		List<Tuple<Point, Point>> l = new List<Tuple<Point, Point>>();
+
+		public Bitmap ResizeBitmap(Bitmap bmp, int width, int height)
+		{
+			Bitmap result = new Bitmap(width, height);
+			using (Graphics g = Graphics.FromImage(result))
+			{
+				g.DrawImage(bmp, 0, 0, width, height);
+			}
+
+			return result;
+		}
 
 		public Form1()
 		{
@@ -50,22 +63,58 @@ namespace Task_1b
                 return c1.R == c2.R && c1.G == c2.G && c1.B == c2.B;
         }
 
+		private void byFilling(Point p)
+		{
+			int back_av = back.Width / 2;
+			int back_yav = back.Height / 2;
+
+			int x_av = back_av - p.X;
+			int y_av = back_yav - p.Y;
+
+			var g = Graphics.FromImage(pictureBox.Image);
+			foreach (var t in l)
+			{
+				if (t.Item1.X < t.Item2.X)
+				{
+					Rectangle r = new Rectangle(t.Item1.X + 1 + x_av, t.Item1.Y + y_av, t.Item2.X - t.Item1.X - 1, 1);
+					Bitmap line = back.Clone(r, back.PixelFormat); //копируем линию из заданного изображения
+
+					r = new Rectangle(t.Item1.X + 1, t.Item1.Y, t.Item2.X - t.Item1.X - 1, 1);
+					g.DrawImage(line,r);
+					pictureBox.Image = pictureBox.Image;
+				}
+			}
+		}
+
         //заливка
         private void filling(Point p, Color c)
         {
             Bitmap b = (Bitmap)pictureBox.Image;
 
+			if (l.Exists(t => t.Item1.Y == p.Y && t.Item1.X <= p.X && p.X <= t.Item2.X))
+				return;
             //если пиксель еще не был закрашен
-            if (0 < p.X && p.X < b.Width && 0 < p.Y && p.Y < b.Height && equalColors(b.GetPixel(p.X, p.Y), c))
+            if (0 < p.X && p.X < b.Width && 0 < p.Y && p.Y < b.Height)// && equalColors(b.GetPixel(p.X, p.Y), c))
             {
-                var g = Graphics.FromImage(b);
+               // var g = Graphics.FromImage(b);
                 Point left_b = p, right_b = p;
                 find_borders(p, ref left_b, ref right_b, b, c); //поиск границ
-                Rectangle r = new Rectangle(left_b.X + 1, p.Y, right_b.X - left_b.X - 1, 1); 
-                Bitmap line = back.Clone(r, back.PixelFormat); //копируем линию из заданного изображения
+				if (left_b.X < left)
+					left = left_b.X;
+				if (right_b.X > right)
+					right = right_b.X;
 
-                g.DrawImage(line, r);
-                pictureBox.Image = b;
+				if (left_b.Y < down)
+					down = left_b.Y;
+				if (right_b.Y > right)
+					up = right_b.Y;
+
+				l.Add(Tuple.Create(left_b, right_b));
+               // Rectangle r = new Rectangle(left_b.X + 1, p.Y, right_b.X - left_b.X - 1, 1); 
+               // Bitmap line = back.Clone(r, back.PixelFormat); //копируем линию из заданного изображения
+
+               // g.DrawImage(line, r);
+               // pictureBox.Image = b;
                 
                 for (int i = left_b.X + 1; i < right_b.X; ++i)
                         filling(new Point(i, p.Y + 1), c);
@@ -85,7 +134,15 @@ namespace Task_1b
             }
             else
             {
-                filling(start, pictureBox.BackColor); // заливаем
+				left = e.Location.X ;
+				right = e.Location.X;
+				up = e.Location.Y;
+				down = e.Location.Y;
+
+				filling(start, pictureBox.BackColor); // заливаем
+				//back = ResizeBitmap(back, right - left, up - down);
+				byFilling(start);
+				l.Clear();
             }
 		}
 
