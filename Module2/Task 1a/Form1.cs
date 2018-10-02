@@ -87,6 +87,8 @@ namespace Task_1a
                 if (leftBound.X!=0)
                     leftBound.X += 1;
                 rightBound.X -= 1;
+				if (rightBound.X - leftBound.X == 0)
+					bmp.SetPixel(rightBound.X, rightBound.Y, needColor.Color);
                 g.DrawLine(needColor, leftBound, rightBound);
                 pictureBox1.Image = bmp;
                 for (int i = leftBound.X; i < rightBound.X + 1; ++i)
