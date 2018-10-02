@@ -138,7 +138,7 @@ namespace Task_1a
             Color c = colorDialog1.Color;
             label5.BackColor = c;
             needColor.Color = c;
-            button2_Click(sender, e);
+            //button2_Click(sender, e);
         }
     }
 }
