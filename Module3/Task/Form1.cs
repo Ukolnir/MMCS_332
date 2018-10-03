@@ -13,7 +13,7 @@ namespace Task
     public partial class Form1 : Form
     {
         bool drawing; //рисуем ли мы на данный момент?
-        int cnt;
+        int cnt; //счетчик для прорисовки ребра
         Bitmap bmp;
 
         public Form1()
@@ -27,22 +27,23 @@ namespace Task
             pictureBox1.Image = bmp;
         }
 
-    private void Clear()
-    {
-        var g = Graphics.FromImage(pictureBox1.Image);
-        g.Clear(pictureBox1.BackColor);
-        pictureBox1.Image = pictureBox1.Image;
-        list.Clear();
-        primitiv.Clear();
-        cnt = 0;
-    }
+        //удаление всех объектов
+        private void Clear()
+        {
+            var g = Graphics.FromImage(pictureBox1.Image);
+            g.Clear(pictureBox1.BackColor);
+            pictureBox1.Image = pictureBox1.Image;
+            list.Clear();
+            primitiv.Clear();
+            cnt = 0;
+        }
 
         List<Point> primitiv = new List<Point>(); //список точек для примитива
         List<Point> list = new List<Point>();
 
         private void pictureBox1_MouseDown(object sender, MouseEventArgs e)
         {
-            if ((radioButton2.Checked && cnt < 1) || radioButton3.Checked)
+            if ((radioButton2.Checked && cnt < 1) || radioButton3.Checked) //для ребра больше одной линии нельзя
             {
                 drawing = true;
                 primitiv.Add(new Point(e.X, e.Y));
@@ -77,6 +78,21 @@ namespace Task
                 start = p;
             }
             drawing = false;
+        }
+
+        //перемножение матриц
+        private float[,] matrix_multiplication(float[,] m1, float[,] m2)
+        {
+            float[,] res = new float[m1.GetLength(0), m2.GetLength(1)];
+
+            for(int i = 0; i < m1.GetLength(0); ++i)
+                for(int j = 0; j < m2.GetLength(1); ++j)
+                    for (int k = 0; k < m2.GetLength(0); k++)
+                    {
+                        res[i, j] += m1[i, k] * m2[k, j];
+                    }
+
+            return res;
         }
 
         private void button1_Click(object sender, EventArgs e)
