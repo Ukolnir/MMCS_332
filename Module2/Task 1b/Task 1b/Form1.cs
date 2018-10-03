@@ -178,6 +178,35 @@ namespace Task_1b
             Clear();
 		}
 
+        //Заменяет кортинку на cntByWidth её копий вширину и cntByHeight ей копий ввысоту
+        private Bitmap multiplyImage(Bitmap im, int cntByWidth, int cntByHeight)
+        {
+            Bitmap res = new Bitmap(im);
+
+            int width = res.Size.Width / cntByWidth;
+            int height = res.Size.Height / cntByHeight;
+
+            //Создаём фрагмент - изначальную картинку, но меньшей ширины и высоты
+            Bitmap fragment = ResizeBitmap(res, width, height);
+            Rectangle r;
+            var g = Graphics.FromImage(res);
+            for (int w = 0; w < cntByWidth; ++w)
+            {
+                for (int h = 0; h < cntByHeight; ++h)
+                {
+                    //Находим координаты для рисования
+                    int x = width*w;
+                    int y = height*h;
+                    
+                    r = new Rectangle(x, y, width, height);
+                    //Рисуем поверх исходного изображения
+                    g.DrawImage(fragment, r);
+                }
+            }
+            res = res;
+            return res;
+        }
+
 		private void button2_Click(object sender, EventArgs e)
 		{
 			open_dialog = new OpenFileDialog(); //создание диалогового окна для выбора файла
@@ -186,8 +215,12 @@ namespace Task_1b
             if (dr == DialogResult.OK)
             {
                 Bitmap b = new Bitmap(open_dialog.FileName);
-                back = new Bitmap(b, pictureBox.Size);
+                //Получаем увеличенную картинку
+                back = new Bitmap(b, pictureBox.Size.Width * 3, pictureBox.Size.Height * 3);
                 pictureBox1.Image = new Bitmap(b, pictureBox1.Size);
+
+                //Получаем расклонированную картинку
+                back = new Bitmap(multiplyImage(back, 3, 3));
             }
 		}
 
