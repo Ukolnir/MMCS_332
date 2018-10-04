@@ -122,16 +122,13 @@ namespace Task
             switch (comboBox1.SelectedItem.ToString())
             { 
                 case "Смещение":
-                    label2.Text = "Выберите точку смещения";
                     double tX = System.Convert.ToDouble(textBox1.Text);
                     double tY = System.Convert.ToDouble(textBox2.Text);
                     transferalMatrix = new double[,] { { 1.0, 0, 0 }, { 0, 1.0, 0 }, { tX, tY, 1.0 } };
 
                     break;
-                    
-
+                
                 case "Масштабирование":
-                    label2.Text = "Выберите коэффициент масштабирования";
                     double cm = System.Convert.ToDouble(textBox1.Text); //прочитали коэфициент
                     int a =0, b = 0;
                     if (!radioButton1.Checked)
@@ -141,6 +138,9 @@ namespace Task
                     else
                         transferalMatrix = new double[3, 3] { { 1.0, 0, 0 }, { 0, 1.0, 0 }, { 0, 0, 1.0 } };
 
+                    break;
+                case "Поворот":
+                   
                     break;
             }
         }
@@ -192,18 +192,23 @@ namespace Task
                 case "Смещение":
                     label2.Text = "Выберите точку смещения";
                     textBox2.Visible = true;
-
+                    label3.Visible = false;
+                    textBox3.Visible = false;
                     break;
                 
                 case "Поворот":
                     label2.Text = "Выберите точку поворота";
                     textBox2.Visible = true;
+                    label3.Visible = true;
+                    textBox3.Visible = true;
                     break;
 
 
                 case "Масштабирование":
                     label2.Text = "Выберите коэффициент масштабирования";
                     textBox2.Visible = false;
+                    label3.Visible = false;
+                    textBox3.Visible = false;
                     break;
             }
         }
