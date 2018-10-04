@@ -12,11 +12,14 @@ namespace Additional
 {
     public partial class Form1 : Form
     {
-        Color c;
+        static Color c;
         OpenFileDialog open_dialog;
         private static Bitmap image;
 
         private static Color borderColor, innerColor, myBorderColor;
+
+        private static Graphics g;
+        Pen pen = new Pen(c, 1);
 
         //Изменение размера изображения
         public Bitmap ResizeBitmap(Bitmap bmp, int width, int height)
@@ -113,7 +116,7 @@ namespace Additional
         }
 
         //Получение слудующего пикселя при обходе границы
-        private void getNextPixel(ref int x, ref int y, ref int whereBorder)
+        private void getNextPixel(ref int x, ref int y, ref int whereBorder, ref int direction)
         {
             if (x > 0 && x < image.Width && y > 0 && y < image.Height)
             {
@@ -129,6 +132,7 @@ namespace Additional
                     x = t.Item1;
                     y = t.Item2;
                     whereBorder = (d + 8 - 2) % 8;
+                    direction = d;
                 }
                 else
                 {
@@ -136,26 +140,119 @@ namespace Additional
                     x = t.Item1;
                     y = t.Item2;
                     whereBorder = (d - 1 + 8 - 3) % 8;
+                    direction = (d - 1 + 8) % 8;
                 }
             }
         }
 
         //Получение всей границы
-        private LinkedList<Tuple<int, int>> getFullBorder(int x, int y)
+        private List<Tuple<int, int>> getFullBorder(int x, int y)
         {
             //Список точек
-            LinkedList<Tuple<int, int>> points = new LinkedList<Tuple<int, int>>();
+            List<Tuple<int, int>> points = new List<Tuple<int, int>>();
+            List<Tuple<int, int>> points1 = new List<Tuple<int, int>>();
+            List<Tuple<int, int>> points2 = new List<Tuple<int, int>>();
+            List<Tuple<int, int>> points3 = new List<Tuple<int, int>>();
+            Dictionary<int, int> d = new Dictionary<int, int>();
+            
+
+            int cntDirChanges = 0;
+            int wb1 = 2, wb2 = 2, wb3 = 2;
+            int direction = 2;
             int whereBorder = 0;
+            
             do
             {
-                //Добавление текущей точки
-                Tuple<int, int> newt = Tuple.Create(x, y);
-                if (points.Count() == 0 || points.Last() != newt)
-                    points.AddLast(newt);
-                //Получение след пикселя
-                getNextPixel(ref x, ref y, ref whereBorder);
+                /*
+                if (cntDirChanges == 0)
+                {
+                    points1.Add(Tuple.Create(x, y));
+                    if (direction != wb3)
+                    {
+                        wb1 = wb2;
+                        wb2 = wb3;
+                        wb3 = direction;
+                        ++cntDirChanges;
+                    }
+                    
+                }
+                else if (cntDirChanges == 1)
+                {
+                    points2.Add(Tuple.Create(x, y));
+                    if (direction != wb3)
+                    {
+                        wb1 = wb2;
+                        wb2 = wb3;
+                        wb3 = direction;
+                        ++cntDirChanges;
+                    }
+                    
+                }
+                else if (cntDirChanges == 2)
+                {
+                    points3.Add(Tuple.Create(x, y));
+                    if (direction != wb3)
+                    {
+                        wb1 = wb2;
+                        wb2 = wb3;
+                        wb3 = direction;
+                        ++cntDirChanges;
+                    }
+                }
+                else
+                {
+                    points3.Add(Tuple.Create(x, y));
+                    if (direction != wb3)
+                    {
+                        points = points.Concat(points1).ToList();
+                        points1 = points2;
+                        points2 = points3;
+                        points3 = new List<Tuple<int, int>>();
+                        //points3.Add(Tuple.Create(x, y));
+
+                        wb1 = wb2;
+                        wb2 = wb3;
+                        wb3 = direction;
+
+                        if (((wb1 + 4) % 8 == (wb2 + 2) % 8) && ((wb2 + 2) % 8 == wb3) ||
+                            ((wb1 + 2) % 8 == (wb2 + 1) % 8) && ((wb2 + 1) % 8 == wb3))
+                        {
+                            points2 = new List<Tuple<int, int>>();
+                        }
+                    }
+
+                    //Добавление текущей точки
+                    //Tuple<int, int> newt = Tuple.Create(x, y);
+                    //if (points.Count() == 0 || points.Last() != newt)
+                      //  points.Add(newt);
+                    //Получение след пикселя
+                    //getNextPixel(ref x, ref y, ref whereBorder);
+
+                    //++cntSteps;
+                }*/
+                if (d.ContainsKey(y))
+                {
+                    g.DrawLine(pen, new Point(d[y], y), new Point(x, y));
+                    d.Remove(y);
+                }
+                else
+                    d.Add(y, x);
+                points.Add(Tuple.Create(x, y));
+                getNextPixel(ref x, ref y, ref whereBorder, ref direction);
             } while (((x != firstX) || (y != firstY)) && (points.Count() < (image.Width + image.Height) * 10));
+            //points.Concat(points2);
+            //points.Concat(points3);
+            pictureBox1.Image = pictureBox1.Image;
             return points;
+        }
+
+        private void pointsToFile(ref List<Tuple<int, int>> points, string fname = "points.txt")
+        {
+            using (System.IO.StreamWriter writetext = new System.IO.StreamWriter(fname))
+            {
+                foreach (var t in points)
+                    writetext.WriteLine("x = " + t.Item1 + "| y = " + t.Item2);
+            }
         }
 
         //Закраска границы
@@ -359,6 +456,8 @@ namespace Additional
 
         private void pictureBox1_MouseClick(object sender, MouseEventArgs e)
         {
+            g = Graphics.FromImage(pictureBox1.Image);
+
             var loc = e.Location;
             var x = loc.X;
             var y = loc.Y;
@@ -366,7 +465,9 @@ namespace Additional
             //Получение правой точки границы
             getRightBorder(x, y);
             //Получение всей границы
-            LinkedList<Tuple<int, int>> points = getFullBorder(firstX, firstY);
+            List<Tuple<int, int>> points = getFullBorder(firstX, firstY);
+
+            pointsToFile(ref points);
 
             //Отсортированные и уникальные точки
             List<Tuple<int, int>> pointsSorted = new List<Tuple<int, int>>(
@@ -379,21 +480,21 @@ namespace Additional
             LinkedList<Tuple<int, LinkedList<Tuple<int, int>>>> newBorders = find_internal_borders(yBorders);
 
             //Соединяем точки
-            fill(newBorders);
+            //fill(newBorders);
+
+            g.Dispose();
         }
 
         private void fill(LinkedList<Tuple<int, LinkedList<Tuple<int, int>>>> lst) {
-            Graphics g = Graphics.FromImage(pictureBox1.Image);
-            Pen col = new Pen(c, 1);
+          
             foreach (Tuple<int, LinkedList<Tuple<int, int>>> l in lst) {
                 int y = l.Item1;
                 foreach (Tuple<int, int> s in l.Item2) {
-                    g.DrawLine(col, s.Item1, y, s.Item2, y);
+                    g.DrawLine(pen, s.Item1, y, s.Item2, y);
                     pictureBox1.Image = pictureBox1.Image;
                 }
             }
-            col.Dispose();
-            g.Dispose();
+            pen.Dispose();
         }
     }
 }

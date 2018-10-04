@@ -42,3 +42,13 @@ D:\_Documents\GitHub\MMCS_332\Module2\Additional\obj\Debug\Additional.Properties
 D:\_Documents\GitHub\MMCS_332\Module2\Additional\obj\Debug\Additional.csproj.GenerateResource.Cache
 D:\_Documents\GitHub\MMCS_332\Module2\Additional\obj\Debug\Additional.exe
 D:\_Documents\GitHub\MMCS_332\Module2\Additional\obj\Debug\Additional.pdb
+C:\flash\PortableGit\MMCS_332\Module2\Additional\bin\Debug\Additional.exe.config
+C:\flash\PortableGit\MMCS_332\Module2\Additional\bin\Debug\Additional.exe
+C:\flash\PortableGit\MMCS_332\Module2\Additional\bin\Debug\Additional.pdb
+C:\flash\PortableGit\MMCS_332\Module2\Additional\obj\Debug\Additional.csprojResolveAssemblyReference.cache
+C:\flash\PortableGit\MMCS_332\Module2\Additional\obj\Debug\Additional.Form1.resources
+C:\flash\PortableGit\MMCS_332\Module2\Additional\obj\Debug\Additional.Properties.Resources.resources
+C:\flash\PortableGit\MMCS_332\Module2\Additional\obj\Debug\Additional.csproj.GenerateResource.Cache
+C:\flash\PortableGit\MMCS_332\Module2\Additional\obj\Debug\Additional.csproj.CoreCompileInputs.cache
+C:\flash\PortableGit\MMCS_332\Module2\Additional\obj\Debug\Additional.exe
+C:\flash\PortableGit\MMCS_332\Module2\Additional\obj\Debug\Additional.pdb
