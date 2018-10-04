@@ -118,8 +118,9 @@ namespace Task
                     /*label2.Text = "Выберите точку смещения";
                     pictureBox1.MouseDown -= (MouseEventHandler)pictureBox1_MouseDown;
                     pictureBox1.MouseDown += new MouseEventHandler(pictureBox1_MouseDown1);*/
-                    double[,] toMachineCoordsionMatrix = new double[,] { { 1.0, 0, 0 }, { 0, -1.0, 0 }, { 100 / 2, 100 / 2, 1.0 } }; //w, h
-
+                    //double[,] toMachineCoordsionMatrix = new double[,] { { 1.0, 0, 0 }, { 0, -1.0, 0 }, { 100 / 2, 100 / 2, 1.0 } }; //w, h
+                    button2.Text = "Переместить";
+                    button2.Visible = true;
 
                     break;
                     
@@ -138,5 +139,37 @@ namespace Task
                     break;
             }
         }
+
+        private void button2_Click1(object sender, EventArgs e)
+        {
+            double tX = System.Convert.ToDouble(textBox1.Text);
+            double tY = System.Convert.ToDouble(textBox2.Text);
+            //Матрица перемещения
+            double[,] transferalMatrix = new double[,] { { 1.0, 0, 0 }, { 0, 1.0, 0 }, { tX, tY, 1.0 } };
+            List<Point> newprimitiv = new List<Point>();
+           
+            foreach (Tuple<double, double> p in primitiv) {
+                double[,] point = new double[,] {{p.Item1, p.Item2, 1.0}};
+                double[,] res = matrix_multiplication(point, transferalMatrix);
+                newprimitiv.Add(new Point(Convert.ToInt32(Math.Round(res[0,0])), Convert.ToInt32(Math.Round(res[0,1]))));
+            }
+            foreach (Point c in newprimitiv)
+                bmp.SetPixel(c.X, c.Y, Color.Black);
+            pictureBox1.Image = bmp;
+
+            //Попытка отладить (ИСПРАВИТЬ НА СВОИ ПАПКИ/ФАЙЛЫ!)
+            using (System.IO.StreamWriter writetext = new System.IO.StreamWriter("C:\\Users\\IRU\\Desktop\\point1.txt"))
+            {
+                foreach (var t in primitiv)
+                    writetext.WriteLine("x = " + t.Item1 + "| y = " + t.Item2);
+            }
+
+            using (System.IO.StreamWriter writetext = new System.IO.StreamWriter("C:\\Users\\IRU\\Desktop\\point2.txt"))
+            {
+                foreach (var t in newprimitiv)
+                    writetext.WriteLine("x = " + t.X + "| y = " + t.Y);
+            }
+        } 
+
     }
 }
