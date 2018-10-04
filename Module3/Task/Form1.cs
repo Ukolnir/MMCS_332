@@ -116,6 +116,22 @@ namespace Task
             list.Clear();
         }
 
+        //поиск центра примитива
+        private void find_center(ref double x, ref double y)
+        {
+
+
+            foreach (var c in primitiv)
+            {
+                x += c.Item1;
+                y += c.Item2;
+            }
+
+            x /= primitiv.Count;
+            y /= primitiv.Count;
+        }
+
+
         private void choose_method()
         {
             //Выбор матрицы афинного преобразования
@@ -130,9 +146,11 @@ namespace Task
                 
                 case "Масштабирование":
                     double cm = System.Convert.ToDouble(textBox1.Text); //прочитали коэфициент
-                    int a =0, b = 0;
+                 
                     if (!radioButton1.Checked)
                     {
+                        double a = 0, b = 0;
+                        find_center(ref a, ref b);
                         transferalMatrix = new double[3, 3] { { cm, 0, 0 }, { 0, cm, 0 }, { (1 - cm) * a, (1 - cm)*b, 1 } };
                     }
                     else
@@ -143,6 +161,14 @@ namespace Task
                    
                     break;
             }
+        }
+
+        //для очищения экрана для перерисовке при применении алгоритма 
+        private void ClearWithout()
+        {
+            var g = Graphics.FromImage(pictureBox1.Image);
+            g.Clear(pictureBox1.BackColor);
+            pictureBox1.Image = pictureBox1.Image;
         }
 
         private void button2_Click1(object sender, EventArgs e)
@@ -157,7 +183,7 @@ namespace Task
                 newprimitiv.Add(new Point(Convert.ToInt32(Math.Round(res[0, 0])), Convert.ToInt32(Math.Round(res[0, 1]))));
             }
 
-            Clear();
+            ClearWithout();
 
             primitiv.Clear();
             
