@@ -15,6 +15,7 @@ namespace Task
         bool drawing; //рисуем ли мы на данный момент?
         int cnt; //счетчик для прорисовки ребра
         Bitmap bmp;
+        double[,] transferalMatrix;
 
         public Form1()
         {
@@ -62,6 +63,10 @@ namespace Task
 
         private void pictureBox_MouseUp(object sender, MouseEventArgs e)
         {
+
+            button2.Text = "apply";
+            button2.Visible = true;
+
             if ((radioButton2.Checked && cnt > 1) || ! drawing ) return;
 
             list.Add(new Point(e.X, e.Y));
@@ -111,30 +116,29 @@ namespace Task
             list.Clear();
         }
 
-        private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
+        private void choose_method()
         {
             switch (comboBox1.SelectedItem.ToString())
             { 
                 case "Смещение":
-                    /*label2.Text = "Выберите точку смещения";
-                    pictureBox1.MouseDown -= (MouseEventHandler)pictureBox1_MouseDown;
-                    pictureBox1.MouseDown += new MouseEventHandler(pictureBox1_MouseDown1);*/
+                    label2.Text = "Выберите точку смещения";
+                    //pictureBox1.MouseDown -= (MouseEventHandler)pictureBox1_MouseDown;
+                    //pictureBox1.MouseDown += new MouseEventHandler(pictureBox1_MouseDown1);
                     //double[,] toMachineCoordsionMatrix = new double[,] { { 1.0, 0, 0 }, { 0, -1.0, 0 }, { 100 / 2, 100 / 2, 1.0 } }; //w, h
-                    button2.Text = "Переместить";
-                    button2.Visible = true;
+
+                    double tX = System.Convert.ToDouble(textBox1.Text);
+                    double tY = System.Convert.ToDouble(textBox2.Text);
+                    transferalMatrix = new double[,] { { 1.0, 0, 0 }, { 0, 1.0, 0 }, { tX, tY, 1.0 } };
 
                     break;
                     
 
                 case "Масштабирование":
-                    
                     label2.Text = "Выберите коэффициент масштабирования";
-                    while (textBox1.Text == "")
-                        continue;
                     double cm = Double.Parse(textBox1.Text); //прочитали коэфициент
-                    double[,] scaling_matrix = matrix_multiplication(new double[3, 3] { { 1.0, 0, 0 }, { 0, 1.0, 0 }, { 0, -pictureBox1.Height + 1, 1 } },
+                    transferalMatrix = matrix_multiplication(new double[3, 3] { { 1.0, 0, 0 }, { 0, 1.0, 0 }, { 0, -pictureBox1.Height + 1, 1 } },
                         new double[3, 3] { { cm, 0, 0 }, { 0, cm, 0 }, { 0, 0, 1 } });
-                    scaling_matrix = matrix_multiplication(scaling_matrix, new double[3, 3] { { 1.0, 0, 0 }, { 0, 1.0, 0 }, { 0, pictureBox1.Height - 1, 1 } });
+                    transferalMatrix = matrix_multiplication(transferalMatrix, new double[3, 3] { { 1.0, 0, 0 }, { 0, 1.0, 0 }, { 0, pictureBox1.Height - 1, 1 } });
 
 
                     break;
@@ -143,10 +147,8 @@ namespace Task
 
         private void button2_Click1(object sender, EventArgs e)
         {
-            double tX = System.Convert.ToDouble(textBox1.Text);
-            double tY = System.Convert.ToDouble(textBox2.Text);
+            choose_method();
             //Матрица перемещения
-            double[,] transferalMatrix = new double[,] { { 1.0, 0, 0 }, { 0, 1.0, 0 }, { tX, tY, 1.0 } };
             List<Point> newprimitiv = new List<Point>();
 
             foreach (Tuple<double, double> p in primitiv) {
@@ -157,8 +159,10 @@ namespace Task
 
             Clear();
 
+            primitiv.Clear();
             
             Point p1 = newprimitiv.First();
+            primitiv.Add(Tuple.Create(p1.X * 1.0, p1.Y * 1.0));
             foreach (Point c in newprimitiv)
             {
                 if (c != p1)
@@ -169,6 +173,7 @@ namespace Task
                     p1 = c;
                     p.Dispose();
                     g.Dispose();
+                    primitiv.Add(Tuple.Create(p1.X * 1.0, p1.Y * 1.0));
                 }
             }
 
@@ -177,8 +182,9 @@ namespace Task
                 bmp.SetPixel(p1.X, p1.Y, Color.Black);
             }
             pictureBox1.Image = bmp;
+            
             //Попытка отладить 
-            using (System.IO.StreamWriter writetext = new System.IO.StreamWriter("point1.txt")) // cохранится в debug'e или realese
+           /* using (System.IO.StreamWriter writetext = new System.IO.StreamWriter("point1.txt")) // cохранится в debug'e или realese
             {
                 foreach (var t in primitiv)
                     writetext.WriteLine("x = " + t.Item1 + "| y = " + t.Item2);
@@ -188,8 +194,26 @@ namespace Task
             {
                 foreach (var t in newprimitiv)
                     writetext.WriteLine("x = " + t.X + "| y = " + t.Y);
-            }
-        } 
+            }*/
 
+        }
+
+        private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            switch (comboBox1.SelectedItem.ToString())
+            {
+                case "Смещение":
+                    label2.Text = "Выберите точку смещения";
+                    textBox2.Visible = true;
+
+                    break;
+
+
+                case "Масштабирование":
+                    label2.Text = "Выберите коэффициент масштабирования";
+                    textBox2.Visible = false;
+                    break;
+            }
+        }
     }
 }
