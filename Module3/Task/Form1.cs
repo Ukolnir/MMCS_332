@@ -65,6 +65,7 @@ namespace Task
             if ((radioButton2.Checked && cnt > 1) || ! drawing ) return;
 
             list.Add(new Point(e.X, e.Y));
+            primitiv.Add(Tuple.Create(e.X * 1.0, e.Y * 1.0));
             Point start = list.First();
 
             foreach (var p in list)
@@ -147,24 +148,43 @@ namespace Task
             //Матрица перемещения
             double[,] transferalMatrix = new double[,] { { 1.0, 0, 0 }, { 0, 1.0, 0 }, { tX, tY, 1.0 } };
             List<Point> newprimitiv = new List<Point>();
-           
-            foreach (Tuple<double, double> p in primitiv) {
-                double[,] point = new double[,] {{p.Item1, p.Item2, 1.0}};
-                double[,] res = matrix_multiplication(point, transferalMatrix);
-                newprimitiv.Add(new Point(Convert.ToInt32(Math.Round(res[0,0])), Convert.ToInt32(Math.Round(res[0,1]))));
-            }
-            foreach (Point c in newprimitiv)
-                bmp.SetPixel(c.X, c.Y, Color.Black);
-            pictureBox1.Image = bmp;
 
-            //Попытка отладить (ИСПРАВИТЬ НА СВОИ ПАПКИ/ФАЙЛЫ!)
-            using (System.IO.StreamWriter writetext = new System.IO.StreamWriter("C:\\Users\\IRU\\Desktop\\point1.txt"))
+            foreach (Tuple<double, double> p in primitiv) {
+                double[,] point = new double[,] { { p.Item1, p.Item2, 1.0 } };
+                double[,] res = matrix_multiplication(point, transferalMatrix);
+                newprimitiv.Add(new Point(Convert.ToInt32(Math.Round(res[0, 0])), Convert.ToInt32(Math.Round(res[0, 1]))));
+            }
+
+            Clear();
+
+            
+            Point p1 = newprimitiv.First();
+            foreach (Point c in newprimitiv)
+            {
+                if (c != p1)
+                { 
+                    var g = Graphics.FromImage(bmp);
+                    Pen p = new Pen(Color.Black, 1);
+                    g.DrawLine(p, p1, c);
+                    p1 = c;
+                    p.Dispose();
+                    g.Dispose();
+                }
+            }
+
+            if (newprimitiv.Count == 1)
+            {
+                bmp.SetPixel(p1.X, p1.Y, Color.Black);
+            }
+            pictureBox1.Image = bmp;
+            //Попытка отладить 
+            using (System.IO.StreamWriter writetext = new System.IO.StreamWriter("point1.txt")) // cохранится в debug'e или realese
             {
                 foreach (var t in primitiv)
                     writetext.WriteLine("x = " + t.Item1 + "| y = " + t.Item2);
             }
 
-            using (System.IO.StreamWriter writetext = new System.IO.StreamWriter("C:\\Users\\IRU\\Desktop\\point2.txt"))
+            using (System.IO.StreamWriter writetext = new System.IO.StreamWriter("point2.txt"))
             {
                 foreach (var t in newprimitiv)
                     writetext.WriteLine("x = " + t.X + "| y = " + t.Y);
