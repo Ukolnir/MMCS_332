@@ -38,7 +38,7 @@ namespace Task
             cnt = 0;
         }
 
-        List<Point> primitiv = new List<Point>(); //список точек для примитива
+        List<Tuple<double, double>> primitiv = new List<Tuple<double,double>>(); //список точек для примитива
         List<Point> list = new List<Point>();
 
         private void pictureBox1_MouseDown(object sender, MouseEventArgs e)
@@ -46,14 +46,14 @@ namespace Task
             if ((radioButton2.Checked && cnt < 1) || radioButton3.Checked) //для ребра больше одной линии нельзя
             {
                 drawing = true;
-                primitiv.Add(new Point(e.X, e.Y));
+                primitiv.Add(Tuple.Create(e.X * 1.0, e.Y * 1.0));
                 list.Add(new Point(e.X, e.Y));
                 cnt++;
             }
 
             if (radioButton1.Checked)
             {
-                primitiv.Add(new Point(e.X, e.Y));
+                primitiv.Add(Tuple.Create(e.X * 1.0, e.Y * 1.0));
                 ((Bitmap)pictureBox1.Image).SetPixel(e.X, e.Y, Color.Black);
                 pictureBox1.Image = pictureBox1.Image;
             }
@@ -81,9 +81,9 @@ namespace Task
         }
 
         //перемножение матриц
-        private float[,] matrix_multiplication(float[,] m1, float[,] m2)
+        private double[,] matrix_multiplication(double[,] m1, double[,] m2)
         {
-            float[,] res = new float[m1.GetLength(0), m2.GetLength(1)];
+            double[,] res = new double[m1.GetLength(0), m2.GetLength(1)];
 
             for(int i = 0; i < m1.GetLength(0); ++i)
                 for(int j = 0; j < m2.GetLength(1); ++j)
@@ -118,10 +118,21 @@ namespace Task
                     /*label2.Text = "Выберите точку смещения";
                     pictureBox1.MouseDown -= (MouseEventHandler)pictureBox1_MouseDown;
                     pictureBox1.MouseDown += new MouseEventHandler(pictureBox1_MouseDown1);*/
-                    double[,] toMachineCoordsionMatrix = new double[,]{ { 1.0, 0, 0 }, { 0, -1.0, 0 }, {100 / 2, 100 / 2, 1.0 }}; //w, h
+                    double[,] toMachineCoordsionMatrix = new double[,] { { 1.0, 0, 0 }, { 0, -1.0, 0 }, { 100 / 2, 100 / 2, 1.0 } }; //w, h
 
 
-                    break;            
+                    break;
+                    
+
+                case "Масштабирование":
+                    
+                    label2.Text = "Выберите коэффициент масштабирования";
+                    while (textBox1.Text == "")
+                        continue;
+                    double cm = Double.Parse(textBox1.Text); //прочитали коэфициент
+                    
+
+                    break;
             }
         }
     }
