@@ -64,7 +64,7 @@ namespace Task
         private void pictureBox_MouseUp(object sender, MouseEventArgs e)
         {
 
-            button2.Text = "apply";
+            button2.Text = "Применить";
             button2.Visible = true;
 
             if ((radioButton2.Checked && cnt > 1) || ! drawing ) return;
@@ -135,11 +135,14 @@ namespace Task
 
                 case "Масштабирование":
                     label2.Text = "Выберите коэффициент масштабирования";
-                    double cm = Double.Parse(textBox1.Text); //прочитали коэфициент
-                    transferalMatrix = matrix_multiplication(new double[3, 3] { { 1.0, 0, 0 }, { 0, 1.0, 0 }, { 0, -pictureBox1.Height + 1, 1 } },
-                        new double[3, 3] { { cm, 0, 0 }, { 0, cm, 0 }, { 0, 0, 1 } });
-                    transferalMatrix = matrix_multiplication(transferalMatrix, new double[3, 3] { { 1.0, 0, 0 }, { 0, 1.0, 0 }, { 0, pictureBox1.Height - 1, 1 } });
-
+                    double cm = System.Convert.ToDouble(textBox1.Text); //прочитали коэфициент
+                    int a =0, b = 0;
+                    if (!radioButton1.Checked)
+                    {
+                        transferalMatrix = new double[3, 3] { { cm, 0, 0 }, { 0, cm, 0 }, { (1 - cm) * a, (1 - cm)*b, 1 } };
+                    }
+                    else
+                        transferalMatrix = new double[3, 3] { { 1.0, 0, 0 }, { 0, 1.0, 0 }, { 0, 0, 1.0 } };
 
                     break;
             }
