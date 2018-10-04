@@ -118,14 +118,11 @@ namespace Task
 
         private void choose_method()
         {
+            //Выбор матрицы афинного преобразования
             switch (comboBox1.SelectedItem.ToString())
             { 
                 case "Смещение":
                     label2.Text = "Выберите точку смещения";
-                    //pictureBox1.MouseDown -= (MouseEventHandler)pictureBox1_MouseDown;
-                    //pictureBox1.MouseDown += new MouseEventHandler(pictureBox1_MouseDown1);
-                    //double[,] toMachineCoordsionMatrix = new double[,] { { 1.0, 0, 0 }, { 0, -1.0, 0 }, { 100 / 2, 100 / 2, 1.0 } }; //w, h
-
                     double tX = System.Convert.ToDouble(textBox1.Text);
                     double tY = System.Convert.ToDouble(textBox2.Text);
                     transferalMatrix = new double[,] { { 1.0, 0, 0 }, { 0, 1.0, 0 }, { tX, tY, 1.0 } };
@@ -151,7 +148,7 @@ namespace Task
         private void button2_Click1(object sender, EventArgs e)
         {
             choose_method();
-            //Матрица перемещения
+            
             List<Point> newprimitiv = new List<Point>();
 
             foreach (Tuple<double, double> p in primitiv) {
@@ -185,19 +182,6 @@ namespace Task
                 bmp.SetPixel(p1.X, p1.Y, Color.Black);
             }
             pictureBox1.Image = bmp;
-            
-            //Попытка отладить 
-           /* using (System.IO.StreamWriter writetext = new System.IO.StreamWriter("point1.txt")) // cохранится в debug'e или realese
-            {
-                foreach (var t in primitiv)
-                    writetext.WriteLine("x = " + t.Item1 + "| y = " + t.Item2);
-            }
-
-            using (System.IO.StreamWriter writetext = new System.IO.StreamWriter("point2.txt"))
-            {
-                foreach (var t in newprimitiv)
-                    writetext.WriteLine("x = " + t.X + "| y = " + t.Y);
-            }*/
 
         }
 
@@ -209,6 +193,11 @@ namespace Task
                     label2.Text = "Выберите точку смещения";
                     textBox2.Visible = true;
 
+                    break;
+                
+                case "Поворот":
+                    label2.Text = "Выберите точку поворота";
+                    textBox2.Visible = true;
                     break;
 
 
