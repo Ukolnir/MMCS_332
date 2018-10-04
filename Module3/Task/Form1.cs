@@ -130,7 +130,10 @@ namespace Task
                     while (textBox1.Text == "")
                         continue;
                     double cm = Double.Parse(textBox1.Text); //прочитали коэфициент
-                    
+                    double[,] scaling_matrix = matrix_multiplication(new double[3, 3] { { 1.0, 0, 0 }, { 0, 1.0, 0 }, { 0, -pictureBox1.Height + 1, 1 } },
+                        new double[3, 3] { { cm, 0, 0 }, { 0, cm, 0 }, { 0, 0, 1 } });
+                    scaling_matrix = matrix_multiplication(scaling_matrix, new double[3, 3] { { 1.0, 0, 0 }, { 0, 1.0, 0 }, { 0, pictureBox1.Height - 1, 1 } });
+
 
                     break;
             }
