@@ -109,5 +109,20 @@ namespace Task
         {
             list.Clear();
         }
+
+        private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            switch (comboBox1.SelectedItem.ToString())
+            { 
+                case "Смещение":
+                    /*label2.Text = "Выберите точку смещения";
+                    pictureBox1.MouseDown -= (MouseEventHandler)pictureBox1_MouseDown;
+                    pictureBox1.MouseDown += new MouseEventHandler(pictureBox1_MouseDown1);*/
+                    double[,] toMachineCoordsionMatrix = new double[,]{ { 1.0, 0, 0 }, { 0, -1.0, 0 }, {100 / 2, 100 / 2, 1.0 }}; //w, h
+
+
+                    break;            
+            }
+        }
     }
 }
