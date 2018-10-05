@@ -136,6 +136,11 @@ namespace Task
             y /= primitiv.Count;
         }
 
+        private void pictureBox1_MouseDown1(object sender, MouseEventArgs e)
+        {
+            textBox1.Text = e.X.ToString();
+            textBox2.Text = e.Y.ToString();
+        }
 
         private void choose_method()
         {
@@ -163,7 +168,13 @@ namespace Task
                     break;
 
                 case "Поворот":
-                   
+                    double c = System.Convert.ToDouble(textBox1.Text);
+                    double d = System.Convert.ToDouble(textBox2.Text);
+                    double p = System.Convert.ToDouble(textBox3.Text) * Math.PI / 180;
+                    double cos = Math.Cos(p);
+                    double sin = Math.Sin(p);
+                    transferalMatrix = new double[,] { {cos, sin, 0}, {-sin, cos, 0}, 
+                        {cos*(-c)+d*sin+c, (-c)*sin-d*cos+d, 1}};
                     break;
 
                 case "Положение точки относительно ребра":
@@ -250,6 +261,10 @@ namespace Task
 
         private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
         {
+            //Опасная секция
+            pictureBox1.MouseDown -= (MouseEventHandler)pictureBox1_MouseDown1;
+            pictureBox1.MouseDown += new MouseEventHandler(pictureBox1_MouseDown);
+
             switch (comboBox1.SelectedItem.ToString())
             {
                 case "Смещение":
@@ -262,18 +277,20 @@ namespace Task
                     method = true;
                     label5.Visible = false;
                     break;
-                
+
                 case "Поворот":
                     label2.Visible = true;
                     textBox1.Visible = true;
-                    label2.Text = "Выберите точку поворота";
+                    label2.Text = "Выберите точку поворота(укажите мышкой)";
                     textBox2.Visible = true;
                     label3.Visible = true;
                     textBox3.Visible = true;
                     label5.Visible = false;
                     method = true;
+                    //Опасная секция
+                    pictureBox1.MouseDown -= (MouseEventHandler)pictureBox1_MouseDown;
+                    pictureBox1.MouseDown += new MouseEventHandler(pictureBox1_MouseDown1);
                     break;
-
 
                 case "Масштабирование":
                     label2.Visible = true;
