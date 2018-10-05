@@ -17,6 +17,8 @@ namespace Task
         Bitmap bmp;
         double[,] transferalMatrix;
         Tuple<double, double> dot;
+        bool method = false; //применимость(true) или проверка
+      //  bool res = false; //для выведения результатов проверки
 
         public Form1()
         {
@@ -37,6 +39,7 @@ namespace Task
             pictureBox1.Image = pictureBox1.Image;
             list.Clear();
             primitiv.Clear();
+            dot = Tuple.Create(-1.0, -1.0);
             cnt = 0;
         }
 
@@ -156,10 +159,14 @@ namespace Task
                     }
                     else
                         transferalMatrix = new double[3, 3] { { 1.0, 0, 0 }, { 0, 1.0, 0 }, { 0, 0, 1.0 } };
-
                     break;
+
                 case "Поворот":
                    
+                    break;
+
+                case "Положение точки относительно ребра":
+                    
                     break;
             }
         }
@@ -175,49 +182,52 @@ namespace Task
         private void button2_Click1(object sender, EventArgs e)
         {
             choose_method();
-            
-            List<Point> newprimitiv = new List<Point>();
-
-            if (radioButton1.Checked)
+            if (method)
             {
-                double[,] point = new double[,] { { dot.Item1, dot.Item2, 1.0} };
-                double[,] res = matrix_multiplication(point, transferalMatrix);
-                newprimitiv.Add(new Point(Convert.ToInt32(Math.Round(res[0, 0])), Convert.ToInt32(Math.Round(res[0, 1]))));
-                ClearWithout();
-                bmp.SetPixel(newprimitiv.First().X, newprimitiv.First().Y, Color.Black);
-                dot = Tuple.Create(newprimitiv.First().X * 1.0, newprimitiv.First().Y * 1.0);
-            }
-            else
-            { 
-                foreach (Tuple<double, double> p in primitiv) {
-                    double[,] point = new double[,] { { p.Item1, p.Item2, 1.0 } };
+                List<Point> newprimitiv = new List<Point>();
+
+                if (radioButton1.Checked)
+                {
+                    double[,] point = new double[,] { { dot.Item1, dot.Item2, 1.0 } };
                     double[,] res = matrix_multiplication(point, transferalMatrix);
                     newprimitiv.Add(new Point(Convert.ToInt32(Math.Round(res[0, 0])), Convert.ToInt32(Math.Round(res[0, 1]))));
+                    ClearWithout();
+                    bmp.SetPixel(newprimitiv.First().X, newprimitiv.First().Y, Color.Black);
+                    dot = Tuple.Create(newprimitiv.First().X * 1.0, newprimitiv.First().Y * 1.0);
                 }
-
-                ClearWithout();
-
-                primitiv.Clear();
-            
-                Point p1 = newprimitiv.First();
-                primitiv.Add(Tuple.Create(p1.X * 1.0, p1.Y * 1.0));
-                foreach (Point c in newprimitiv)
+                else
                 {
-                    if (c != p1)
-                    { 
-                        var g = Graphics.FromImage(bmp);
-                        Pen p = new Pen(Color.Black, 1);
-                        g.DrawLine(p, p1, c);
-                        p1 = c;
-                        p.Dispose();
-                        g.Dispose();
-                        primitiv.Add(Tuple.Create(p1.X * 1.0, p1.Y * 1.0));
+                    foreach (Tuple<double, double> p in primitiv)
+                    {
+                        double[,] point = new double[,] { { p.Item1, p.Item2, 1.0 } };
+                        double[,] res = matrix_multiplication(point, transferalMatrix);
+                        newprimitiv.Add(new Point(Convert.ToInt32(Math.Round(res[0, 0])), Convert.ToInt32(Math.Round(res[0, 1]))));
+                    }
+
+                    ClearWithout();
+
+                    primitiv.Clear();
+
+                    Point p1 = newprimitiv.First();
+                    primitiv.Add(Tuple.Create(p1.X * 1.0, p1.Y * 1.0));
+                    foreach (Point c in newprimitiv)
+                    {
+                        if (c != p1)
+                        {
+                            var g = Graphics.FromImage(bmp);
+                            Pen p = new Pen(Color.Black, 1);
+                            g.DrawLine(p, p1, c);
+                            p1 = c;
+                            p.Dispose();
+                            g.Dispose();
+                            primitiv.Add(Tuple.Create(p1.X * 1.0, p1.Y * 1.0));
+                        }
                     }
                 }
+
+                pictureBox1.Image = bmp;
             }
-
-            pictureBox1.Image = bmp;
-
+           
         }
 
         private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
@@ -225,26 +235,50 @@ namespace Task
             switch (comboBox1.SelectedItem.ToString())
             {
                 case "Смещение":
+                    label2.Visible = true;
+                    textBox1.Visible = true;
                     label2.Text = "Выберите точку смещения";
                     textBox2.Visible = true;
                     label3.Visible = false;
                     textBox3.Visible = false;
+                    method = true;
+                    label5.Visible = false;
                     break;
                 
                 case "Поворот":
+                    label2.Visible = true;
+                    textBox1.Visible = true;
                     label2.Text = "Выберите точку поворота";
                     textBox2.Visible = true;
                     label3.Visible = true;
                     textBox3.Visible = true;
+                    label5.Visible = false;
+                    method = true;
                     break;
 
 
                 case "Масштабирование":
+                    label2.Visible = true;
+                    label5.Visible = false;
+                    textBox1.Visible = true;
                     label2.Text = "Выберите коэффициент масштабирования";
                     textBox2.Visible = false;
                     label3.Visible = false;
                     textBox3.Visible = false;
+                    method = true;
                     break;
+
+                case "Положение точки относительно ребра":
+                    label2.Visible = false;
+                    label5.Visible = true;
+                    label5.Text = "Точка лежит относительно ребра: ";
+                    textBox1.Visible = false;
+                    textBox2.Visible = false;
+                    label3.Visible = false;
+                    textBox3.Visible = false;
+                    method = false;
+                    break;
+
             }
         }
     }
