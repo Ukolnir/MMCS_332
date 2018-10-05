@@ -16,6 +16,7 @@ namespace Task
         int cnt; //счетчик для прорисовки ребра
         Bitmap bmp;
         double[,] transferalMatrix;
+        Tuple<double, double> dot;
 
         public Form1()
         {
@@ -54,7 +55,7 @@ namespace Task
 
             if (radioButton1.Checked)
             {
-                primitiv.Add(Tuple.Create(e.X * 1.0, e.Y * 1.0));
+                dot = Tuple.Create(e.X * 1.0, e.Y * 1.0);
                 ((Bitmap)pictureBox1.Image).SetPixel(e.X, e.Y, Color.Black);
                 pictureBox1.Image = pictureBox1.Image;
             }
@@ -177,36 +178,44 @@ namespace Task
             
             List<Point> newprimitiv = new List<Point>();
 
-            foreach (Tuple<double, double> p in primitiv) {
-                double[,] point = new double[,] { { p.Item1, p.Item2, 1.0 } };
+            if (radioButton1.Checked)
+            {
+                double[,] point = new double[,] { { dot.Item1, dot.Item2, 1.0} };
                 double[,] res = matrix_multiplication(point, transferalMatrix);
                 newprimitiv.Add(new Point(Convert.ToInt32(Math.Round(res[0, 0])), Convert.ToInt32(Math.Round(res[0, 1]))));
+                ClearWithout();
+                bmp.SetPixel(newprimitiv.First().X, newprimitiv.First().Y, Color.Black);
+                dot = Tuple.Create(newprimitiv.First().X * 1.0, newprimitiv.First().Y * 1.0);
             }
+            else
+            { 
+                foreach (Tuple<double, double> p in primitiv) {
+                    double[,] point = new double[,] { { p.Item1, p.Item2, 1.0 } };
+                    double[,] res = matrix_multiplication(point, transferalMatrix);
+                    newprimitiv.Add(new Point(Convert.ToInt32(Math.Round(res[0, 0])), Convert.ToInt32(Math.Round(res[0, 1]))));
+                }
 
-            ClearWithout();
+                ClearWithout();
 
-            primitiv.Clear();
+                primitiv.Clear();
             
-            Point p1 = newprimitiv.First();
-            primitiv.Add(Tuple.Create(p1.X * 1.0, p1.Y * 1.0));
-            foreach (Point c in newprimitiv)
-            {
-                if (c != p1)
-                { 
-                    var g = Graphics.FromImage(bmp);
-                    Pen p = new Pen(Color.Black, 1);
-                    g.DrawLine(p, p1, c);
-                    p1 = c;
-                    p.Dispose();
-                    g.Dispose();
-                    primitiv.Add(Tuple.Create(p1.X * 1.0, p1.Y * 1.0));
+                Point p1 = newprimitiv.First();
+                primitiv.Add(Tuple.Create(p1.X * 1.0, p1.Y * 1.0));
+                foreach (Point c in newprimitiv)
+                {
+                    if (c != p1)
+                    { 
+                        var g = Graphics.FromImage(bmp);
+                        Pen p = new Pen(Color.Black, 1);
+                        g.DrawLine(p, p1, c);
+                        p1 = c;
+                        p.Dispose();
+                        g.Dispose();
+                        primitiv.Add(Tuple.Create(p1.X * 1.0, p1.Y * 1.0));
+                    }
                 }
             }
 
-            if (newprimitiv.Count == 1)
-            {
-                bmp.SetPixel(p1.X, p1.Y, Color.Black);
-            }
             pictureBox1.Image = bmp;
 
         }
