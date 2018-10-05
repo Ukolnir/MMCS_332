@@ -29,6 +29,7 @@ namespace Task
             bmp = (Bitmap)pictureBox1.Image;
             Clear();
             pictureBox1.Image = bmp;
+            label5.Visible = false;
         }
 
         //удаление всех объектов

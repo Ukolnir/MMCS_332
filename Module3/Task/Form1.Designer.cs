@@ -121,7 +121,8 @@
             this.comboBox1.Items.AddRange(new object[] {
             "Смещение",
             "Поворот",
-            "Масштабирование"});
+            "Масштабирование",
+            "Положение точки относительно ребра"});
             this.comboBox1.Location = new System.Drawing.Point(33, 257);
             this.comboBox1.Name = "comboBox1";
             this.comboBox1.Size = new System.Drawing.Size(124, 21);
