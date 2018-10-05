@@ -42,6 +42,7 @@ namespace Task
             primitiv.Clear();
             dot = Tuple.Create(-1.0, -1.0);
             cnt = 0;
+            label5.Text = "";
         }
 
         List<Tuple<double, double>> primitiv = new List<Tuple<double,double>>(); //список точек для примитива
@@ -125,7 +126,6 @@ namespace Task
         private void find_center(ref double x, ref double y)
         {
 
-
             foreach (var c in primitiv)
             {
                 x += c.Item1;
@@ -167,7 +167,24 @@ namespace Task
                     break;
 
                 case "Положение точки относительно ребра":
-                    
+                    if (dot.Item1 == -1 || primitiv.Count != 2)
+                        return;
+                    Tuple<double, double> cm1 = primitiv.First();
+
+                    label5.Text = "Точка лежит относительно ребра: ";
+
+                    double yb = primitiv.Last().Item2 - cm1.Item2;
+                    double xb = primitiv.Last().Item1 - cm1.Item1;
+                    double ya = dot.Item2 - cm1.Item2;
+                    double xa = dot.Item1 - cm1.Item1;
+
+                    if (yb * xa - xb * ya > 0)
+                        label5.Text += " левее";
+                    else
+                        if (yb * xa - xb * ya < 0)
+                            label5.Text += " правее";
+                        else
+                            label5.Text += " лежит на прямой";
                     break;
             }
         }
@@ -272,7 +289,7 @@ namespace Task
                 case "Положение точки относительно ребра":
                     label2.Visible = false;
                     label5.Visible = true;
-                    label5.Text = "Точка лежит относительно ребра: ";
+                  //  label5.Text = "Точка лежит относительно ребра: ";
                     textBox1.Visible = false;
                     textBox2.Visible = false;
                     label3.Visible = false;
