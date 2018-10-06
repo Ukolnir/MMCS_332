@@ -18,7 +18,8 @@ namespace Task
         double[,] transferalMatrix;
         Tuple<double, double> dot;
         bool method = false; //применимость(true) или проверка
-      //  bool res = false; //для выведения результатов проверки
+        bool t5 = false;
+
 
         public Form1()
         {
@@ -43,6 +44,7 @@ namespace Task
             dot = Tuple.Create(-1.0, -1.0);
             cnt = 0;
             label5.Text = "";
+            t5 = false;
         }
 
         List<Tuple<double, double>> primitiv = new List<Tuple<double,double>>(); //список точек для примитива
@@ -50,7 +52,7 @@ namespace Task
 
         private void pictureBox1_MouseDown(object sender, MouseEventArgs e)
         {
-            if ((radioButton2.Checked && cnt < 1) || radioButton3.Checked) //для ребра больше одной линии нельзя
+            if ((radioButton2.Checked && (cnt < 1 || cnt < 2 && t5)) || radioButton3.Checked) //для ребра больше одной линии нельзя
             {
                 drawing = true;
                 primitiv.Add(Tuple.Create(e.X * 1.0, e.Y * 1.0));
@@ -73,22 +75,38 @@ namespace Task
             button2.Text = "Применить";
             button2.Visible = true;
 
-            if ((radioButton2.Checked && cnt > 1) || ! drawing ) return;
+            if ((radioButton2.Checked && (cnt > 1 && !t5 || cnt > 2 && t5)) || ! drawing ) return;
 
             list.Add(new Point(e.X, e.Y));
             primitiv.Add(Tuple.Create(e.X * 1.0, e.Y * 1.0));
             Point start = list.First();
 
-            foreach (var p in list)
+            if (!t5)
+            {
+                foreach (var p in list)
+                {
+                    var pen = new Pen(Color.Black, 1);
+                    var g = Graphics.FromImage(pictureBox1.Image);
+                    g.DrawLine(pen, start, p);
+                    pen.Dispose();
+                    g.Dispose();
+                    pictureBox1.Image = pictureBox1.Image;
+
+                    start = p;
+                }
+            }
+            else
             {
                 var pen = new Pen(Color.Black, 1);
                 var g = Graphics.FromImage(pictureBox1.Image);
-                g.DrawLine(pen, start, p);
+                g.DrawLine(pen, start, new Point(Convert.ToInt32(Math.Round(primitiv[1].Item1)), Convert.ToInt32(Math.Round(primitiv[1].Item2))));
+                g.DrawLine(pen, new Point(Convert.ToInt32(Math.Round(primitiv[2].Item1)), Convert.ToInt32(Math.Round(primitiv[2].Item2))), 
+                    new Point(Convert.ToInt32(Math.Round(primitiv[3].Item1)), Convert.ToInt32(Math.Round(primitiv[3].Item2))));
                 pen.Dispose();
                 g.Dispose();
                 pictureBox1.Image = pictureBox1.Image;
-                start = p;
             }
+
             drawing = false;
         }
 
@@ -140,6 +158,87 @@ namespace Task
         {
             textBox1.Text = e.X.ToString();
             textBox2.Text = e.Y.ToString();
+        }
+
+        bool less1(double p1, double p2)
+        {
+	        return (p1<p2 && Math.Abs(p1 - p2) >= 0.00001);
+        }
+
+    bool less_or_equal(double x, double y)
+        {
+            return Math.Abs(x - y) < 0.0001 || less1(x, y);
+        }
+
+        private bool vert_intersect(Tuple<double, double> c1, Tuple<double, double> c2, Tuple<double, double> d1, Tuple<double, double> d2, ref Point p)
+        {
+	        double x1 = c1.Item1;
+            //Ax+b=y, A - tang
+            double tan2 = (d1.Item2 - d2.Item2) / (d1.Item1 - d2.Item1);
+            double b2 = d1.Item2 - tan2 * d1.Item1;
+            double y1 = tan2 * x1 + b2;
+
+	        //x,y лежат в заданных диапазонах 
+	        if (less_or_equal(d1.Item1, x1) && less_or_equal(x1, d2.Item1) && less_or_equal(Math.Min(c1.Item2, c2.Item2), y1) 
+                        && less_or_equal(y1, Math.Max(c1.Item2, c2.Item2)))
+	        {
+		        p.X = Convert.ToInt32(Math.Round(x1));
+                p.Y = Convert.ToInt32(Math.Round(y1));
+                return true;
+	        }
+	        return false;
+        }
+
+
+        bool intersect(Tuple<double, double> r1, Tuple<double, double> r2, Tuple<double, double> d1, Tuple<double, double> d2, ref Point p)
+        {
+            if (r1.Item1 == d1.Item1 && r1.Item2 == d1.Item2 || r1.Item1 == d2.Item1 && r1.Item2 == d2.Item2)
+            {
+                p = new Point(Convert.ToInt32(Math.Round(r1.Item1)), Convert.ToInt32(Math.Round(r1.Item2)));
+                return true;
+            }
+
+            if (r2.Item1 == d1.Item1 && d1.Item2 == r2.Item2 || d1.Item1 == r2.Item1 && d1.Item2 == r2.Item2)
+            {
+                p = new Point(Convert.ToInt32(Math.Round(d1.Item1)), Convert.ToInt32(Math.Round(d1.Item2)));
+                return true;
+            }
+
+            if (Math.Abs(d1.Item1 - d2.Item1) < 0.0001)
+                return vert_intersect(d1, d2, r1, r2, ref p);
+
+            if (Math.Abs(r1.Item1 - r2.Item1) < 0.0001)
+                return vert_intersect(r1, r2, d1, d2, ref p);
+
+                //Ax+b = y
+            double a1 = (r1.Item2 - r2.Item2) / (r1.Item1 - r2.Item1);
+            double a2 = (d1.Item2 - d2.Item2) / (d1.Item1 - d2.Item1);
+            double b1 = r1.Item2 - a1 * r1.Item1;
+            double b2 = d1.Item2 - a2 * d1.Item1;
+
+            if (a1 == a2)
+                return false; //отрезки параллельны
+
+
+            //x - абсцисса точки пересечения двух прямых
+            double x = (b2 - b1) / (a1 - a2);
+            double y = a1 * x + b1;
+
+            if (less1(x, Math.Min(r1.Item1, r2.Item1)) || less1(Math.Max(r1.Item1, r2.Item1), x) ||
+                less1(x, Math.Min(d1.Item1, d2.Item1)) || less1(Math.Max(d1.Item1, d2.Item1), x) ||
+                less1(y, Math.Min(r1.Item2, r2.Item2)) || less1(Math.Max(r1.Item2, r2.Item2), y) ||
+                less1(y, Math.Min(d1.Item2, d2.Item2)) || less1(Math.Max(d1.Item2, d2.Item2), y))
+                return false; //точка x находится вне пересечения проекций отрезков на ось X 
+
+            p.X = Convert.ToInt32(Math.Round(x));
+            p.Y = Convert.ToInt32(Math.Round(y));
+            return true;
+        }
+
+        //поиск точки пересечения
+        private bool intersection_point_search(ref Point p)
+        {
+            return intersect(primitiv[0], primitiv[1], primitiv[2], primitiv[3], ref p);
         }
 
         private void choose_method()
@@ -196,6 +295,31 @@ namespace Task
                             label5.Text += " правее";
                         else
                             label5.Text += " лежит на прямой";
+                    break;
+
+                case "Принадлежит ли точка выпуклому многоугольнику":
+                    if (dot.Item1 == -1 || primitiv.Count < 2)
+                        return;
+
+                    cm1 = primitiv.First();
+                    break;
+
+                case "Поиск точки пересечения двух ребер":
+                    t5 = true;
+                    if (primitiv.Count == 4)
+                    {
+                        label5.Text = "Точка пересечения найдена: ";
+                        Point p1 = new Point(-1,-1);
+                        bool f = intersection_point_search(ref p1);
+                        if (f)
+                        {
+                            label5.Text += " Да;  Координаты: " + p1.X.ToString() + " " + p1.Y.ToString();
+                            ((Bitmap)pictureBox1.Image).SetPixel(p1.X, p1.Y, Color.Red);
+                            pictureBox1.Image = pictureBox1.Image;
+                        }
+                        else
+                            label5.Text += " Нет";
+                    }
                     break;
             }
         }
@@ -314,6 +438,28 @@ namespace Task
                     method = false;
                     break;
 
+                case "Принадлежит ли точка выпуклому многоугольнику":
+                    label2.Visible = false;
+                    label5.Visible = true;
+                    label5.Text = "Принадлежт точка многоугольнику: ";
+                    textBox1.Visible = false;
+                    textBox2.Visible = false;
+                    label3.Visible = false;
+                    textBox3.Visible = false;
+                    method = false;
+                    break;
+
+                case "Поиск точки пересечения двух ребер":
+                    label5.Visible = true;
+                    label5.Text = "Нарисуйте новую прямую: ";
+                    textBox1.Visible = false;
+                    textBox2.Visible = false;
+                    label3.Visible = false;
+                    textBox3.Visible = false;
+                    method = false;
+                   // cnt = 0;
+                    t5 = true;
+                    break;
             }
         }
     }
