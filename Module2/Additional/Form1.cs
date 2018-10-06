@@ -12,14 +12,14 @@ namespace Additional
 {
     public partial class Form1 : Form
     {
-        static Color c;
+        static Color penColor;
         OpenFileDialog open_dialog;
         private static Bitmap image;
 
         private static Color borderColor, innerColor, myBorderColor;
 
         private static Graphics g;
-        Pen pen = new Pen(c, 1);
+        Pen pen;
 
         //Изменение размера изображения
         public Bitmap ResizeBitmap(Bitmap bmp, int width, int height)
@@ -145,6 +145,28 @@ namespace Additional
             }
         }
 
+        private void drawLine(int x1, int x2, int y)
+        {
+            if (x1 > x2)
+            {
+                int t = x2;
+                x2 = x1;
+                x1 = t;
+            }
+                
+            int xLeft = x1, xRight = x1;
+            
+            for (int i = x1; i < x2; ++i)
+            {
+                xRight = i;
+                if (colorsEqual(borderColor, image.GetPixel(i, y)))
+                {
+                    break;
+                }
+            }
+            g.DrawLine(pen, new Point(xLeft, y), new Point(xRight, y));
+        }
+
         //Получение всей границы
         private List<Tuple<int, int>> getFullBorder(int x, int y)
         {
@@ -230,19 +252,26 @@ namespace Additional
 
                     //++cntSteps;
                 }*/
+                /*
                 if (d.ContainsKey(y))
                 {
-                    g.DrawLine(pen, new Point(d[y], y), new Point(x, y));
-                    d.Remove(y);
+                    drawLine(d[y], x, y);
+                    for (int i_y = y; i_y <= y; ++ i_y)
+                    {
+                        if (d.ContainsKey(i_y))
+                            d.Remove(i_y);
+                    }
+                    //d.Remove(y);
                 }
                 else
                     d.Add(y, x);
+                    */
                 points.Add(Tuple.Create(x, y));
                 getNextPixel(ref x, ref y, ref whereBorder, ref direction);
             } while (((x != firstX) || (y != firstY)) && (points.Count() < (image.Width + image.Height) * 10));
             //points.Concat(points2);
             //points.Concat(points3);
-            pictureBox1.Image = pictureBox1.Image;
+            //pictureBox1.Image = pictureBox1.Image;
             return points;
         }
 
@@ -328,6 +357,41 @@ namespace Additional
             return yBorders;
         }
 
+        //Получение для одного У всех соответствующих ему Х
+        private List<Tuple<int, List<int>>> getYandRelatedX(ref List<Tuple<int, int>> points)
+        {
+            List<Tuple<int, List<int>>> yXs =
+                new List<Tuple<int, List<int>>>();
+            //Предыдущее значение
+            int prevy = points.First().Item2;
+            int currx = 0;
+            int curry = 0;
+
+            //Список X для одного У
+            List<int> xs = new List<int>();
+
+            foreach (var t in points)
+            {
+                currx = t.Item1;
+                curry = t.Item2;
+
+                if (curry == prevy)
+                {
+                    xs.Add(currx);
+                }
+                else
+                {
+                    yXs.Add(Tuple.Create(prevy, xs));
+                    xs = new List<int>();
+                    xs.Add(currx);
+                    prevy = curry;
+                }
+            }
+            yXs.Add(Tuple.Create(curry, xs));
+            
+            return yXs;
+        }
+
         public Form1()
         {
             InitializeComponent();
@@ -335,9 +399,9 @@ namespace Additional
             colorDialog1.FullOpen = true;
             // установка начального цвета для colorDialog
             colorDialog1.Color = Color.Red;
-            c = Color.Red;
+            penColor = Color.Red;
 
-            label2.BackColor = c;
+            label2.BackColor = penColor;
         }
 
         void button2_Click(object sender, EventArgs e)
@@ -346,8 +410,8 @@ namespace Additional
                 return;
             
             // установка цвета формы
-            c = colorDialog1.Color;
-            label2.BackColor = c;
+            penColor = colorDialog1.Color;
+            label2.BackColor = penColor;
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -365,6 +429,26 @@ namespace Additional
                 //Изменение размера изображения до размера pictureBox
                 image = ResizeBitmap(imageSource, pictureBox1.Size.Width, pictureBox1.Size.Height);
             }
+        }
+
+        private void fillByPoints(ref List<Tuple<int, int>> points)
+        {
+            List<Tuple<int, List<int>>> yXs = getYandRelatedX(ref points);
+
+            foreach (var t in yXs)
+            {
+                int curry = t.Item1;
+                List<int> xs = t.Item2;
+                for (int i_x1 = 0; i_x1 < xs.Count; ++i_x1)
+                {
+                    for (int i_x2 = i_x1+1; i_x2 < xs.Count; ++i_x2)
+                    {
+                        drawLine(xs[i_x1], xs[i_x2], curry);
+                    }
+                }
+
+            }
+            pictureBox1.Image = pictureBox1.Image;
         }
 
         //находим внут. границу
@@ -457,6 +541,8 @@ namespace Additional
         private void pictureBox1_MouseClick(object sender, MouseEventArgs e)
         {
             g = Graphics.FromImage(pictureBox1.Image);
+            pen = new Pen(penColor, 1);
+
 
             var loc = e.Location;
             var x = loc.X;
@@ -473,6 +559,8 @@ namespace Additional
             List<Tuple<int, int>> pointsSorted = new List<Tuple<int, int>>(
                 points.OrderBy(t => t.Item2).ThenBy(t => t.Item1).ToList().Distinct().ToList());
 
+            fillByPoints(ref pointsSorted);
+
             //Получение У и соответствующих ему интервалов
             LinkedList<Tuple<int, LinkedList<Tuple<int, int>>>> yBorders = getYandBorders(ref pointsSorted);
 
@@ -486,7 +574,7 @@ namespace Additional
         }
 
         private void fill(LinkedList<Tuple<int, LinkedList<Tuple<int, int>>>> lst) {
-          
+         
             foreach (Tuple<int, LinkedList<Tuple<int, int>>> l in lst) {
                 int y = l.Item1;
                 foreach (Tuple<int, int> s in l.Item2) {
