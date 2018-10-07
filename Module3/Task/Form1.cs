@@ -44,6 +44,7 @@ namespace Task
             dot = Tuple.Create(-1.0, -1.0);
             cnt = 0;
             label5.Text = "";
+            comboBox1.SelectedItem = "...";
             t5 = false;
         }
 
@@ -60,10 +61,11 @@ namespace Task
                 cnt++;
             }
 
-            if (radioButton1.Checked)
+            if (radioButton1.Checked && dot.Item1 == -1)
             {
                 dot = Tuple.Create(e.X * 1.0, e.Y * 1.0);
                 ((Bitmap)pictureBox1.Image).SetPixel(e.X, e.Y, Color.Black);
+
                 pictureBox1.Image = pictureBox1.Image;
             }
         }
@@ -241,6 +243,43 @@ namespace Task
             return intersect(primitiv[0], primitiv[1], primitiv[2], primitiv[3], ref p);
         }
 
+        //принадлежность точки к многоугольнику
+        private bool point_affiliation()
+        {
+            Tuple<double, double> dot1 = Tuple.Create(pictureBox1.Width - 1.0, dot.Item2);
+            int cnt = 0;
+            Point p = new Point(0, 0);
+            Tuple<double, double> p1 = primitiv.First();
+
+            int num = 0;
+
+            foreach (var p2 in primitiv)
+            {
+                if (p1 == p2) continue;
+
+                if (dot.Item1 <= p1.Item1 && Math.Abs(dot.Item2 - p1.Item2) < 0.0001 && num == 0)
+                {
+                    num++;
+                    continue;
+                }
+                else
+                    num = 0;
+
+                if (intersect(dot, dot1, p1, p2, ref p))
+                    cnt++;
+
+                p1 = p2;
+            }
+
+            if (!(dot.Item1 <= p1.Item1 && Math.Abs(dot.Item2 - p1.Item2) < 0.0001 && num == 0))
+            {
+
+                if (intersect(dot, dot1, p1, primitiv.First(), ref p))
+                    cnt++;
+            }
+            return cnt % 2 != 0;
+        }
+
         private void choose_method()
         {
             //Выбор матрицы афинного преобразования
@@ -297,11 +336,15 @@ namespace Task
                             label5.Text += " лежит на прямой";
                     break;
 
-                case "Принадлежит ли точка выпуклому многоугольнику":
-                    if (dot.Item1 == -1 || primitiv.Count < 2)
+                case "Принадлежит ли точка многоугольнику":
+                    if (dot.Item1 == -1 || primitiv.Count < 3)
                         return;
 
-                    cm1 = primitiv.First();
+                    if (point_affiliation())
+                        label5.Text += " да";
+                    else
+                        label5.Text += " нет";
+
                     break;
 
                 case "Поиск точки пересечения двух ребер":
@@ -313,13 +356,26 @@ namespace Task
                         bool f = intersection_point_search(ref p1);
                         if (f)
                         {
-                            label5.Text += " Да;  Координаты: " + p1.X.ToString() + " " + p1.Y.ToString();
+                            label5.Text += " да;  Координаты: " + p1.X.ToString() + " " + p1.Y.ToString();
                             ((Bitmap)pictureBox1.Image).SetPixel(p1.X, p1.Y, Color.Red);
+
+                            if (p1.X - 1 > 0)
+                                ((Bitmap)pictureBox1.Image).SetPixel(p1.X - 1, p1.Y, Color.Red);
+                            if (p1.Y - 1 > 0)
+                                ((Bitmap)pictureBox1.Image).SetPixel(p1.X, p1.Y - 1, Color.Red);
+
+                            if (p1.X + 1 < pictureBox1.Width)
+                                ((Bitmap)pictureBox1.Image).SetPixel(p1.X + 1, p1.Y, Color.Red);
+                            if (p1.Y + 1 < pictureBox1.Height)
+                                ((Bitmap)pictureBox1.Image).SetPixel(p1.X, p1.Y + 1, Color.Red);
                             pictureBox1.Image = pictureBox1.Image;
                         }
                         else
-                            label5.Text += " Нет";
+                            label5.Text += " нет";
                     }
+                    break;
+
+                default:
                     break;
             }
         }
@@ -438,10 +494,10 @@ namespace Task
                     method = false;
                     break;
 
-                case "Принадлежит ли точка выпуклому многоугольнику":
+                case "Принадлежит ли точка многоугольнику":
                     label2.Visible = false;
                     label5.Visible = true;
-                    label5.Text = "Принадлежт точка многоугольнику: ";
+                    label5.Text = "Принадлежит точка многоугольнику: ";
                     textBox1.Visible = false;
                     textBox2.Visible = false;
                     label3.Visible = false;
@@ -459,6 +515,9 @@ namespace Task
                     method = false;
                    // cnt = 0;
                     t5 = true;
+                    break;
+
+                default:
                     break;
             }
         }

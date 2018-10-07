@@ -117,13 +117,13 @@
             // 
             this.comboBox1.FormattingEnabled = true;
             this.comboBox1.Items.AddRange(new object[] {
+            "...",
             "Смещение",
             "Поворот",
             "Масштабирование",
             "Поиск точки пересечения двух ребер",
             "Положение точки относительно ребра",
-            "Принадлежит ли точка выпуклому многоугольнику",
-            "Принадлежит ли точка невыпуклому многоугольнику"});
+            "Принадлежит ли точка многоугольнику"});
             this.comboBox1.Location = new System.Drawing.Point(33, 257);
             this.comboBox1.Name = "comboBox1";
             this.comboBox1.Size = new System.Drawing.Size(124, 21);
