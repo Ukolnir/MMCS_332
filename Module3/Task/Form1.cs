@@ -309,6 +309,7 @@ namespace Task
                     double c = System.Convert.ToDouble(textBox1.Text);
                     double d = System.Convert.ToDouble(textBox2.Text);
                     double p = System.Convert.ToDouble(textBox3.Text) * Math.PI / 180;
+					radioButton3.Checked = true;
                     double cos = Math.Cos(p);
                     double sin = Math.Sin(p);
                     transferalMatrix = new double[,] { {cos, sin, 0}, {-sin, cos, 0}, 
@@ -406,11 +407,13 @@ namespace Task
                 }
                 else
                 {
+					List<Tuple<double, double>> l1 = new List<Tuple<double, double>>();
                     foreach (Tuple<double, double> p in primitiv)
                     {
                         double[,] point = new double[,] { { p.Item1, p.Item2, 1.0 } };
                         double[,] res = matrix_multiplication(point, transferalMatrix);
-                        newprimitiv.Add(new Point(Convert.ToInt32(Math.Round(res[0, 0])), Convert.ToInt32(Math.Round(res[0, 1]))));
+						l1.Add(Tuple.Create(res[0, 0], res[0, 1]));
+						newprimitiv.Add(new Point(Convert.ToInt32(Math.Round(res[0, 0])), Convert.ToInt32(Math.Round(res[0, 1]))));
                     }
 
                     ClearWithout();
@@ -429,9 +432,11 @@ namespace Task
                             p1 = c;
                             p.Dispose();
                             g.Dispose();
-                            primitiv.Add(Tuple.Create(p1.X * 1.0, p1.Y * 1.0));
                         }
                     }
+
+					primitiv = l1;
+
                 }
 
                 pictureBox1.Image = bmp;
@@ -439,11 +444,18 @@ namespace Task
            
         }
 
-        private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
+		private void fff(object sender, EventArgs e) {
+
+
+		}
+
+
+		private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
         {
             //Опасная секция
             pictureBox1.MouseDown -= (MouseEventHandler)pictureBox1_MouseDown1;
             pictureBox1.MouseDown += new MouseEventHandler(pictureBox1_MouseDown);
+			pictureBox1.MouseUp += new MouseEventHandler(pictureBox_MouseUp);
 
             switch (comboBox1.SelectedItem.ToString())
             {
@@ -470,6 +482,8 @@ namespace Task
                     //Опасная секция
                     pictureBox1.MouseDown -= (MouseEventHandler)pictureBox1_MouseDown;
                     pictureBox1.MouseDown += new MouseEventHandler(pictureBox1_MouseDown1);
+					pictureBox1.MouseUp += new MouseEventHandler(fff);
+					pictureBox1.MouseUp -= (MouseEventHandler)pictureBox_MouseUp;
                     break;
 
                 case "Масштабирование":
