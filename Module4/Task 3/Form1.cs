@@ -37,7 +37,9 @@ namespace Task_3
 			bmp.SetPixel(x - 1, y + 1, c);
 			bmp.SetPixel(x + 1, y - 1, c);
 			bmp.SetPixel(x - 1, y - 1, c);
-		}
+
+            pictureBox1.Image = bmp;
+        }
 
 		private bool addPoint(int x, int y)
 		{
@@ -48,7 +50,6 @@ namespace Task_3
 				drawPoint(x, y, Color.Black);
 
 				label1.Text = "Point added";
-				pictureBox1.Image = bmp;
 
 				return true;
 			}
@@ -76,7 +77,6 @@ namespace Task_3
 					drawPoint(p.X, p.Y, pictureBox1.BackColor);
 
 					label1.Text = "Point deleted";
-					pictureBox1.Image = bmp;
 
 					return true;
 				}
@@ -133,5 +133,55 @@ namespace Task_3
 				}
 			}
 		}
-	}
+
+        private PointF q(PointF p0, PointF p1, float t)
+        {
+            return new PointF(p0.X * (1 - t) + p1.X * t, p0.Y * (1 - t) + p1.Y * t);
+        }
+
+        private PointF r(PointF p0, PointF p1, PointF p2, float t)
+        {
+            return new PointF(q(p0, p1, t).X * (1 - t) + q(p1, p2, t).X * t,
+                q(p0, p1, t).Y * (1 - t) + q(p1, p2, t).Y * t);
+        }
+
+        private PointF b(PointF p0, PointF p1, PointF p2, PointF p3, float t)
+        {
+            return new PointF(r(p0, p1, p2, t).X * (1 - t) + r(p1, p2, p3, t).X * t, 
+                r(p0, p1, p2, t).Y * (1 - t) + r(p1, p2, p3, t).Y * t);
+        }
+
+        private void drawLine(PointF p1, PointF p2, Color c)
+        {
+            g.DrawLine(new Pen(c), new Point((int)p1.X, (int)p1.Y), new Point((int)p2.X, (int)p2.Y));
+            pictureBox1.Image = pictureBox1.Image;
+        }
+
+        private void drawCurve()
+        {
+            if (points.Count() > 3)
+            {
+                Point p0 = points[0];
+                Point p1 = points[1];
+                Point p2 = points[2];
+                Point p3 = points[3];
+
+                
+                PointF prevP = b(p0, p1, p2, p3, (float)0);
+                for (int i = 1; i < 100; ++i)
+                {
+                    PointF p = b(p0, p1, p2, p3, (float)i / 100);
+
+                    drawLine(prevP, p, Color.Red);
+                    prevP = p;
+                }
+            }
+        }
+
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            drawCurve();
+        }
+    }
 }
