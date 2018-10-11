@@ -199,6 +199,7 @@ namespace Task_2
             {
                 cnt++;
 
+                R = double.Parse(textBox5.Text);
                 if (cnt == 1)
                 {
                     button2.Text = "Следующий шаг";
@@ -208,8 +209,6 @@ namespace Task_2
                     points.Add(pl);
                     points.Add(pr);
                     button4.Visible = true;
-
-                    R = double.Parse(textBox5.Text);
                 }
                 else
                 {
