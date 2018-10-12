@@ -34,6 +34,7 @@
             this.radioDelete = new System.Windows.Forms.RadioButton();
             this.radioMove = new System.Windows.Forms.RadioButton();
             this.button1 = new System.Windows.Forms.Button();
+            this.button2 = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.SuspendLayout();
             // 
@@ -41,7 +42,7 @@
             // 
             this.pictureBox1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.pictureBox1.Location = new System.Drawing.Point(303, 15);
-            this.pictureBox1.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.pictureBox1.Margin = new System.Windows.Forms.Padding(4);
             this.pictureBox1.Name = "pictureBox1";
             this.pictureBox1.Size = new System.Drawing.Size(757, 617);
             this.pictureBox1.TabIndex = 0;
@@ -53,7 +54,7 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(16, 15);
+            this.label1.Location = new System.Drawing.Point(15, 70);
             this.label1.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(46, 17);
@@ -63,8 +64,8 @@
             // radioAdd
             // 
             this.radioAdd.AutoSize = true;
-            this.radioAdd.Location = new System.Drawing.Point(20, 55);
-            this.radioAdd.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.radioAdd.Location = new System.Drawing.Point(19, 110);
+            this.radioAdd.Margin = new System.Windows.Forms.Padding(4);
             this.radioAdd.Name = "radioAdd";
             this.radioAdd.Size = new System.Drawing.Size(153, 21);
             this.radioAdd.TabIndex = 2;
@@ -75,8 +76,8 @@
             // radioDelete
             // 
             this.radioDelete.AutoSize = true;
-            this.radioDelete.Location = new System.Drawing.Point(20, 84);
-            this.radioDelete.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.radioDelete.Location = new System.Drawing.Point(19, 139);
+            this.radioDelete.Margin = new System.Windows.Forms.Padding(4);
             this.radioDelete.Name = "radioDelete";
             this.radioDelete.Size = new System.Drawing.Size(136, 21);
             this.radioDelete.TabIndex = 3;
@@ -87,8 +88,8 @@
             // radioMove
             // 
             this.radioMove.AutoSize = true;
-            this.radioMove.Location = new System.Drawing.Point(20, 112);
-            this.radioMove.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.radioMove.Location = new System.Drawing.Point(19, 167);
+            this.radioMove.Margin = new System.Windows.Forms.Padding(4);
             this.radioMove.Name = "radioMove";
             this.radioMove.Size = new System.Drawing.Size(165, 21);
             this.radioMove.TabIndex = 4;
@@ -106,18 +107,29 @@
             this.button1.UseVisualStyleBackColor = true;
             this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
+            // button2
+            // 
+            this.button2.Location = new System.Drawing.Point(13, 15);
+            this.button2.Name = "button2";
+            this.button2.Size = new System.Drawing.Size(243, 52);
+            this.button2.TabIndex = 6;
+            this.button2.Text = "clear";
+            this.button2.UseVisualStyleBackColor = true;
+            this.button2.Click += new System.EventHandler(this.button2_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1076, 647);
+            this.Controls.Add(this.button2);
             this.Controls.Add(this.button1);
             this.Controls.Add(this.radioMove);
             this.Controls.Add(this.radioDelete);
             this.Controls.Add(this.radioAdd);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.pictureBox1);
-            this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "Form1";
             this.Text = "Form1";
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
@@ -134,6 +146,7 @@
 		private System.Windows.Forms.RadioButton radioDelete;
 		private System.Windows.Forms.RadioButton radioMove;
         private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Button button2;
     }
 }
 

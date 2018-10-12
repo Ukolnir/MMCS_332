@@ -24,7 +24,28 @@ namespace Task_3
 		private static Graphics g;
 		private static Bitmap bmp;
 
-		private void drawPoint(int x, int y, Color c)
+        private void clear()
+        {
+            pictureBox1.Image = new Bitmap(pictureBox1.Width, pictureBox1.Height);
+            g = Graphics.FromImage(pictureBox1.Image);
+            bmp = (Bitmap)pictureBox1.Image;
+
+            points.Clear();
+        }
+
+        private void clearWithoutPoints()
+        {
+            pictureBox1.Image = new Bitmap(pictureBox1.Width, pictureBox1.Height);
+            g = Graphics.FromImage(pictureBox1.Image);
+            bmp = (Bitmap)pictureBox1.Image;
+
+            foreach (var p in points)
+            {
+                drawPoint(p.X, p.Y, Color.Black);
+            }
+        }
+
+        private void drawPoint(int x, int y, Color c)
 		{
 			bmp.SetPixel(x, y, c);
 
@@ -157,31 +178,85 @@ namespace Task_3
             pictureBox1.Image = pictureBox1.Image;
         }
 
+        private Point pointBetweenPoints(Point p1, Point p2)
+        {
+            return new Point((p1.X + p2.X) / 2, (p1.Y + p2.Y) / 2);
+        }
+
+        private void addPointsForDrawingCurve()
+        {
+            int s = points.Count();
+            if (s % 2 != 0)
+            {
+                Point p1 = points[s - 2];
+                Point p2 = points[s - 1];
+                points[s - 1] = pointBetweenPoints(p1, p2);
+                points.Add(p2);
+            }
+        }
+
+        private void drawCurveBy4Points(Point p0, Point p1, Point p2, Point p3)
+        {
+            PointF prevP = b(p0, p1, p2, p3, (float)0);
+            for (int i = 1; i <= 100; ++i)
+            {
+                PointF p = b(p0, p1, p2, p3, (float)i / 100);
+
+                drawLine(prevP, p, Color.Red);
+                prevP = p;
+            }
+        }
+
         private void drawCurve()
         {
-            if (points.Count() > 3)
+            if (points.Count() == 4)
             {
                 Point p0 = points[0];
                 Point p1 = points[1];
                 Point p2 = points[2];
                 Point p3 = points[3];
 
-                
-                PointF prevP = b(p0, p1, p2, p3, (float)0);
-                for (int i = 1; i < 100; ++i)
-                {
-                    PointF p = b(p0, p1, p2, p3, (float)i / 100);
+                drawCurveBy4Points(p0, p1, p2, p3);
+            }
+            if (points.Count() > 4)
+            {
+                addPointsForDrawingCurve();
+                int sz = points.Count();
 
-                    drawLine(prevP, p, Color.Red);
-                    prevP = p;
+                Point p0 = points[0];
+                Point p1 = points[1];
+                Point p2 = points[2];
+                Point p3 = pointBetweenPoints(points[2], points[3]);
+
+                drawCurveBy4Points(p0, p1, p2, p3);
+
+                for (int i = 3; i < sz-4; i += 2)
+                {
+                    p0 = pointBetweenPoints(points[i - 1], points[i]);
+                    p1 = points[i];
+                    p2 = points[i + 1];
+                    p3 = pointBetweenPoints(points[i + 1], points[i + 2]);
+
+                    drawCurveBy4Points(p0, p1, p2, p3);
                 }
+
+                p3 = points[sz - 1];
+                p2 = points[sz - 2];
+                p1 = points[sz - 3];
+                p0 = pointBetweenPoints(points[sz - 3], points[sz - 4]);
+                drawCurveBy4Points(p0, p1, p2, p3);
             }
         }
 
-
         private void button1_Click(object sender, EventArgs e)
         {
+            clearWithoutPoints();
             drawCurve();
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            clear();
         }
     }
 }
