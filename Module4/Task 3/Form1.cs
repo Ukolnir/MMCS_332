@@ -23,6 +23,12 @@ namespace Task_3
 		private static List<Point> points = new List<Point>();
 		private static Graphics g;
 		private static Bitmap bmp;
+        private bool haveFictivePoint = false;
+        private Point fictivePoint = new Point();
+        private bool nowMoving = false;
+        private int indOfMovingPoint = -1;
+
+        private System.IO.StreamWriter writer = new System.IO.StreamWriter("indices.txt");
 
         private void clear()
         {
@@ -62,13 +68,17 @@ namespace Task_3
             pictureBox1.Image = bmp;
         }
 
-		private bool addPoint(int x, int y)
+		private bool addPoint(int x, int y, Color c, int index = -1)
 		{
 			if (x > 0 && x < pictureBox1.Width && y > 0 && y < pictureBox1.Height)
 			{
-				points.Add(new Point(x, y));
+                Point p = new Point(x, y);
+                if (index == -1)
+                    points.Add(p);
+                else
+                    points.Insert(index, p);
 
-				drawPoint(x, y, Color.Black);
+				drawPoint(x, y, c);
 
 				label1.Text = "Point added";
 
@@ -86,16 +96,24 @@ namespace Task_3
 		{
 			if (x > 0 && x < pictureBox1.Width && y > 0 && y < pictureBox1.Height)
 			{
-				Point p;
+                int indToDel = 0;
 				int diff = 7;
 				if (points.Exists(point => ((point.X > x - diff) && (point.X < x + diff)) &&
 					((point.Y > y - diff) && (point.Y < y + diff))))
 				{
-					p = points.Find(point => ((point.X > x - diff) && (point.X < x + diff)) &&
+					indToDel = points.FindIndex(point => ((point.X > x - diff) && (point.X < x + diff)) &&
 						((point.Y > y - diff) && (point.Y < y + diff)));
-					points.Remove(p);
 
-					drawPoint(p.X, p.Y, pictureBox1.BackColor);
+                    drawPoint(points[indToDel].X, points[indToDel].Y, pictureBox1.BackColor);
+
+                    points.RemoveAt(indToDel);
+
+                    if (nowMoving && indOfMovingPoint == -1)
+                    {
+                        indOfMovingPoint = indToDel;
+                        writer.WriteLine(indToDel);
+                        writer.Flush();
+                    }
 
 					label1.Text = "Point deleted";
 
@@ -122,13 +140,21 @@ namespace Task_3
 			int y = e.Location.Y;
 			if (radioAdd.Checked)
 			{
-				addPoint(x, y);
-			}
+				addPoint(x, y, Color.Black);
+            }
 			if (radioDelete.Checked)
 			{
 				deletePoint(x, y);
+
+                if (haveFictivePoint)
+                {
+                    deletePoint(fictivePoint.X, fictivePoint.Y);
+                    haveFictivePoint = false;
+                }
 			}
-		}
+            clearWithoutPoints();
+            drawObject();
+        }
 
 		private void pictureBox1_MouseDown(object sender, MouseEventArgs e)
 		{
@@ -137,8 +163,19 @@ namespace Task_3
 
 			if (radioMove.Checked)
 			{
+                nowMoving = true;
 				deletePoint(x, y);
-			}
+
+                /*
+                if (haveFictivePoint)
+                {
+                    deletePoint(fictivePoint.X, fictivePoint.Y);
+                    haveFictivePoint = false;
+                }
+                */
+                clearWithoutPoints();
+                drawObject();
+            }
 		}
 
 		private void pictureBox1_MouseUp(object sender, MouseEventArgs e)
@@ -148,10 +185,15 @@ namespace Task_3
 
 			if (radioMove.Checked)
 			{
-				if (addPoint(x, y))
+                int ind = System.Math.Min(indOfMovingPoint, points.Count());
+				if (addPoint(x, y, Color.Black, ind))
 				{
 					label1.Text = "Point moved";
-				}
+                    clearWithoutPoints();
+                    drawObject();
+                }
+                nowMoving = false;
+                indOfMovingPoint = -1;
 			}
 		}
 
@@ -185,13 +227,29 @@ namespace Task_3
 
         private void addPointsForDrawingCurve()
         {
+            
             int s = points.Count();
-            if (s % 2 != 0)
+
+            if (s % 2 != 0 && s > 4)
             {
-                Point p1 = points[s - 2];
-                Point p2 = points[s - 1];
-                points[s - 1] = pointBetweenPoints(p1, p2);
-                points.Add(p2);
+                if (!haveFictivePoint)
+                {
+                    Point p1 = points[s - 2];
+                    Point p2 = points[s - 1];
+                    Point pb = pointBetweenPoints(p1, p2);
+
+                    points[s - 1] = pb;
+                    drawPoint(pb.X, pb.Y, Color.Green);
+                    points.Add(p2);
+
+                    haveFictivePoint = true;
+                    fictivePoint = pb;
+                }
+                else
+                {
+                    deletePoint(fictivePoint.X, fictivePoint.Y);
+                    haveFictivePoint = false;
+                }
             }
         }
 
@@ -209,6 +267,7 @@ namespace Task_3
 
         private void drawCurve()
         {
+            addPointsForDrawingCurve();
             if (points.Count() == 4)
             {
                 Point p0 = points[0];
@@ -220,43 +279,84 @@ namespace Task_3
             }
             if (points.Count() > 4)
             {
-                addPointsForDrawingCurve();
+                //addPointsForDrawingCurve();
                 int sz = points.Count();
 
-                Point p0 = points[0];
-                Point p1 = points[1];
-                Point p2 = points[2];
-                Point p3 = pointBetweenPoints(points[2], points[3]);
-
-                drawCurveBy4Points(p0, p1, p2, p3);
-
-                for (int i = 3; i < sz-4; i += 2)
+                if (sz % 2 == 0)
                 {
-                    p0 = pointBetweenPoints(points[i - 1], points[i]);
-                    p1 = points[i];
-                    p2 = points[i + 1];
-                    p3 = pointBetweenPoints(points[i + 1], points[i + 2]);
+                    Point p0 = points[0];
+                    Point p1 = points[1];
+                    Point p2 = points[2];
+                    Point p3 = pointBetweenPoints(points[2], points[3]);
 
                     drawCurveBy4Points(p0, p1, p2, p3);
-                }
 
-                p3 = points[sz - 1];
-                p2 = points[sz - 2];
-                p1 = points[sz - 3];
-                p0 = pointBetweenPoints(points[sz - 3], points[sz - 4]);
-                drawCurveBy4Points(p0, p1, p2, p3);
+                    for (int i = 3; i < sz - 4; i += 2)
+                    {
+                        p0 = pointBetweenPoints(points[i - 1], points[i]);
+                        p1 = points[i];
+                        p2 = points[i + 1];
+                        p3 = pointBetweenPoints(points[i + 1], points[i + 2]);
+
+                        drawCurveBy4Points(p0, p1, p2, p3);
+                    }
+
+                    p3 = points[sz - 1];
+                    p2 = points[sz - 2];
+                    p1 = points[sz - 3];
+                    p0 = pointBetweenPoints(points[sz - 3], points[sz - 4]);
+                    drawCurveBy4Points(p0, p1, p2, p3);
+                }
             }
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        private List<Point> sortByPolar(ref List<Point> pointsWithoutMin)
         {
-            clearWithoutPoints();
-            drawCurve();
+
+        }
+
+        private void drawConvex()
+        {
+            if (points.Count() > 2)
+            {
+                Point pMin = points[0];
+                int indMin = 0;
+                for (int i = 1; i < points.Count(); ++i)
+                {
+                    if ((points[i].Y > pMin.Y) || (points[i].Y == pMin.Y && points[i].X < pMin.X))
+                    {
+                        pMin = points[i];
+                        indMin = i;
+                    }
+                }
+
+                List<Point> pointsWithoutMin = points.ToList();
+                pointsWithoutMin.RemoveAt(indMin);
+
+                List<Point> sorted = sortByPolar(ref pointsWithoutMin);
+            }
+        }
+
+        private void drawObject()
+        {
+            if (listBoxMode.SelectedItem.ToString() == "BezeCurve")
+            {
+                drawCurve();   
+            }
+            if (listBoxMode.SelectedItem.ToString() == "GrahamScan")
+            {
+                drawConvex();
+            }
         }
 
         private void button2_Click(object sender, EventArgs e)
         {
             clear();
+        }
+
+        private void listBoxMode_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            label1.Text = listBoxMode.SelectedItem.ToString();
         }
     }
 }

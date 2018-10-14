@@ -33,8 +33,9 @@
             this.radioAdd = new System.Windows.Forms.RadioButton();
             this.radioDelete = new System.Windows.Forms.RadioButton();
             this.radioMove = new System.Windows.Forms.RadioButton();
-            this.button1 = new System.Windows.Forms.Button();
             this.button2 = new System.Windows.Forms.Button();
+            this.domainUpDown1 = new System.Windows.Forms.DomainUpDown();
+            this.listBoxMode = new System.Windows.Forms.ListBox();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.SuspendLayout();
             // 
@@ -54,7 +55,7 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(15, 70);
+            this.label1.Location = new System.Drawing.Point(13, 158);
             this.label1.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(46, 17);
@@ -64,7 +65,7 @@
             // radioAdd
             // 
             this.radioAdd.AutoSize = true;
-            this.radioAdd.Location = new System.Drawing.Point(19, 110);
+            this.radioAdd.Location = new System.Drawing.Point(13, 193);
             this.radioAdd.Margin = new System.Windows.Forms.Padding(4);
             this.radioAdd.Name = "radioAdd";
             this.radioAdd.Size = new System.Drawing.Size(153, 21);
@@ -76,7 +77,7 @@
             // radioDelete
             // 
             this.radioDelete.AutoSize = true;
-            this.radioDelete.Location = new System.Drawing.Point(19, 139);
+            this.radioDelete.Location = new System.Drawing.Point(13, 222);
             this.radioDelete.Margin = new System.Windows.Forms.Padding(4);
             this.radioDelete.Name = "radioDelete";
             this.radioDelete.Size = new System.Drawing.Size(136, 21);
@@ -88,7 +89,7 @@
             // radioMove
             // 
             this.radioMove.AutoSize = true;
-            this.radioMove.Location = new System.Drawing.Point(19, 167);
+            this.radioMove.Location = new System.Drawing.Point(13, 250);
             this.radioMove.Margin = new System.Windows.Forms.Padding(4);
             this.radioMove.Name = "radioMove";
             this.radioMove.Size = new System.Drawing.Size(165, 21);
@@ -97,33 +98,47 @@
             this.radioMove.Text = "Перемещение точки";
             this.radioMove.UseVisualStyleBackColor = true;
             // 
-            // button1
-            // 
-            this.button1.Location = new System.Drawing.Point(19, 211);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(237, 85);
-            this.button1.TabIndex = 5;
-            this.button1.Text = "draw curve";
-            this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.button1_Click);
-            // 
             // button2
             // 
-            this.button2.Location = new System.Drawing.Point(13, 15);
+            this.button2.Location = new System.Drawing.Point(13, 81);
             this.button2.Name = "button2";
             this.button2.Size = new System.Drawing.Size(243, 52);
             this.button2.TabIndex = 6;
             this.button2.Text = "clear";
             this.button2.UseVisualStyleBackColor = true;
-            this.button2.Click += new System.EventHandler(this.button2_Click);
+            // 
+            // domainUpDown1
+            // 
+            this.domainUpDown1.Items.Add("BezeCurve");
+            this.domainUpDown1.Items.Add("GrahamScan");
+            this.domainUpDown1.Location = new System.Drawing.Point(12, 34);
+            this.domainUpDown1.Name = "domainUpDown1";
+            this.domainUpDown1.Size = new System.Drawing.Size(223, 22);
+            this.domainUpDown1.TabIndex = 7;
+            this.domainUpDown1.Text = "BezeCurve";
+            // 
+            // listBoxMode
+            // 
+            this.listBoxMode.Cursor = System.Windows.Forms.Cursors.Arrow;
+            this.listBoxMode.DisplayMember = "BezeCurve";
+            this.listBoxMode.ItemHeight = 16;
+            this.listBoxMode.Items.AddRange(new object[] {
+            "BezeCurve",
+            "GrahamScan"});
+            this.listBoxMode.Location = new System.Drawing.Point(16, 315);
+            this.listBoxMode.Name = "listBoxMode";
+            this.listBoxMode.Size = new System.Drawing.Size(120, 84);
+            this.listBoxMode.TabIndex = 0;
+            this.listBoxMode.SelectedIndexChanged += new System.EventHandler(this.listBoxMode_SelectedIndexChanged);
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1076, 647);
+            this.Controls.Add(this.listBoxMode);
+            this.Controls.Add(this.domainUpDown1);
             this.Controls.Add(this.button2);
-            this.Controls.Add(this.button1);
             this.Controls.Add(this.radioMove);
             this.Controls.Add(this.radioDelete);
             this.Controls.Add(this.radioAdd);
@@ -145,8 +160,9 @@
 		private System.Windows.Forms.RadioButton radioAdd;
 		private System.Windows.Forms.RadioButton radioDelete;
 		private System.Windows.Forms.RadioButton radioMove;
-        private System.Windows.Forms.Button button1;
         private System.Windows.Forms.Button button2;
+        private System.Windows.Forms.DomainUpDown domainUpDown1;
+        private System.Windows.Forms.ListBox listBoxMode;
     }
 }
 
