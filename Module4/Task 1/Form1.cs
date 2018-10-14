@@ -47,6 +47,7 @@ namespace Task_1{
         int cnt;
         double angle;
         char direction;
+        int mode;
 
         List<Point> fractal;
 
@@ -77,7 +78,7 @@ namespace Task_1{
             fractal.Add(new Point(0, ht));
 
             double ang = 0;
-
+            //Здесь идет разветвление по режиму
             for (int i = 0; i < str.Length; ++i) {
                 switch (str[i]) { 
                     case 'F':
@@ -91,7 +92,7 @@ namespace Task_1{
 
                         break;
                     case '+':
-                        ang = (ang + angle);// % 360; //Может не сработать, но нужно именно такое поведение
+                        ang = (ang + angle);
                         break;
                     case '-':
                         ang = (ang - angle);
@@ -106,7 +107,7 @@ namespace Task_1{
             textBox1.Text = s;*/
         }
 
-        private void render() {
+        private void render(string str) {
             int minx, maxx, miny, maxy;
             IEnumerable<Point> query = fractal.OrderBy(x => x.X);
             minx = query.First().X;
@@ -115,11 +116,15 @@ namespace Task_1{
             miny = query.First().Y;
             maxy = query.Last().Y;
 
-            string s = "(" + minx + " ; " + miny + ") " + "(" + maxx + " ; " + maxy + ")";
+           // string s = "(" + minx + " ; " + miny + ") " + "(" + maxx + " ; " + maxy + ")";
           //  textBox1.Text = s;
 
-            fractal = fractal.Select(p => new Point(Convert.ToInt32(pictureBox1.Width * (p.X - minx) / (maxx - minx)), 
-                Convert.ToInt32(pictureBox1.Height*(p.Y - miny) / (maxy - miny)))).ToList();
+            if (maxy==miny)
+                fractal = fractal.Select(p => new Point(Convert.ToInt32((pictureBox1.Width-1) * (p.X - minx) / (maxx - minx)),
+                    pictureBox1.Height-5)).ToList();
+            else
+                fractal = fractal.Select(p => new Point(Convert.ToInt32((pictureBox1.Width - 1) * (p.X - minx) / (maxx - minx)),
+                    Convert.ToInt32((pictureBox1.Height-1) * (p.Y - miny) / (maxy - miny)))).ToList();
 
             g.DrawLines(new Pen(Color.Black), fractal.ToArray());
             pictureBox1.Image = pictureBox1.Image;
@@ -127,7 +132,7 @@ namespace Task_1{
 
         private void button1_Click(object sender, EventArgs e)
         {
-            cnt = Convert.ToInt32(textBox1.Text);
+            cnt = Convert.ToInt32(numericUpDown1.Value);
             axiom = param[0];  //аксиома
             rules = new Dictionary<char, string>(); //правила
             angle = Convert.ToDouble(param[1]); // угол
@@ -151,8 +156,14 @@ namespace Task_1{
                 pred = result;
             }
             //textBox1.Text = result;
+
+            if (result.Any(x => x == '['))
+                mode = 1;
+            else
+                mode = 0;
+            
             perform_fractal(result);
-            render();
+            render(result);
         }
 
         private void очиститьToolStripMenuItem_Click(object sender, EventArgs e){
