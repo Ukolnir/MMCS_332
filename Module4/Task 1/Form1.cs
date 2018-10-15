@@ -17,7 +17,6 @@ namespace Task_1{
             pictureBox1.Image = new Bitmap(pictureBox1.Width, pictureBox1.Height);
             bmp = (Bitmap)pictureBox1.Image;
             Clear();
-            //g = Graphics.FromImage(bmp);
             pictureBox1.Image = bmp;
         }
 
@@ -46,10 +45,11 @@ namespace Task_1{
         string axiom;
         int cnt;
         double angle;
-        char direction;
-        int mode;
+        string direction;
 
         List<Point> fractal;
+        List<int> nolinepoint;
+        Stack<Tuple<Point,double>> memory;
 
         private double[,] matrix_multiplication(double[,] m1, double[,] m2){
             double[,] res = new double[m1.GetLength(0), m2.GetLength(1)];
@@ -76,6 +76,9 @@ namespace Task_1{
             int ht = pictureBox1.Height;
             fractal = new List<Point>();
             fractal.Add(new Point(0, ht));
+            int countPoint = 0; //Первая точка - нулевая
+            memory = new Stack<Tuple<Point, double>>();
+            nolinepoint = new List<int>();
 
             double ang = 0;
             //Здесь идет разветвление по режиму
@@ -86,16 +89,26 @@ namespace Task_1{
                         int x, y;
                         x = p0.X + len;
                         y = p0.Y;
-
                         var p = rotation(ang, p0.X, p0.Y, x, y);
                         fractal.Add(p);
-
+                        ++countPoint;
                         break;
                     case '+':
                         ang = (ang + angle);
                         break;
                     case '-':
                         ang = (ang - angle);
+                        break;
+                    case '[':
+                        var temp = Tuple.Create(fractal.Last(), ang);
+                        memory.Push(temp);
+                        break;
+                    case ']':
+                        var t0 = memory.Pop();
+                        nolinepoint.Add(countPoint);
+                        fractal.Add(t0.Item1);
+                        ang = t0.Item2;
+                        ++countPoint;
                         break;
                     default:
                         break;
@@ -119,15 +132,23 @@ namespace Task_1{
            // string s = "(" + minx + " ; " + miny + ") " + "(" + maxx + " ; " + maxy + ")";
           //  textBox1.Text = s;
 
-            if (maxy==miny)
-                fractal = fractal.Select(p => new Point(Convert.ToInt32((pictureBox1.Width-1) * (p.X - minx) / (maxx - minx)),
-                    pictureBox1.Height-5)).ToList();
+            if (maxy == miny)
+                fractal = fractal.Select(p => new Point(Convert.ToInt32((pictureBox1.Width - 1) * (p.X - minx) / (maxx - minx)),
+                    pictureBox1.Height - 5)).ToList();
             else
                 fractal = fractal.Select(p => new Point(Convert.ToInt32((pictureBox1.Width - 1) * (p.X - minx) / (maxx - minx)),
-                    Convert.ToInt32((pictureBox1.Height-1) * (p.Y - miny) / (maxy - miny)))).ToList();
-
-            g.DrawLines(new Pen(Color.Black), fractal.ToArray());
+                    Convert.ToInt32((pictureBox1.Height - 1) * (p.Y - miny) / (maxy - miny)))).ToList();
+            
+            var pen = new Pen(Color.Black);
+            if (nolinepoint.Count == 0)
+                g.DrawLines(pen, fractal.ToArray());
+            else
+                for (int i = 0; i < fractal.Count-1; ++i) { 
+                    if(nolinepoint.Any(x=>x == i)) continue;
+                    g.DrawLine(pen, fractal[i], fractal[i + 1]);
+                }
             pictureBox1.Image = pictureBox1.Image;
+            pen.Dispose();
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -136,7 +157,7 @@ namespace Task_1{
             axiom = param[0];  //аксиома
             rules = new Dictionary<char, string>(); //правила
             angle = Convert.ToDouble(param[1]); // угол
-            direction = Convert.ToChar(param[2]); // направление
+            direction = param[2]; // направление
             for (int i = 3; i < param.Count; ++i){
                 char key = param[i][0];
                 rules.Add(key, param[i].Substring(3));
@@ -156,11 +177,6 @@ namespace Task_1{
                 pred = result;
             }
             //textBox1.Text = result;
-
-            if (result.Any(x => x == '['))
-                mode = 1;
-            else
-                mode = 0;
             
             perform_fractal(result);
             render(result);
