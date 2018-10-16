@@ -34,7 +34,6 @@
             this.radioDelete = new System.Windows.Forms.RadioButton();
             this.radioMove = new System.Windows.Forms.RadioButton();
             this.button2 = new System.Windows.Forms.Button();
-            this.domainUpDown1 = new System.Windows.Forms.DomainUpDown();
             this.listBoxMode = new System.Windows.Forms.ListBox();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.SuspendLayout();
@@ -106,16 +105,7 @@
             this.button2.TabIndex = 6;
             this.button2.Text = "clear";
             this.button2.UseVisualStyleBackColor = true;
-            // 
-            // domainUpDown1
-            // 
-            this.domainUpDown1.Items.Add("BezeCurve");
-            this.domainUpDown1.Items.Add("GrahamScan");
-            this.domainUpDown1.Location = new System.Drawing.Point(12, 34);
-            this.domainUpDown1.Name = "domainUpDown1";
-            this.domainUpDown1.Size = new System.Drawing.Size(223, 22);
-            this.domainUpDown1.TabIndex = 7;
-            this.domainUpDown1.Text = "BezeCurve";
+            this.button2.Click += new System.EventHandler(this.button2_Click);
             // 
             // listBoxMode
             // 
@@ -129,6 +119,7 @@
             this.listBoxMode.Name = "listBoxMode";
             this.listBoxMode.Size = new System.Drawing.Size(120, 84);
             this.listBoxMode.TabIndex = 0;
+            this.listBoxMode.Visible = false;
             this.listBoxMode.SelectedIndexChanged += new System.EventHandler(this.listBoxMode_SelectedIndexChanged);
             // 
             // Form1
@@ -137,7 +128,6 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1076, 647);
             this.Controls.Add(this.listBoxMode);
-            this.Controls.Add(this.domainUpDown1);
             this.Controls.Add(this.button2);
             this.Controls.Add(this.radioMove);
             this.Controls.Add(this.radioDelete);
@@ -161,7 +151,6 @@
 		private System.Windows.Forms.RadioButton radioDelete;
 		private System.Windows.Forms.RadioButton radioMove;
         private System.Windows.Forms.Button button2;
-        private System.Windows.Forms.DomainUpDown domainUpDown1;
         private System.Windows.Forms.ListBox listBoxMode;
     }
 }

@@ -28,6 +28,8 @@ namespace Task_3
         private bool nowMoving = false;
         private int indOfMovingPoint = -1;
 
+        private int diff_for_accuracy = 7;
+
         private System.IO.StreamWriter writer = new System.IO.StreamWriter("indices.txt");
 
         private void clear()
@@ -97,7 +99,7 @@ namespace Task_3
 			if (x > 0 && x < pictureBox1.Width && y > 0 && y < pictureBox1.Height)
 			{
                 int indToDel = 0;
-				int diff = 7;
+				int diff = diff_for_accuracy;
 				if (points.Exists(point => ((point.X > x - diff) && (point.X < x + diff)) &&
 					((point.Y > y - diff) && (point.Y < y + diff))))
 				{
@@ -107,13 +109,6 @@ namespace Task_3
                     drawPoint(points[indToDel].X, points[indToDel].Y, pictureBox1.BackColor);
 
                     points.RemoveAt(indToDel);
-
-                    if (nowMoving && indOfMovingPoint == -1)
-                    {
-                        indOfMovingPoint = indToDel;
-                        writer.WriteLine(indToDel);
-                        writer.Flush();
-                    }
 
 					label1.Text = "Point deleted";
 
@@ -164,7 +159,16 @@ namespace Task_3
 			if (radioMove.Checked)
 			{
                 nowMoving = true;
-				deletePoint(x, y);
+                //deletePoint(x, y);
+                int diff = diff_for_accuracy;
+                
+                if (nowMoving && indOfMovingPoint == -1)
+                {
+                    indOfMovingPoint = points.FindIndex(point => ((point.X > x - diff) && (point.X < x + diff)) &&
+                        ((point.Y > y - diff) && (point.Y < y + diff)));
+                    writer.WriteLine(indOfMovingPoint);
+                    writer.Flush();
+                }
 
                 /*
                 if (haveFictivePoint)
@@ -186,6 +190,8 @@ namespace Task_3
 			if (radioMove.Checked)
 			{
                 int ind = System.Math.Min(indOfMovingPoint, points.Count());
+                Point p = points[indOfMovingPoint];
+                deletePoint(p.X, p.Y);
 				if (addPoint(x, y, Color.Black, ind))
 				{
 					label1.Text = "Point moved";
@@ -310,10 +316,10 @@ namespace Task_3
             }
         }
 
-        private List<Point> sortByPolar(ref List<Point> pointsWithoutMin)
+        /*private List<Point> sortByPolar(ref List<Point> pointsWithoutMin)
         {
 
-        }
+        }*/
 
         private void drawConvex()
         {
@@ -333,19 +339,19 @@ namespace Task_3
                 List<Point> pointsWithoutMin = points.ToList();
                 pointsWithoutMin.RemoveAt(indMin);
 
-                List<Point> sorted = sortByPolar(ref pointsWithoutMin);
+                //List<Point> sorted = sortByPolar(ref pointsWithoutMin);
             }
         }
 
         private void drawObject()
         {
-            if (listBoxMode.SelectedItem.ToString() == "BezeCurve")
+            //if (listBoxMode.SelectedItem.ToString() == "BezeCurve")
             {
                 drawCurve();   
             }
-            if (listBoxMode.SelectedItem.ToString() == "GrahamScan")
+            //if (listBoxMode.SelectedItem.ToString() == "GrahamScan")
             {
-                drawConvex();
+            //    drawConvex();
             }
         }
 
