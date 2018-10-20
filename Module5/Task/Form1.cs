@@ -58,6 +58,8 @@ namespace Task
             Pen p = new Pen(Color.Black);
             foreach (var t in pol.vis_edge)
                 g.DrawLine(p, t.Item1, t.Item2);
+            foreach (var t in pol.invis_edge)
+                g.DrawLine(p, t.Item1, t.Item2);
             pictureBox1.Image = pictureBox1.Image;
         }
 
@@ -75,7 +77,7 @@ namespace Task
         int len = 100;
         public List<Point> vertices; //Список вершин многогранника
         public List<Tuple<Point, Point>> vis_edge; //Видимые ребра
-        List<Tuple<Point, Point>> invis_edge; //Невидимые ребра
+        public List<Tuple<Point, Point>> invis_edge; //Невидимые ребра
         //Конструктор. Рисуется просто гексаэдр, 
         //обход вершин: A A1 B1 B C C1 D1 D A, где без индексов - основание куба
 
@@ -178,19 +180,24 @@ namespace Task
         public void Octahedron() {
             var edges = getEdges(vertices.First());
 
-            var pt1 = new Point((edges[1].Item2.X - edges[1].Item1.X) / 2 + edges[1].Item2.X,
-                (edges[0].Item2.Y - edges[0].Item1.Y) / 2 + edges[0].Item2.Y); //(edges[0].Item2.Y - edges[0].Item1.Y) / 2 + edges[0].Item2.Y)
+            var avg = (edges[0].Item1.Y - edges[0].Item2.Y) / 2 + edges[0].Item2.Y;
+            var rot = rotation(-45, edges[0].Item1.X, avg, (edges[2].Item2.X - edges[2].Item1.X) / 2 + edges[2].Item2.X, avg);
+
+            var pt1 = rot;
+            //var pt1 = new Point((edges[1].Item2.X - edges[1].Item1.X) / 2 + edges[1].Item2.X,
+                //(edges[0].Item2.Y - edges[0].Item1.Y) / 2 + edges[0].Item2.Y); //(edges[0].Item2.Y - edges[0].Item1.Y) / 2 + edges[0].Item2.Y)
             var pt2 = new Point((edges[2].Item2.X - edges[2].Item1.X) / 2 + edges[2].Item2.X,
                 (edges[0].Item2.Y - edges[0].Item1.Y) / 2 + edges[0].Item2.Y); //(edges[0].Item2.Y - edges[0].Item1.Y) / 2 + edges[0].Item2.Y)
             var pt3 = new Point((edges[2].Item2.X - edges[2].Item1.X) / 2 + edges[2].Item2.X,
                 (edges[1].Item2.Y - edges[1].Item1.Y) / 2 + edges[1].Item2.Y); //(edges[1].Item2.Y - edges[1].Item1.Y) / 2 + edges[1].Item2.Y)
             vis_edge.Clear();
             vertices.Clear();
+            invis_edge.Clear();
             vertices.Add(pt1); vertices.Add(pt2); vertices.Add(pt3);
             vis_edge.Add(Tuple.Create(pt1, pt2));
             vis_edge.Add(Tuple.Create(pt2, pt3));
             vis_edge.Add(Tuple.Create(pt1, pt3));
-            vertices.Add(new Point(vertices[0].X + len, vertices[0].Y));
+            /*vertices.Add(new Point(vertices[0].X + len, vertices[0].Y));
             vis_edge.Add(Tuple.Create(pt2, vertices.Last()));
             vis_edge.Add(Tuple.Create(pt3, vertices.Last()));
             var p = rotation(45, pt2.X, pt2.Y, pt2.X + len / 2, pt2.Y);
@@ -201,7 +208,7 @@ namespace Task
             vertices.Add(new Point(pt3.X, pt3.Y + len));
             vis_edge.Add(Tuple.Create(pt1, vertices.Last())); 
             vis_edge.Add(Tuple.Create(pt2, vertices.Last()));
-            vis_edge.Add(Tuple.Create(vertices[3], vertices.Last()));
+            vis_edge.Add(Tuple.Create(vertices[3], vertices.Last()));*/
         }
 
         //public virtual void shift() { }
