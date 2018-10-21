@@ -88,14 +88,14 @@ namespace Task
 
         public Polyhedron(){
             vertices = new List<PointPol>();
-            vertices.Add(new PointPol(0, len, 0));
-            vertices.Add(new PointPol(0, len, len));
-            vertices.Add(new PointPol(0, 0, len));
-            vertices.Add(new PointPol(0, 0, 0));
-            vertices.Add(new PointPol(len, 0, 0));
-            vertices.Add(new PointPol(len, 0, len));
-            vertices.Add(new PointPol(len, len, len));
-            vertices.Add(new PointPol(len, len, 0));
+            vertices.Add(new PointPol(0, len, 0)); //A
+            vertices.Add(new PointPol(0, len, len)); //A1
+            vertices.Add(new PointPol(0, 0, len)); //B1
+            vertices.Add(new PointPol(0, 0, 0)); // B
+            vertices.Add(new PointPol(len, 0, 0)); // C
+            vertices.Add(new PointPol(len, 0, len));//C1
+            vertices.Add(new PointPol(len, len, len));//D1
+            vertices.Add(new PointPol(len, len, 0));//D
         }
 
         private double[,] matrix_multiplication(double[,] m1, double[,] m2)
