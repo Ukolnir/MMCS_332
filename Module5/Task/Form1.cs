@@ -81,21 +81,71 @@ namespace Task
         Form1 _form = new Form1(); //Доступ к элементам формы
         int len = 100;
         public List<PointPol> vertices; //Список вершин многогранника
-        public List<Point> vertices2D; 
+        public List<Point> vertices2D;
+        public Dictionary<PointPol, List<PointPol>> neighbors = new Dictionary<PointPol, List<PointPol>>();
+        public Dictionary<Point, List<Point>> neighbors2D = new Dictionary<Point, List<Point>>();
 
         //Конструктор. Рисуется просто гексаэдр, 
         //обход вершин: A A1 B1 B C C1 D1 D A, где без индексов - основание куба
 
         public Polyhedron(){
             vertices = new List<PointPol>();
-            vertices.Add(new PointPol(0, len, 0)); //A
-            vertices.Add(new PointPol(0, len, len)); //A1
-            vertices.Add(new PointPol(0, 0, len)); //B1
-            vertices.Add(new PointPol(0, 0, 0)); // B
-            vertices.Add(new PointPol(len, 0, 0)); // C
-            vertices.Add(new PointPol(len, 0, len));//C1
-            vertices.Add(new PointPol(len, len, len));//D1
-            vertices.Add(new PointPol(len, len, 0));//D
+
+            PointPol a = new PointPol(0, len, 0), a1 = new PointPol(0, len, len),
+                b1 = new PointPol(0, 0, len), b = new PointPol(0, 0, 0), 
+                c = new PointPol(len, 0, 0), c1 = new PointPol(len, 0, len), 
+                d = new PointPol(len, len, 0), d1 = new PointPol(len, len, len);
+
+            neighbors[a] = new List<PointPol>();
+            neighbors[b] = new List<PointPol>();
+            neighbors[c] = new List<PointPol>();
+            neighbors[d] = new List<PointPol>();
+
+            neighbors[a1] = new List<PointPol>();
+            neighbors[b1] = new List<PointPol>();
+            neighbors[c1] = new List<PointPol>();
+            neighbors[d1] = new List<PointPol>();
+
+            vertices.Add(a); //A
+            neighbors[a1].Add(a);
+            neighbors[b].Add(a);
+            neighbors[d].Add(a);
+
+            vertices.Add(a1); //A1
+            neighbors[a].Add(a1);
+            neighbors[b1].Add(a1);
+            neighbors[d1].Add(a1);
+
+            vertices.Add(b1); //B1
+            neighbors[a1].Add(b1);
+            neighbors[c1].Add(b1);
+            neighbors[b].Add(b1);
+
+            vertices.Add(b); // B
+            neighbors[a].Add(b);
+            neighbors[c].Add(b);
+            neighbors[b1].Add(b);
+
+            vertices.Add(c); // C
+            neighbors[c1].Add(c);
+            neighbors[d].Add(c);
+            neighbors[b].Add(c);
+
+            vertices.Add(c1);//C1
+            neighbors[c].Add(c1);
+            neighbors[d1].Add(c1);
+            neighbors[b1].Add(c1);
+
+            vertices.Add(d1);//D1
+            neighbors[c1].Add(d1);
+            neighbors[a1].Add(d1);
+            neighbors[d].Add(d1);
+
+            vertices.Add(d);//D
+            neighbors[c].Add(d);
+            neighbors[a].Add(d);
+            neighbors[d1].Add(d);
+
         }
 
         private double[,] matrix_multiplication(double[,] m1, double[,] m2)
