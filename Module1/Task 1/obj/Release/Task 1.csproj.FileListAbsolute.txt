@@ -1,9 +1,0 @@
-D:\Документы\OneDrive\Документы\7 семестр\комп. графика\MMCS_332\Module1\Task 1\bin\Release\Task 1.exe.config
-D:\Документы\OneDrive\Документы\7 семестр\комп. графика\MMCS_332\Module1\Task 1\bin\Release\Task 1.exe
-D:\Документы\OneDrive\Документы\7 семестр\комп. графика\MMCS_332\Module1\Task 1\bin\Release\Task 1.pdb
-D:\Документы\OneDrive\Документы\7 семестр\комп. графика\MMCS_332\Module1\Task 1\obj\Release\Task1.Form1.resources
-D:\Документы\OneDrive\Документы\7 семестр\комп. графика\MMCS_332\Module1\Task 1\obj\Release\Task_1.Properties.Resources.resources
-D:\Документы\OneDrive\Документы\7 семестр\комп. графика\MMCS_332\Module1\Task 1\obj\Release\Task 1.csproj.GenerateResource.Cache
-D:\Документы\OneDrive\Документы\7 семестр\комп. графика\MMCS_332\Module1\Task 1\obj\Release\Task 1.exe
-D:\Документы\OneDrive\Документы\7 семестр\комп. графика\MMCS_332\Module1\Task 1\obj\Release\Task 1.pdb
-D:\Документы\OneDrive\Документы\7 семестр\комп. графика\MMCS_332\Module1\Task 1\obj\Release\Task 1.csprojResolveAssemblyReference.cache

@@ -1,8 +1,0 @@
-C:\Users\IRU\Documents\GitHub\MMCS_332\Module2\Task 1a\bin\x64\Debug\Task 1a.exe.config
-C:\Users\IRU\Documents\GitHub\MMCS_332\Module2\Task 1a\bin\x64\Debug\Task 1a.exe
-C:\Users\IRU\Documents\GitHub\MMCS_332\Module2\Task 1a\bin\x64\Debug\Task 1a.pdb
-C:\Users\IRU\Documents\GitHub\MMCS_332\Module2\Task 1a\obj\x64\Debug\Task_1a.Form1.resources
-C:\Users\IRU\Documents\GitHub\MMCS_332\Module2\Task 1a\obj\x64\Debug\Task_1a.Properties.Resources.resources
-C:\Users\IRU\Documents\GitHub\MMCS_332\Module2\Task 1a\obj\x64\Debug\Task 1a.csproj.GenerateResource.Cache
-C:\Users\IRU\Documents\GitHub\MMCS_332\Module2\Task 1a\obj\x64\Debug\Task 1a.exe
-C:\Users\IRU\Documents\GitHub\MMCS_332\Module2\Task 1a\obj\x64\Debug\Task 1a.pdb

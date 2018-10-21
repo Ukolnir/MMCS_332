@@ -1,8 +1,0 @@
-C:\Users\IRU\Documents\GitHub\MMCS_332\Module2\Additional\bin\x64\Debug\Additional.exe.config
-C:\Users\IRU\Documents\GitHub\MMCS_332\Module2\Additional\bin\x64\Debug\Additional.exe
-C:\Users\IRU\Documents\GitHub\MMCS_332\Module2\Additional\bin\x64\Debug\Additional.pdb
-C:\Users\IRU\Documents\GitHub\MMCS_332\Module2\Additional\obj\x64\Debug\Additional.Form1.resources
-C:\Users\IRU\Documents\GitHub\MMCS_332\Module2\Additional\obj\x64\Debug\Additional.Properties.Resources.resources
-C:\Users\IRU\Documents\GitHub\MMCS_332\Module2\Additional\obj\x64\Debug\Additional.csproj.GenerateResource.Cache
-C:\Users\IRU\Documents\GitHub\MMCS_332\Module2\Additional\obj\x64\Debug\Additional.exe
-C:\Users\IRU\Documents\GitHub\MMCS_332\Module2\Additional\obj\x64\Debug\Additional.pdb
