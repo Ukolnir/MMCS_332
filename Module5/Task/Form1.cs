@@ -16,6 +16,8 @@ namespace Task
         Tuple<PointPol, PointPol> line;
         List<PointPol> polygon = new List<PointPol>();
         double r = 0.002;
+        double ind_scale;
+
         int ind_op;
 
         public double[,] matrix_multiplication(double[,] m1, double[,] m2)
@@ -64,6 +66,76 @@ namespace Task
             g = Graphics.FromImage(pictureBox1.Image);
             g.Clear(pictureBox1.BackColor);
             pictureBox1.Image = pictureBox1.Image;
+        }
+
+        public void find_center(Tuple<PointPol, PointPol> line_1, ref double x, ref double y, ref double z)
+        {
+            x = (line_1.Item1.X + line_1.Item2.X) / 2;
+            y = (line_1.Item1.Y + line_1.Item2.Y) / 2;
+            z = (line_1.Item1.Z + line_1.Item2.Z) / 2;
+        }
+
+        public void find_center(List<PointPol> pol, ref double x, ref double y, ref double z)
+        { 
+            x = 0; y = 0; z = 0;
+  
+            foreach (var p in pol)
+            {
+                x += p.X;
+                y += p.Y;
+                z += p.Z;
+            }
+
+            x /= pol.Count();
+            y /= pol.Count();
+            z /= pol.Count();
+        }
+
+        public double[,] matrix_for_point(PointPol p, double a, double b, double c)
+        {
+            double[,] transfer = new double[4, 4] { { 1, 0, 0, -a }, { 1, 0, 0, -b }, { 1, 0, 0, -c }, { 0, 0, 0, 1 } };
+            var t1 = matrix_multiplication(p.getP(), transfer);
+
+            t1 = matrix_multiplication(t1, new double[4, 4] { { ind_scale, 0, 0, 0 }, { 0, ind_scale, 0, 0 }, { 0, 0, ind_scale, 0 }, { 0, 0, 0, 1 } });
+            transfer = new double[4, 4] { { 1, 0, 0, a }, { 1, 0, 0, b }, { 1, 0, 0, c }, { 0, 0, 0, 1 } };
+            t1 = matrix_multiplication(t1, transfer);
+
+            return t1;
+        }
+
+        public Tuple<PointPol, PointPol> scale(Tuple<PointPol, PointPol> line_1)
+        {
+            double a, b, c;
+            a = b = c = 0;
+            find_center(line_1, ref a, ref b, ref c);
+
+            double[,] p1 = matrix_for_point(line_1.Item1, a, b, c);
+            double[,] p2 = matrix_for_point(line_1.Item2, a, b, c);
+
+            PointPol ps1 = new PointPol(p1[0, 0], p1[0, 1], p1[0, 2]);
+            PointPol ps2 = new PointPol(p2[0, 0], p2[0, 1], p2[0, 2]);
+
+            Tuple<PointPol, PointPol> new_line = Tuple.Create(ps1, ps2);
+            return new_line;
+        }
+
+        public List<PointPol> scale(List<PointPol> list)
+        {
+            double a, b, c;
+            a = b = c = 0;
+            find_center(list, ref a, ref b, ref c);
+
+            List<PointPol> new_list = new List<PointPol>();
+
+            foreach (var p in list)
+            {
+                double[,] pn = matrix_for_point(p, a, b, c);
+                PointPol ps1 = new PointPol(pn[0, 0], pn[0, 1], pn[0, 2]);
+                new_list.Add(ps1);
+            }
+
+            return new_list;
+            
         }
 
         //Пока рисует объект многогранник (любой из)
