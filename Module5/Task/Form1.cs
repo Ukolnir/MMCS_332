@@ -100,11 +100,21 @@ namespace Task
             if (ind_op == -1)
             {
                 Pen col = new Pen(Color.Black);
-                // pol.Display();
-                for (int i = 0; i < pol.vertices2D.Count; ++i)
-                    for (int j = 1; j < pol.vertices2D.Count; ++j)
-                        g.DrawLine(col, pol.vertices2D[i], pol.vertices2D[j]);
+                pol.Display();
+                foreach (var i in pol.edges)
+                    g.DrawLine(col, i.Item1, i.Item2);
+                textBox1.Text = "";
+                foreach (var i in pol.vertices)
+                    textBox1.Text += "(" + i.X + " " + i.Y + " " + i.Z + ")     ";
 
+                pol.shift(200, 200, 200);
+                pol.Display();
+                foreach (var i in pol.edges)
+                    g.DrawLine(col, i.Item1, i.Item2);
+
+                textBox3.Text = "";
+                foreach (var i in pol.vertices)
+                    textBox3.Text += "(" + i.X + " " + i.Y + " " + i.Z + ")     ";
                 pictureBox1.Image = pictureBox1.Image;
             }
         }
@@ -261,8 +271,17 @@ namespace Task
             X = x; Y = y; Z = z; W = 1;
         }
 
+        public PointPol(double x, double y, double z, double w){
+            X = x; Y = y; Z = z; W = w;
+        }
+
         public double[,] getP(){
             return new double[3,1]{{X},{Y},{Z}};
+        }
+
+        public double[,] getPol()
+        {
+            return new double[4, 1] { { X }, { Y }, { Z }, { W } };
         }
     }
 
@@ -273,18 +292,24 @@ namespace Task
         public List<PointPol> vertices; //Список вершин многогранника
         public List<Point> vertices2D;
         public Dictionary<PointPol, List<PointPol>> neighbors = new Dictionary<PointPol, List<PointPol>>();
-        public Dictionary<Point, List<Point>> neighbors2D = new Dictionary<Point, List<Point>>();
+        public List<Tuple<Point, Point>> edges;
 
-        //Конструктор. Рисуется просто гексаэдр, 
+        //Изометрическая проекция
+        double[,] displayMatrix = new double[3, 3] { { Math.Sqrt(0.5), 0, -Math.Sqrt(0.5) }, { 1 / Math.Sqrt(6), Math.Sqrt(2) / 3, 1 / Math.Sqrt(6) }, { 1 / Math.Sqrt(3), -1 / Math.Sqrt(3), 1 / Math.Sqrt(3) } };
+
+        //Конструктор. Создается гексаэдр, 
         //обход вершин: A A1 B1 B C C1 D1 D A, где без индексов - основание куба
 
         public Polyhedron(){
             vertices = new List<PointPol>();
 
-            PointPol a = new PointPol(0, len, 0), a1 = new PointPol(0, len, len),
-                b1 = new PointPol(0, 0, len), b = new PointPol(0, 0, 0), 
-                c = new PointPol(len, 0, 0), c1 = new PointPol(len, 0, len), 
-                d = new PointPol(len, len, 0), d1 = new PointPol(len, len, len);
+            vertices = new List<PointPol>();
+            var h = _form.pictureBox1.Height / 2;
+            var w = _form.pictureBox1.Width / 2;
+            PointPol a = new PointPol(w, h + len, 0), a1 = new PointPol(w, h + len, len),
+                b1 = new PointPol(w, h, len), b = new PointPol(w, h, 0),
+                c = new PointPol(w + len, h, 0), c1 = new PointPol(w + len, h, len),
+                d = new PointPol(w + len, h + len, 0), d1 = new PointPol(w + len, h + len, len);
 
             neighbors[a] = new List<PointPol>();
             neighbors[b] = new List<PointPol>();
@@ -338,22 +363,22 @@ namespace Task
 
         }
 
-        /*
-        private Point rotation(double ang, int x0, int y0, int x, int y)
-        {
-            double p = ang * Math.PI / 180;
-            double cos = Math.Cos(p);
-            double sin = Math.Sin(p);
-            double[,] transferalMatrix = new double[,] { {cos, sin, 0}, {-sin, cos, 0}, 
-                        {cos*(-x0)+y0*sin+x0, (-x0)*sin-y0*cos+y0, 1}};
-            double[,] point = new double[,] { { x, y, 1.0 } };
-           double[,] res = matrix_multiplication(point, transferalMatrix);
-            return new Point(Convert.ToInt32(res[0, 0]), Convert.ToInt32(res[0, 1]));
-        }
-        */
         //Тетраэдр
         public void Tetrahedron() {
-
+            List<PointPol> temp = new List<PointPol>();
+            temp.Add(vertices[0]); //A
+            temp.Add(vertices[2]);
+            temp.Add(vertices[4]);
+            temp.Add(vertices[6]);
+            Dictionary<PointPol, List<PointPol>> temp_n = new Dictionary<PointPol, List<PointPol>>();
+            for (int i = 0; i < 4; ++i) {
+                temp_n[temp[i]] = new List<PointPol>();
+                temp_n[temp[i]].Add(temp[(i + 1) % 4]);
+                temp_n[temp[i]].Add(temp[(i + 2) % 4]);
+                temp_n[temp[i]].Add(temp[(i + 3) % 4]);
+            }
+            vertices = temp;
+            neighbors = temp_n;
         }
 
         //Октаэдр
@@ -361,17 +386,51 @@ namespace Task
             
         }
 
-        /*
-        public void Display() { 
+        public void Display()
+        {
+            edges = new List<Tuple<Point, Point>>();
             vertices2D = new List<Point>();
-            double[,] transformMatrix = new double[3,3]{{Math.Sqrt(0.5),0,-Math.Sqrt(0.5)},{1/Math.Sqrt(6),Math.Sqrt(2)/3,1/Math.Sqrt(6)},{1/Math.Sqrt(3), -1/Math.Sqrt(3), 1/Math.Sqrt(3)}};
-            foreach (var p in vertices) {
-                var temp = matrix_multiplication(transformMatrix, p.getP());
-                vertices2D.Add(new Point(Convert.ToInt32(temp[0,0]), Convert.ToInt32(temp[1,0])));
-                
+            foreach (var p in vertices)
+            {
+                var temp = _form.matrix_multiplication(displayMatrix, p.getP());
+                var temp2d = new Point(Convert.ToInt32(temp[0, 0]), Convert.ToInt32(temp[1, 0]));
+                vertices2D.Add(temp2d);
+
+                foreach (var t in neighbors[p])
+                {
+                    var t1 = _form.matrix_multiplication(displayMatrix, t.getP());
+                    vertices2D.Add(new Point(Convert.ToInt32(t1[0, 0]), Convert.ToInt32(t1[1, 0])));
+                    edges.Add(Tuple.Create(temp2d, vertices2D.Last()));
+                }
             }
-        } 
-        */
-        //public virtual void shift() { }
+        }
+
+        private PointPol translatePol(double[,] f)
+        {
+            return new PointPol(f[0, 0], f[1, 0], f[2, 0], f[3, 0]);
+        }
+
+
+        public void shift(double x, double y, double z)
+        {
+            //Показать в текстбоксах точку куда смещаем (или в текстбоксах будет задаваться точка, пока делаем так до интеграции)
+            //double x = e.X, y = e.Y, z = 0;
+            double[,] shiftMatrix = new double[4, 4] { { 1, 0, 0, x }, { 0, 1, 0, y }, { 0, 0, 1, z }, { 0, 0, 0, 1 } };
+
+            List<PointPol> shift_vert = new List<PointPol>();
+
+            var temp_vertices = vertices.Select(u => translatePol(_form.matrix_multiplication(shiftMatrix, u.getPol()))).ToList();
+
+            Dictionary<PointPol, List<PointPol>> temp_dict = new Dictionary<PointPol, List<PointPol>>();
+
+            for (int i = 0; i < neighbors.Count; ++i)
+            {
+                var key = temp_vertices[i];
+                temp_dict[key] = neighbors[vertices[i]].Select(h => translatePol(_form.matrix_multiplication(shiftMatrix, h.getPol()))).ToList();
+            }
+
+            vertices = temp_vertices;
+            neighbors = temp_dict;
+        }
     }
 }

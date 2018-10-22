@@ -38,6 +38,7 @@
             this.textBox2 = new System.Windows.Forms.TextBox();
             this.label2 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
+            this.textBox3 = new System.Windows.Forms.TextBox();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.trackBar1)).BeginInit();
             this.SuspendLayout();
@@ -105,7 +106,7 @@
             // 
             this.textBox1.Location = new System.Drawing.Point(186, 539);
             this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(348, 20);
+            this.textBox1.Size = new System.Drawing.Size(692, 20);
             this.textBox1.TabIndex = 5;
             // 
             // trackBar1
@@ -145,11 +146,19 @@
             this.label3.TabIndex = 9;
             this.label3.Text = "label3";
             // 
+            // textBox3
+            // 
+            this.textBox3.Location = new System.Drawing.Point(186, 572);
+            this.textBox3.Name = "textBox3";
+            this.textBox3.Size = new System.Drawing.Size(691, 20);
+            this.textBox3.TabIndex = 10;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1105, 608);
+            this.Controls.Add(this.textBox3);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.textBox2);
@@ -181,6 +190,7 @@
         private System.Windows.Forms.TextBox textBox2;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.TextBox textBox3;
     }
 }
 
