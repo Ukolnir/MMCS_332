@@ -15,7 +15,7 @@ namespace Task
         PointPol dot = new PointPol(-1, -1, -1);
         Tuple<PointPol, PointPol> line;
         List<PointPol> polygon = new List<PointPol>();
-
+        double r = 0.002;
         int ind_op;
 
         public double[,] matrix_multiplication(double[,] m1, double[,] m2)
@@ -39,6 +39,7 @@ namespace Task
             trackBar1.Maximum = pictureBox1.Width;
             pictureBox1.Image = bmp;
             textBox2.Text = trackBar1.Value.ToString();
+            textBox4.Text = "0,002";
 
         }
 
@@ -154,9 +155,11 @@ namespace Task
 
         public void draw_elems(PointPol p)
         {
-            double[,] transformMatrix = new double[3, 3] { { Math.Sqrt(0.5), 0, -Math.Sqrt(0.5) }, { 1 / Math.Sqrt(6), Math.Sqrt(2) / 3, 1 / Math.Sqrt(6) }, { 1 / Math.Sqrt(3), -1 / Math.Sqrt(3), 1 / Math.Sqrt(3) } };
-            var temp = matrix_multiplication(transformMatrix, p.getP());
-            Point dot2D = new Point(Convert.ToInt32(temp[0, 0]), Convert.ToInt32(temp[1, 0]));
+            //double[,] transformMatrix = new double[3, 3] { { Math.Sqrt(0.5), 0, -Math.Sqrt(0.5) }, { 1 / Math.Sqrt(6), Math.Sqrt(2) / 3, 1 / Math.Sqrt(6) }, { 1 / Math.Sqrt(3), -1 / Math.Sqrt(3), 1 / Math.Sqrt(3) } };
+            double c = 1 + p.Z * r;
+            double[,] transformMatrix = new double[4, 4] { { 1.0/c, 0, 0, 0 }, { 0, 1.0/c, 0, 0}, { 0, 0, 0, 0}, { 0, 0, -1.0/(r*c), 1.0/c} };
+            var temp = matrix_multiplication(p.getP(), transformMatrix);
+            Point dot2D = new Point(Convert.ToInt32(temp[0, 0]), Convert.ToInt32(temp[0, 1]));
             bmp = (Bitmap)pictureBox1.Image;
             bmp.SetPixel(dot2D.X, dot2D.Y, Color.Black);
             bmp.SetPixel(dot2D.X + 1, dot2D.Y, Color.Black);
@@ -168,12 +171,14 @@ namespace Task
 
         public void draw_elems(Tuple<PointPol, PointPol> linel)
         {
-            double[,] transformMatrix = new double[3, 3] { { Math.Sqrt(0.5), 0, -Math.Sqrt(0.5) }, { 1 / Math.Sqrt(6), Math.Sqrt(2) / 3, 1 / Math.Sqrt(6) }, { 1 / Math.Sqrt(3), -1 / Math.Sqrt(3), 1 / Math.Sqrt(3) } };
-            var temp = matrix_multiplication(transformMatrix, linel.Item1.getP());
-            Point p1 = new Point(Convert.ToInt32(temp[0, 0]), Convert.ToInt32(temp[1, 0]));
+            double c = 1 + linel.Item1.Z * r;
+            double[,] transformMatrix = new double[4, 4] { { 1.0 / c, 0, 0, 0 }, { 0, 1.0 / c, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, -1.0 / (r * c), 1.0 / c } }; var temp = matrix_multiplication(linel.Item1.getP(), transformMatrix);
+            Point p1 = new Point(Convert.ToInt32(temp[0, 0]), Convert.ToInt32(temp[0, 1]));
 
-            var temp1 = matrix_multiplication(transformMatrix, linel.Item2.getP());
-            Point p2 = new Point(Convert.ToInt32(temp1[0, 0]), Convert.ToInt32(temp1[1, 0]));
+            c = 1 + linel.Item2.Z * r;
+            transformMatrix = new double[4, 4] { { 1.0 / c, 0, 0, 0 }, { 0, 1.0 / c, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, -1.0 / (r * c), 1.0 / c } };
+            var temp1 = matrix_multiplication(linel.Item2.getP(), transformMatrix);
+            Point p2 = new Point(Convert.ToInt32(temp1[0, 0]), Convert.ToInt32(temp1[0, 1]));
 
             if (p1 != p2)
             {
@@ -192,9 +197,10 @@ namespace Task
 
             foreach (var p in pol)
             {
-                double[,] transformMatrix = new double[3, 3] { { Math.Sqrt(0.5), 0, -Math.Sqrt(0.5) }, { 1 / Math.Sqrt(6), Math.Sqrt(2) / 3, 1 / Math.Sqrt(6) }, { 1 / Math.Sqrt(3), -1 / Math.Sqrt(3), 1 / Math.Sqrt(3) } };
-                var temp = matrix_multiplication(transformMatrix, p.getP());
-                polygon2D.Add(new Point(Convert.ToInt32(temp[0, 0]), Convert.ToInt32(temp[1, 0])));
+                double c = 1 + p.Z * r;
+                double[,] transformMatrix = new double[4, 4] { { 1.0 / c, 0, 0, 0 }, { 0, 1.0 / c, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, -1.0 / (r * c), 1.0 / c } };
+                var temp = matrix_multiplication(p.getP(), transformMatrix);
+                polygon2D.Add(new Point(Convert.ToInt32(temp[0, 0]), Convert.ToInt32(temp[0, 1])));
             }
 
             Point p1 = polygon2D.First();
@@ -262,6 +268,16 @@ namespace Task
                     break;
             }
         }
+
+        private void label4_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void textBox4_TextChanged(object sender, EventArgs e)
+        {
+            r = Double.Parse(textBox4.Text);
+        }
     }
 
     public class PointPol {
@@ -276,7 +292,7 @@ namespace Task
         }
 
         public double[,] getP(){
-            return new double[3,1]{{X},{Y},{Z}};
+            return new double[1,4]{{X, Y, Z, W}};
         }
 
         public double[,] getPol()
