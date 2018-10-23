@@ -50,7 +50,12 @@ namespace Task_1{
         List<Point> fractal;
         List<int> nolinepoint;
         Stack<Tuple<Point,double>> memory;
-
+        Stack<Tuple<Color, Tuple<int,int>>> _memory;
+        Dictionary<Point, Tuple<Color, Tuple<int, int>>> fractal_dict;
+        Color color;
+        int width = 7;
+        int height = 100;
+        
         private double[,] matrix_multiplication(double[,] m1, double[,] m2){
             double[,] res = new double[m1.GetLength(0), m2.GetLength(1)];
             for (int i = 0; i < m1.GetLength(0); ++i)
@@ -109,6 +114,66 @@ namespace Task_1{
                         fractal.Add(t0.Item1);
                         ang = t0.Item2;
                         ++countPoint;
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+
+        private void perform_fractal_ac(string str)
+        {
+            int len = height;
+            int ht = pictureBox1.Height;
+            int wh = width;
+            color = Color.ForestGreen;
+            fractal_dict = new Dictionary<Point, Tuple<Color, Tuple<int, int>>>();
+            fractal_dict.Add(new Point(0, ht), Tuple.Create(color, Tuple.Create(len, wh)));            
+            int countPoint = 0; //Первая точка - нулевая
+            
+            memory = new Stack<Tuple<Point, double>>();
+            nolinepoint = new List<int>();
+            Random rand = new Random();
+            _memory = new Stack<Tuple<Color, Tuple<int, int>>>();
+            
+            double ang = 0;
+            //Здесь идет разветвление по режиму
+            for (int i = 0; i < str.Length; ++i)
+            {
+                switch (str[i])
+                {
+                    case 'F':
+                        Point p0 = fractal_dict.Last().Key;
+                        int x, y;
+                        x = p0.X + fractal_dict.Last().Value.Item2.Item1;
+                        y = p0.Y;
+                        var p = rotation(ang, p0.X, p0.Y, x, y);
+                        fractal_dict.Add(p, Tuple.Create(color, Tuple.Create(len, wh)));
+                        ++countPoint;
+                        break;
+                    case '+':
+                        ang = ang + rand.Next(Convert.ToInt32(angle)); //Здесь аккуратнее
+                        break;
+                    case '-':
+                        ang = ang - rand.Next(Convert.ToInt32(angle));
+                        break;
+                    case '[':
+                        var temp = Tuple.Create(fractal_dict.Last().Key, ang);
+                        memory.Push(temp);
+                        
+                        //Проблема - к какой скобке соотносить @
+
+                        break;
+                    case ']':
+                        var t0 = memory.Pop();
+                        nolinepoint.Add(countPoint);
+                        fractal.Add(t0.Item1);
+                        ang = t0.Item2;
+                        ++countPoint;
+                        //достаем здесь 
+                        break;
+                    case '@':
+                        _memory.Push(Tuple.Create(color, Tuple.Create(len, width)));
                         break;
                     default:
                         break;
@@ -177,9 +242,10 @@ namespace Task_1{
                 pred = result;
             }
             //textBox1.Text = result;
-            
-            perform_fractal(result);
-            render(result);
+            if (result.Any(x => x == '@'))
+                label2.Text = "Включен режим случайности";
+            //perform_fractal(result);
+            //render(result);
         }
 
         private void очиститьToolStripMenuItem_Click(object sender, EventArgs e){
