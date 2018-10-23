@@ -131,7 +131,20 @@ namespace Task
 			pictureBox1.Image = pictureBox1.Image;
 		}
 
-		private void button6_Click(object sender, EventArgs e)
+        private void button5_Click(object sender, EventArgs e)
+        {
+            string axis = comboBox2.SelectedItem.ToString();
+
+            pol.reflection(axis);
+            pol.Display();
+
+            ClearWithout();
+            foreach (var i in pol.edges)
+                g.DrawLine(col, i.Item1, i.Item2);
+            pictureBox1.Image = pictureBox1.Image;
+        }
+
+        private void button6_Click(object sender, EventArgs e)
 		{
 			double x1 = Double.Parse(textBoxX1.Text);
 			double y1 = Double.Parse(textBoxY1.Text);
@@ -152,9 +165,9 @@ namespace Task
 				g.DrawLine(col, i.Item1, i.Item2);
 			pictureBox1.Image = pictureBox1.Image;
 		}
-	}
+    }
 
-	public class PointPol {
+    public class PointPol {
        public double X, Y, Z, W;
 
 		Form1 _form = new Form1();
@@ -459,6 +472,30 @@ namespace Task
 			vertices = temp_vertices;
 			neighbors = temp_dict;
 		}
+
+        public void reflection(string axis)
+        {
+            double a = 0;
+            double b = 0;
+            double c = 0;
+            _form.find_center(vertices, ref a, ref b, ref c);
+
+            if (axis == "X")
+            {
+                rotate(new Edge(new PointPol(0, 0, 0), new PointPol(1, 0, 0)), 180);
+                shift(-a*2, 0, 0);
+            }
+            if (axis == "Y")
+            {
+                rotate(new Edge(new PointPol(0, 0, 0), new PointPol(0, 1, 0)), 180);
+                shift(0, -b*2, 0);
+            }
+            if (axis == "Z")
+            {
+                rotate(new Edge(new PointPol(0, 0, 0), new PointPol(0, 0, 1)), 180);
+                shift(0, 0, -c*2);
+            }
+        }
 
 	}
 }
