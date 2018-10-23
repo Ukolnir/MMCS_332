@@ -43,8 +43,16 @@
 			this.textBox6 = new System.Windows.Forms.TextBox();
 			this.textBox7 = new System.Windows.Forms.TextBox();
 			this.textBox8 = new System.Windows.Forms.TextBox();
-			this.textBox9 = new System.Windows.Forms.TextBox();
+			this.textBoxX2 = new System.Windows.Forms.TextBox();
 			this.comboBox2 = new System.Windows.Forms.ComboBox();
+			this.textBoxZ1 = new System.Windows.Forms.TextBox();
+			this.textBoxY2 = new System.Windows.Forms.TextBox();
+			this.textBoxY1 = new System.Windows.Forms.TextBox();
+			this.textBoxX1 = new System.Windows.Forms.TextBox();
+			this.textBoxZ2 = new System.Windows.Forms.TextBox();
+			this.textBoxAngle = new System.Windows.Forms.TextBox();
+			this.label2 = new System.Windows.Forms.Label();
+			this.label3 = new System.Windows.Forms.Label();
 			((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
 			this.SuspendLayout();
 			// 
@@ -139,6 +147,7 @@
 			this.button4.TabIndex = 15;
 			this.button4.Text = "смещение";
 			this.button4.UseVisualStyleBackColor = true;
+			this.button4.Click += new System.EventHandler(this.button4_Click);
 			// 
 			// button5
 			// 
@@ -151,12 +160,13 @@
 			// 
 			// button6
 			// 
-			this.button6.Location = new System.Drawing.Point(15, 490);
+			this.button6.Location = new System.Drawing.Point(16, 490);
 			this.button6.Name = "button6";
 			this.button6.Size = new System.Drawing.Size(113, 42);
 			this.button6.TabIndex = 17;
 			this.button6.Text = "поворот";
 			this.button6.UseVisualStyleBackColor = true;
+			this.button6.Click += new System.EventHandler(this.button6_Click);
 			// 
 			// textBox6
 			// 
@@ -179,12 +189,13 @@
 			this.textBox8.Size = new System.Drawing.Size(28, 20);
 			this.textBox8.TabIndex = 20;
 			// 
-			// textBox9
+			// textBoxX2
 			// 
-			this.textBox9.Location = new System.Drawing.Point(135, 512);
-			this.textBox9.Name = "textBox9";
-			this.textBox9.Size = new System.Drawing.Size(28, 20);
-			this.textBox9.TabIndex = 21;
+			this.textBoxX2.Location = new System.Drawing.Point(135, 512);
+			this.textBoxX2.Name = "textBoxX2";
+			this.textBoxX2.Size = new System.Drawing.Size(28, 20);
+			this.textBoxX2.TabIndex = 21;
+			this.textBoxX2.Text = "x2";
 			// 
 			// comboBox2
 			// 
@@ -198,13 +209,87 @@
 			this.comboBox2.Size = new System.Drawing.Size(98, 21);
 			this.comboBox2.TabIndex = 22;
 			// 
+			// textBoxZ1
+			// 
+			this.textBoxZ1.Location = new System.Drawing.Point(203, 486);
+			this.textBoxZ1.Name = "textBoxZ1";
+			this.textBoxZ1.Size = new System.Drawing.Size(28, 20);
+			this.textBoxZ1.TabIndex = 23;
+			this.textBoxZ1.Text = "z1";
+			// 
+			// textBoxY2
+			// 
+			this.textBoxY2.Location = new System.Drawing.Point(169, 512);
+			this.textBoxY2.Name = "textBoxY2";
+			this.textBoxY2.Size = new System.Drawing.Size(28, 20);
+			this.textBoxY2.TabIndex = 24;
+			this.textBoxY2.Text = "y2";
+			// 
+			// textBoxY1
+			// 
+			this.textBoxY1.Location = new System.Drawing.Point(169, 486);
+			this.textBoxY1.Name = "textBoxY1";
+			this.textBoxY1.Size = new System.Drawing.Size(28, 20);
+			this.textBoxY1.TabIndex = 25;
+			this.textBoxY1.Text = "y1";
+			// 
+			// textBoxX1
+			// 
+			this.textBoxX1.Location = new System.Drawing.Point(135, 486);
+			this.textBoxX1.Name = "textBoxX1";
+			this.textBoxX1.Size = new System.Drawing.Size(28, 20);
+			this.textBoxX1.TabIndex = 26;
+			this.textBoxX1.Text = "x1";
+			// 
+			// textBoxZ2
+			// 
+			this.textBoxZ2.Location = new System.Drawing.Point(204, 512);
+			this.textBoxZ2.Name = "textBoxZ2";
+			this.textBoxZ2.Size = new System.Drawing.Size(28, 20);
+			this.textBoxZ2.TabIndex = 27;
+			this.textBoxZ2.Text = "z2";
+			// 
+			// textBoxAngle
+			// 
+			this.textBoxAngle.Location = new System.Drawing.Point(169, 557);
+			this.textBoxAngle.Name = "textBoxAngle";
+			this.textBoxAngle.Size = new System.Drawing.Size(28, 20);
+			this.textBoxAngle.TabIndex = 28;
+			// 
+			// label2
+			// 
+			this.label2.AutoSize = true;
+			this.label2.Font = new System.Drawing.Font("Microsoft Sans Serif", 6.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+			this.label2.Location = new System.Drawing.Point(135, 358);
+			this.label2.Name = "label2";
+			this.label2.Size = new System.Drawing.Size(98, 12);
+			this.label2.TabIndex = 29;
+			this.label2.Text = "Введите координаты: ";
+			// 
+			// label3
+			// 
+			this.label3.AutoSize = true;
+			this.label3.Location = new System.Drawing.Point(149, 541);
+			this.label3.Name = "label3";
+			this.label3.Size = new System.Drawing.Size(77, 13);
+			this.label3.TabIndex = 30;
+			this.label3.Text = "Введите угол:";
+			// 
 			// Form1
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.ClientSize = new System.Drawing.Size(1105, 608);
+			this.Controls.Add(this.label3);
+			this.Controls.Add(this.label2);
+			this.Controls.Add(this.textBoxAngle);
+			this.Controls.Add(this.textBoxZ2);
+			this.Controls.Add(this.textBoxX1);
+			this.Controls.Add(this.textBoxY1);
+			this.Controls.Add(this.textBoxY2);
+			this.Controls.Add(this.textBoxZ1);
 			this.Controls.Add(this.comboBox2);
-			this.Controls.Add(this.textBox9);
+			this.Controls.Add(this.textBoxX2);
 			this.Controls.Add(this.textBox8);
 			this.Controls.Add(this.textBox7);
 			this.Controls.Add(this.textBox6);
@@ -245,8 +330,16 @@
 		private System.Windows.Forms.TextBox textBox6;
 		private System.Windows.Forms.TextBox textBox7;
 		private System.Windows.Forms.TextBox textBox8;
-		private System.Windows.Forms.TextBox textBox9;
+		private System.Windows.Forms.TextBox textBoxX2;
 		private System.Windows.Forms.ComboBox comboBox2;
+		private System.Windows.Forms.TextBox textBoxZ1;
+		private System.Windows.Forms.TextBox textBoxY2;
+		private System.Windows.Forms.TextBox textBoxY1;
+		private System.Windows.Forms.TextBox textBoxX1;
+		private System.Windows.Forms.TextBox textBoxZ2;
+		private System.Windows.Forms.TextBox textBoxAngle;
+		private System.Windows.Forms.Label label2;
+		private System.Windows.Forms.Label label3;
 	}
 }
 

@@ -10,51 +10,51 @@ using System.Windows.Forms;
 
 namespace Task
 {
-    public partial class Form1 : Form
-    {
+	public partial class Form1 : Form
+	{
 		Polyhedron pol;
 		Pen col;
 
 		public double[,] matrix_multiplication(double[,] m1, double[,] m2)
-        {
-            double[,] res = new double[m1.GetLength(0), m2.GetLength(1)];
-            for (int i = 0; i < m1.GetLength(0); ++i)
-                for (int j = 0; j < m2.GetLength(1); ++j)
-                    for (int k = 0; k < m2.GetLength(0); k++)
-                        res[i, j] += m1[i, k] * m2[k, j];
-            return res;
-        }
+		{
+			double[,] res = new double[m1.GetLength(0), m2.GetLength(1)];
+			for (int i = 0; i < m1.GetLength(0); ++i)
+				for (int j = 0; j < m2.GetLength(1); ++j)
+					for (int k = 0; k < m2.GetLength(0); k++)
+						res[i, j] += m1[i, k] * m2[k, j];
+			return res;
+		}
 
 
-        public Form1()
-        {
+		public Form1()
+		{
 			col = new Pen(Color.Black);
 			InitializeComponent();
-            pictureBox1.Image = new Bitmap(pictureBox1.Width, pictureBox1.Height);
-            bmp = (Bitmap)pictureBox1.Image;
-            Clear();
-            pictureBox1.Image = bmp;
+			pictureBox1.Image = new Bitmap(pictureBox1.Width, pictureBox1.Height);
+			bmp = (Bitmap)pictureBox1.Image;
+			Clear();
+			pictureBox1.Image = bmp;
 
 
-        }
+		}
 
-        public Graphics g;
-        public Bitmap bmp;
+		public Graphics g;
+		public Bitmap bmp;
 
-        public void Clear()
-        {
+		public void Clear()
+		{
 			g = Graphics.FromImage(pictureBox1.Image);
-            g.Clear(pictureBox1.BackColor);
-            pictureBox1.Image = pictureBox1.Image;
-            comboBox1.SelectedItem = "...";
-        }
+			g.Clear(pictureBox1.BackColor);
+			pictureBox1.Image = pictureBox1.Image;
+			comboBox1.SelectedItem = "...";
+		}
 
-        public void ClearWithout()
-        {
-            g = Graphics.FromImage(pictureBox1.Image);
-            g.Clear(pictureBox1.BackColor);
-            pictureBox1.Image = pictureBox1.Image;
-        }
+		public void ClearWithout()
+		{
+			g = Graphics.FromImage(pictureBox1.Image);
+			g.Clear(pictureBox1.BackColor);
+			pictureBox1.Image = pictureBox1.Image;
+		}
 
 		public void find_center(List<PointPol> pol, ref double x, ref double y, ref double z)
 		{
@@ -74,34 +74,34 @@ namespace Task
 
 		//Пока рисует объект многогранник (любой из)
 		private void button2_Click(object sender, EventArgs e)
-        {
-            pol = new Polyhedron();
+		{
+			pol = new Polyhedron();
 
-            switch (comboBox1.SelectedItem.ToString())
-            {
-                case "Гексаэдр":
-                    break;
-                case "Тетраэдр":
-                    pol.Tetrahedron();
-                    break;
-            }
+			switch (comboBox1.SelectedItem.ToString())
+			{
+				case "Гексаэдр":
+					break;
+				case "Тетраэдр":
+					pol.Tetrahedron();
+					break;
+			}
 
-                
-                pol.Display();
-                foreach (var i in pol.edges)
-                    g.DrawLine(col, i.Item1, i.Item2);
-                textBox1.Text = "";
-                foreach (var i in pol.vertices)
-                    textBox1.Text += "(" + i.X + " " + i.Y + " " + i.Z + ")     ";
 
-				pictureBox1.Image = pictureBox1.Image;
+			pol.Display();
+			foreach (var i in pol.edges)
+				g.DrawLine(col, i.Item1, i.Item2);
+			textBox1.Text = "";
+			foreach (var i in pol.vertices)
+				textBox1.Text += "(" + i.X + " " + i.Y + " " + i.Z + ")     ";
 
-        }
+			pictureBox1.Image = pictureBox1.Image;
 
-        private void button1_Click(object sender, EventArgs e)
-        {
-            Clear();
-        }
+		}
+
+		private void button1_Click(object sender, EventArgs e)
+		{
+			Clear();
+		}
 
 
 
@@ -111,6 +111,43 @@ namespace Task
 			pol.scale(ind_scale);
 			pol.Display();
 
+			ClearWithout();
+			foreach (var i in pol.edges)
+				g.DrawLine(col, i.Item1, i.Item2);
+			pictureBox1.Image = pictureBox1.Image;
+		}
+
+		private void button4_Click(object sender, EventArgs e)
+		{
+			double x = Double.Parse(textBox6.Text);
+			double y = Double.Parse(textBox7.Text);
+			double z = Double.Parse(textBox8.Text);
+
+			pol.shift(x, y, z);
+			pol.Display();
+			ClearWithout();
+			foreach (var i in pol.edges)
+				g.DrawLine(col, i.Item1, i.Item2);
+			pictureBox1.Image = pictureBox1.Image;
+		}
+
+		private void button6_Click(object sender, EventArgs e)
+		{
+			double x1 = Double.Parse(textBoxX1.Text);
+			double y1 = Double.Parse(textBoxY1.Text);
+			double z1 = Double.Parse(textBoxZ1.Text);
+
+			double x2 = Double.Parse(textBoxX2.Text);
+			double y2 = Double.Parse(textBoxY2.Text);
+			double z2 = Double.Parse(textBoxZ2.Text);
+
+			double angle = Double.Parse(textBoxAngle.Text);
+
+			Edge e1 = new Edge(new PointPol(x1, y1, z1), new PointPol(x2, y2, z2));
+			pol.rotate(e1, angle);
+
+			pol.Display();
+			ClearWithout();
 			foreach (var i in pol.edges)
 				g.DrawLine(col, i.Item1, i.Item2);
 			pictureBox1.Image = pictureBox1.Image;
@@ -147,11 +184,11 @@ namespace Task
 
 		public PointPol scale( double ind_scale, double a, double b, double c)
 		{
-			double[,] transfer = new double[4, 4] { { 1, 0, 0, -a }, { 1, 0, 0, -b }, { 1, 0, 0, -c }, { 0, 0, 0, 1 } };
+			double[,] transfer = new double[4, 4] { { 1, 0, 0, 0 }, { 0, 1, 0, 0 }, { 0, 0, 1, 0 }, { -a, -b, -c, 1 } };
 			var t1 = _form.matrix_multiplication(getP(), transfer);
 
 			t1 = _form.matrix_multiplication(t1, new double[4, 4] { { ind_scale, 0, 0, 0 }, { 0, ind_scale, 0, 0 }, { 0, 0, ind_scale, 0 }, { 0, 0, 0, 1 } });
-			transfer = new double[4, 4] { { 1, 0, 0, a }, { 1, 0, 0, b }, { 1, 0, 0, c }, { 0, 0, 0, 1 } };
+			transfer = new double[4, 4] { { 1, 0, 0, 0 }, { 0, 1, 0, 0 }, { 0, 0, 1, 0 }, { a, b, c, 1 } };
 			t1 = _form.matrix_multiplication(t1, transfer);
 
 			return translatePol(t1);
@@ -198,16 +235,16 @@ namespace Task
 			return new PointPol(f[0, 0], f[0, 1], f[0, 2], f[0, 3]);
 		}
 
+		private PointPol translatePol1(double[,] f)
+		{
+			return new PointPol(f[0, 0], f[1, 0], f[2, 0], f[3, 0]);
+		}
 
 		public PointPol shift(double x, double y, double z)
 		{
-			//Показать в текстбоксах точку куда смещаем (или в текстбоксах будет задаваться точка, пока делаем так до интеграции)
-			//double x = e.X, y = e.Y, z = 0;
 			double[,] shiftMatrix = new double[4, 4] { { 1, 0, 0, x }, { 0, 1, 0, y }, { 0, 0, 1, z }, { 0, 0, 0, 1 } };
-			return translatePol(_form.matrix_multiplication(shiftMatrix, getPol()));
+			return translatePol1(_form.matrix_multiplication(shiftMatrix, getPol()));
 		}
-		
-
 	}
 
 	public class Edge
@@ -355,8 +392,7 @@ namespace Task
             return new PointPol(f[0, 0], f[1, 0], f[2, 0], f[3, 0]);
         }
 
-
-        public void shift(double x, double y, double z)
+		public void shift(double x, double y, double z)
         {
             //Показать в текстбоксах точку куда смещаем (или в текстбоксах будет задаваться точка, пока делаем так до интеграции)
             //double x = e.X, y = e.Y, z = 0;
@@ -364,14 +400,14 @@ namespace Task
 
             List<PointPol> shift_vert = new List<PointPol>();
 
-            var temp_vertices = vertices.Select(u => translatePol(_form.matrix_multiplication(shiftMatrix, u.getPol()))).ToList();
+            var temp_vertices = vertices.Select(u => u.shift(x,y,z)).ToList();
 
             Dictionary<PointPol, List<PointPol>> temp_dict = new Dictionary<PointPol, List<PointPol>>();
 
             for (int i = 0; i < neighbors.Count; ++i)
             {
                 var key = temp_vertices[i];
-                temp_dict[key] = neighbors[vertices[i]].Select(h => translatePol(_form.matrix_multiplication(shiftMatrix, h.getPol()))).ToList();
+                temp_dict[key] = neighbors[vertices[i]].Select(h => h.shift(x,y,z)).ToList();
             }
 
             vertices = temp_vertices;
