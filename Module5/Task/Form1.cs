@@ -12,14 +12,10 @@ namespace Task
 {
     public partial class Form1 : Form
     {
-        PointPol dot = new PointPol(-1, -1, -1);
-        Tuple<PointPol, PointPol> line;
-        List<PointPol> polygon = new List<PointPol>();
-        double r = 0.02;
+		Polyhedron pol;
+		Pen col;
 
-        int ind_op;
-
-        public double[,] matrix_multiplication(double[,] m1, double[,] m2)
+		public double[,] matrix_multiplication(double[,] m1, double[,] m2)
         {
             double[,] res = new double[m1.GetLength(0), m2.GetLength(1)];
             for (int i = 0; i < m1.GetLength(0); ++i)
@@ -32,15 +28,13 @@ namespace Task
 
         public Form1()
         {
-            InitializeComponent();
+			col = new Pen(Color.Black);
+			InitializeComponent();
             pictureBox1.Image = new Bitmap(pictureBox1.Width, pictureBox1.Height);
             bmp = (Bitmap)pictureBox1.Image;
             Clear();
-            trackBar1.Value = 0;
-            trackBar1.Maximum = pictureBox1.Width;
             pictureBox1.Image = bmp;
-            textBox2.Text = trackBar1.Value.ToString();
-            textBox4.Text = "0,2";
+
 
         }
 
@@ -49,14 +43,10 @@ namespace Task
 
         public void Clear()
         {
-            g = Graphics.FromImage(pictureBox1.Image);
+			g = Graphics.FromImage(pictureBox1.Image);
             g.Clear(pictureBox1.BackColor);
             pictureBox1.Image = pictureBox1.Image;
-            ind_op = -1;
             comboBox1.SelectedItem = "...";
-            dot = new PointPol(-1, -1, -1);
-            line = Tuple.Create(dot, dot);
-            polygon.Clear();
         }
 
         public void ClearWithout()
@@ -85,7 +75,7 @@ namespace Task
 		//Пока рисует объект многогранник (любой из)
 		private void button2_Click(object sender, EventArgs e)
         {
-            Polyhedron pol = new Polyhedron();
+            pol = new Polyhedron();
 
             switch (comboBox1.SelectedItem.ToString())
             {
@@ -96,9 +86,7 @@ namespace Task
                     break;
             }
 
-            if (ind_op == -1)
-            {
-                Pen col = new Pen(Color.Black);
+                
                 pol.Display();
                 foreach (var i in pol.edges)
                     g.DrawLine(col, i.Item1, i.Item2);
@@ -107,7 +95,7 @@ namespace Task
                     textBox1.Text += "(" + i.X + " " + i.Y + " " + i.Z + ")     ";
 
 				pictureBox1.Image = pictureBox1.Image;
-            }
+
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -115,27 +103,17 @@ namespace Task
             Clear();
         }
 
-        private void textBox2_TextChanged(object sender, EventArgs e)
-        {
-            int v = Int32.Parse(textBox2.Text);
-            trackBar1.Value = v;
-        }
-
-
-        private void label4_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void textBox4_TextChanged(object sender, EventArgs e)
-        {
-            r = Double.Parse(textBox4.Text);
-        }
 
 
 		private void button3_Click(object sender, EventArgs e)
 		{
+			double ind_scale = Double.Parse(textBox5.Text);
+			pol.scale(ind_scale);
+			pol.Display();
 
+			foreach (var i in pol.edges)
+				g.DrawLine(col, i.Item1, i.Item2);
+			pictureBox1.Image = pictureBox1.Image;
 		}
 	}
 
@@ -181,7 +159,7 @@ namespace Task
 
 		public PointPol rotate(Edge direction, double phi, double a, double b, double c)
 		{
-			double x = direction.X;
+			/*double x = direction.X;
 			double y = direction.Y;
 			double z = direction.Z;
 
@@ -201,13 +179,15 @@ namespace Task
 			t1 = _form.matrix_multiplication(t1, transfer);
 
 			PointPol p = new PointPol(t1[0, 0], t1[0, 1], t1[0, 2], t1[0, 3]);
-
+			
+*/
+			PointPol p = new PointPol(0,0,0);
 			return p;
 		}
 
 		private PointPol translatePol(double[,] f)
 		{
-			return new PointPol(f[0, 0], f[1, 0], f[2, 0], f[3, 0]);
+			return new PointPol(f[0, 0], f[0, 1], f[0, 2], f[0, 3]);
 		}
 
 
@@ -218,9 +198,9 @@ namespace Task
 			double[,] shiftMatrix = new double[4, 4] { { 1, 0, 0, x }, { 0, 1, 0, y }, { 0, 0, 1, z }, { 0, 0, 0, 1 } };
 			return translatePol(_form.matrix_multiplication(shiftMatrix, getPol()));
 		}
+		
 
-
-		}
+	}
 
 	public class Edge
 	{
