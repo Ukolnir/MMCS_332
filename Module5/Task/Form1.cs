@@ -347,6 +347,56 @@ namespace Task
         {
             r = Double.Parse(textBox4.Text);
         }
+
+        //direction(l,m,n)
+        PointPol axisX = new PointPol(1, 0, 0);
+        PointPol axisY = new PointPol(0, 1, 0);
+        PointPol axisZ = new PointPol(0, 0, 1);
+
+        private PointPol rotate(PointPol obj, PointPol direction, double phi)
+        {
+            double x = direction.X;
+            double y = direction.Y;
+            double z = direction.Z;
+
+            double len = Math.Sqrt(x * x + y * y + z * z);
+
+            double l = x / len;
+            double m = y / len;
+            double n = z / len;
+
+            double[,] transfer = new double[4, 4] {
+                { l*l+Math.Cos(phi)*(1 - l*l), l*(1-Math.Cos(phi))*m + n*Math.Sin(phi), l*(1-Math.Cos(phi))*n - m*Math.Sin(phi), 0 },
+                { l*(1-Math.Cos(phi))*m - n*Math.Sin(phi), m*m+Math.Cos(phi)*(1 - m*m), m*(1-Math.Cos(phi))*n + l*Math.Sin(phi), 0 },
+                { l*(1-Math.Cos(phi))*n + m*Math.Sin(phi), m*(1-Math.Cos(phi))*n - l*Math.Sin(phi), n*n+Math.Cos(phi)*(1 - n*n), 0 },
+                { 0, 0, 0, 1 } };
+            var t1 = matrix_multiplication(direction.getP(), transfer);
+
+            t1 = matrix_multiplication(t1, transfer);
+
+            PointPol p = new PointPol(t1[0, 0], t1[0, 1], t1[0, 2], t1[0, 3]);
+
+            return p;
+        }
+
+        private Tuple<PointPol, PointPol> rotate(Tuple<PointPol, PointPol> obj, PointPol direction, double phi)
+        {
+            PointPol p1 = rotate(obj.Item1, direction, phi);
+            PointPol p2 = rotate(obj.Item2, direction, phi);
+            return Tuple.Create(p1, p2);
+        }
+
+        private List<PointPol> rotate(List<PointPol> obj, PointPol direction, double phi)
+        {
+            List<PointPol> l = new List<PointPol>();
+            foreach (var p in obj)
+            {
+                PointPol newp = rotate(p, direction, phi);
+                l.Add(newp);
+            }
+            return l;
+        }
+
     }
 
     public class PointPol {
