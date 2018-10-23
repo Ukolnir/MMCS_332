@@ -159,30 +159,38 @@ namespace Task
 
 		public PointPol rotate(Edge direction, double phi, double a, double b, double c)
 		{
-			/*double x = direction.X;
-			double y = direction.Y;
-			double z = direction.Z;
+			PointPol p = shift(-a, -b, -c);
 
-			double len = Math.Sqrt(x * x + y * y + z * z);
+			double x1 = direction.P1.X;
+			double y1 = direction.P1.Y;
+			double z1 = direction.P1.Z;
 
-			double l = x / len;
-			double m = y / len;
-			double n = z / len;
+			double x2 = direction.P2.X;
+			double y2 = direction.P2.Y;
+			double z2 = direction.P2.Z;
+
+			double vecx = x2 - x1;
+			double vecy = y2 - y1;
+			double vecz = z2 - z1;
+
+			double len = Math.Sqrt(vecx * vecx + vecy * vecy + vecz * vecz);
+
+			double l = vecx / len;
+			double m = vecy / len;
+			double n = vecz / len;
 
 			double[,] transfer = new double[4, 4] {
 				{ l*l+Math.Cos(phi)*(1 - l*l), l*(1-Math.Cos(phi))*m + n*Math.Sin(phi), l*(1-Math.Cos(phi))*n - m*Math.Sin(phi), 0 },
 				{ l*(1-Math.Cos(phi))*m - n*Math.Sin(phi), m*m+Math.Cos(phi)*(1 - m*m), m*(1-Math.Cos(phi))*n + l*Math.Sin(phi), 0 },
 				{ l*(1-Math.Cos(phi))*n + m*Math.Sin(phi), m*(1-Math.Cos(phi))*n - l*Math.Sin(phi), n*n+Math.Cos(phi)*(1 - n*n), 0 },
 				{ 0, 0, 0, 1 } };
-			var t1 = _form.matrix_multiplication(direction.getP(), transfer);
+			var t1 = _form.matrix_multiplication(p.getP(), transfer);
 
 			t1 = _form.matrix_multiplication(t1, transfer);
 
-			PointPol p = new PointPol(t1[0, 0], t1[0, 1], t1[0, 2], t1[0, 3]);
-			
-*/
-			PointPol p = new PointPol(0,0,0);
-			return p;
+			PointPol p2 = p.shift(-a, -b, -c);
+
+			return p2;
 		}
 
 		private PointPol translatePol(double[,] f)

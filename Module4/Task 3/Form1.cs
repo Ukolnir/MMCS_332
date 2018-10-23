@@ -316,42 +316,213 @@ namespace Task_3
             }
         }
 
-        /*private List<Point> sortByPolar(ref List<Point> pointsWithoutMin)
+        /*
+        private double alpha(Point p, Point pMin)
         {
+            p.X -= pMin.X;
+            p.Y = pMin.Y - p.Y;
+            double alph;
+            if (p.X == 0)
+                alph = Math.PI / 2;
+            else
+            {
+                if (p.Y == 0)
+                {
+                    alph = 0;
+                }
+                else
+                {
+                    alph = Math.Atan(Convert.ToDouble(p.Y) / Convert.ToDouble(p.X));
+                }
+                if (p.X < 0)
+                    alph += Math.PI;
+            }
+            return alph;
+        }
 
-        }*/
+        private int sizePointsWithoutMin;
+
+        private List<Point> sortByPolar(ref List<Point> pointsWithoutMin, Point pMin)
+        {
+            sizePointsWithoutMin = pointsWithoutMin.Count();
+            bool t = true;
+            while (t)
+            {
+                t = false;
+                for (int j = 0; j < sizePointsWithoutMin-1; ++j)
+                {
+                    if (alpha(pointsWithoutMin[j], pMin) > alpha(pointsWithoutMin[j+1], pMin))
+                    {
+                        Point tmp = new Point();
+                        tmp = pointsWithoutMin[j];
+                        pointsWithoutMin[j] = pointsWithoutMin[j + 1];
+                        pointsWithoutMin[j + 1] = tmp;
+                        t = true;
+                    }
+                    else
+                    {
+                        if (alpha(pointsWithoutMin[j], pMin) == alpha(pointsWithoutMin[j+1], pMin))
+                        {
+                            if (pointsWithoutMin[j].X > pointsWithoutMin[j+1].X)
+                            {
+                                for (int k = j+2; k < sizePointsWithoutMin; ++k)
+                                {
+                                    pointsWithoutMin[k - 1] = pointsWithoutMin[k];
+                                }
+                                --sizePointsWithoutMin;
+                                t = true;
+                            }
+                            else
+                            {
+                                if (pointsWithoutMin[j+1].X > pointsWithoutMin[j].X)
+                                {
+                                    for (int k = j + 1; k <sizePointsWithoutMin; ++k)
+                                    {
+                                        pointsWithoutMin[k - 1] = pointsWithoutMin[k];
+                                    }
+                                    --sizePointsWithoutMin;
+                                    t = true;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            return pointsWithoutMin;
+        }
+        */
+
+        /*
+        private List<Point> buildConvex()
+        {
+            //points = points.OrderBy(p1 => p1.Y).ThenBy(p2 => p2.X).ToList();
+            Point pMin = points[0];
+            int indMin = 0;
+            for (int i = 1; i < points.Count(); ++i)
+            {
+                if ((points[i].Y < pMin.Y) || (points[i].Y == pMin.Y && points[i].X < pMin.X))
+                {
+                    pMin = points[i];
+                    indMin = i;
+                }
+            }
+
+            List<Point> pointsWithoutMin = points.ToList();
+            pointsWithoutMin.RemoveAt(indMin);
+
+            List<Point> sorted = sortByPolar(ref pointsWithoutMin, pMin);
+            List<Point> pointsToDraw = new List<Point>();
+            for (int i = 0; i < points.Count(); ++i)
+            {
+                pointsToDraw.Add(new Point());
+            }
+
+            pointsToDraw[0] = pMin;
+            pointsToDraw[1] = sorted[0];
+            pointsToDraw[2] = sorted[1];
+
+            int last = 2;
+            for (int i = 0; i < sizePointsWithoutMin; ++i)
+            {
+                while (last > 0 && angle(pointsToDraw[last - 1], pointsToDraw[last], sorted[i]) >= 0)
+                    --last;
+                ++last;
+                pointsToDraw[last] = sorted[i];
+            }
+            return pointsToDraw;
+        }
+        */
+
+        private double angle(Point p0, Point p1, Point p2)
+        {
+            return (p1.X - p0.X) * (-p2.Y + p1.Y) - (p2.X - p1.X) * (-p1.Y + p0.Y);
+        }
+
+        private List<Point> grahamScan()
+        {
+            int n = points.Count();
+            List<int> P = new List<int>(); // список номеров точек
+            for (int i = 0; i < n; ++i)
+                P.Add(i);
+
+            //place index of min point in P[0]
+            for (int i = 1; i < n; ++i)
+            {
+                if (points[P[i]].X < points[P[0]].X)
+                {
+                    int tmp = P[0];
+                    P[0] = P[i];
+                    P[i] = tmp;
+                }
+            }
+
+            //sort by pollar angle
+            for (int i = 2; i < n; ++i)
+            {
+                int j = i;
+                while (j > 1 && (angle(points[P[0]], points[P[j-1]], points[P[j]]) < 0))
+                {
+                    int tmp = P[j];
+                    P[j] = P[j - 1];
+                    P[j - 1] = tmp;
+
+                    j -= 1;
+                }
+            }
+
+            List<int> stack = new List<int>();
+            stack.Add(P[0]);
+            stack.Add(P[1]);
+
+            //Delete inner poits
+            for (int i = 2; i < n; ++i)
+            {
+                Point p0 = points[stack[stack.Count() - 2]];
+                Point p1 = points[stack[stack.Count() - 1]];
+                Point p2 = points[P[i]];
+                while ((stack.Count() > 1) && angle(p0, p1, p2) < 0)
+                {
+                    stack.RemoveAt(stack.Count() - 1);
+
+                    p0 = points[stack[stack.Count() - 2]];
+                    p1 = points[stack[stack.Count() - 1]];
+                    p2 = points[P[i]];
+                }
+                stack.Add(P[i]);
+            }
+
+            List<Point> outers = new List<Point>();
+
+            for (int i = 0; i < stack.Count(); ++i)
+                outers.Add(points[stack[i]]);
+
+            return outers;
+        }
 
         private void drawConvex()
         {
             if (points.Count() > 2)
             {
-                Point pMin = points[0];
-                int indMin = 0;
-                for (int i = 1; i < points.Count(); ++i)
+                List<Point> toDraw = grahamScan();
+
+                Point prev = toDraw[0];
+                for (int i = 1; i < toDraw.Count(); ++i)
                 {
-                    if ((points[i].Y > pMin.Y) || (points[i].Y == pMin.Y && points[i].X < pMin.X))
-                    {
-                        pMin = points[i];
-                        indMin = i;
-                    }
+                    drawLine(prev, toDraw[i], Color.Red);
+                    prev = toDraw[i];
                 }
-
-                List<Point> pointsWithoutMin = points.ToList();
-                pointsWithoutMin.RemoveAt(indMin);
-
-                //List<Point> sorted = sortByPolar(ref pointsWithoutMin);
+                drawLine(toDraw[0], toDraw[toDraw.Count() - 1], Color.Red);
             }
         }
-
         private void drawObject()
         {
             //if (listBoxMode.SelectedItem.ToString() == "BezeCurve")
             {
-                drawCurve();   
+            //    drawCurve();   
             }
             //if (listBoxMode.SelectedItem.ToString() == "GrahamScan")
             {
-            //    drawConvex();
+                drawConvex();
             }
         }
 
