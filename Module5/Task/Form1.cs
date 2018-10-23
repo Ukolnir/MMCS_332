@@ -180,7 +180,7 @@ namespace Task
                 foreach (var i in pol.vertices)
                     textBox1.Text += "(" + i.X + " " + i.Y + " " + i.Z + ")     ";
 
-                pol.shift(200, 200, 200);
+               /* pol.shift(-100, 0, 0);
                 pol.Display();
                 foreach (var i in pol.edges)
                     g.DrawLine(col, i.Item1, i.Item2);
@@ -188,7 +188,7 @@ namespace Task
                 textBox3.Text = "";
                 foreach (var i in pol.vertices)
                     textBox3.Text += "(" + i.X + " " + i.Y + " " + i.Z + ")     ";
-                pictureBox1.Image = pictureBox1.Image;
+                */pictureBox1.Image = pictureBox1.Image;
             }
         }
 
@@ -202,7 +202,6 @@ namespace Task
             int v = Int32.Parse(textBox2.Text);
             trackBar1.Value = v;
         }
-
 
         private void pictureBox1_MouseDown(object sender, MouseEventArgs e)
         {
@@ -259,8 +258,6 @@ namespace Task
                 g.DrawLine(mypen, p1, p2);
                 pictureBox1.Image = pictureBox1.Image;
             }
-
-
         }
 
         public void draw_elems(List<PointPol> pol)
@@ -367,6 +364,11 @@ namespace Task
             return new double[1,4]{{X, Y, Z, W}};
         }
 
+        public double[,] getP1()
+        {
+            return new double[3, 1] { { X}, {Y}, { Z } };
+        }
+
         public double[,] getPol()
         {
             return new double[4, 1] { { X }, { Y }, { Z }, { W } };
@@ -470,23 +472,33 @@ namespace Task
         }
 
         //Октаэдр
-        public void Octahedron() {
-            
+        public void Octahedron()
+        {
+
         }
 
+        //double[,] transformMatrix = new double[4, 4] { { 1 / Math.Sqrt(2), -1 / Math.Sqrt(6), 0, 0 }, { 0, Math.Sqrt(2 / 3), 0, 0 }, { -1 / Math.Sqrt(2), -1 / Math.Sqrt(6), 0, 0 }, { 0, 0, 0, 1 } };
+        //double[,] transformMatrix = new double[4, 4] { { 1 / Math.Sqrt(2), -1 / Math.Sqrt(6), Math.Sqrt(1 / 3), 0 }, { 0, Math.Sqrt(2 / 3), Math.Sqrt(1 / 3), 0 }, { -1 / Math.Sqrt(2), -1 / Math.Sqrt(6), Math.Sqrt(1 / 3), 0 }, { 0, 0, 0, 1 } };
+        //double[,] transformMatrix = new double[4, 4] { { 1, 0, 0, 0 }, { 0, 1, 0, 0 }, { Math.Sqrt(2) / 4, Math.Sqrt(2) / 4, 0, 0 }, { 0, 0, 0, 1 } };
         public void Display()
         {
             edges = new List<Tuple<Point, Point>>();
             vertices2D = new List<Point>();
             foreach (var p in vertices)
             {
-                var temp = _form.matrix_multiplication(displayMatrix, p.getP());
+                //double c = 1 + p.Z * 0.002;
+                //double[,] transformMatrix = new double[4, 4] { { 1.0 / c, 0, 0, 0 }, { 0, 1.0 / c, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, -1.0 / (0.002 * c), 1.0 / c } };
+                //var temp = _form.matrix_multiplication(transformMatrix, p.getPol());
+                var temp = _form.matrix_multiplication(displayMatrix, p.getP1());
                 var temp2d = new Point(Convert.ToInt32(temp[0, 0]), Convert.ToInt32(temp[1, 0]));
                 vertices2D.Add(temp2d);
 
                 foreach (var t in neighbors[p])
                 {
-                    var t1 = _form.matrix_multiplication(displayMatrix, t.getP());
+                    //c = 1 + t.Z * 0.00002;
+                    //transformMatrix = new double[4, 4] { { 1.0 / c, 0, 0, 0 }, { 0, 1.0 / c, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, -1.0 / (0.00002 * c), 1.0 / c } };
+                    //var temp = _form.matrix_multiplication(transformMatrix, t.getPol());
+                    var t1 = _form.matrix_multiplication(displayMatrix, t.getP1());
                     vertices2D.Add(new Point(Convert.ToInt32(t1[0, 0]), Convert.ToInt32(t1[1, 0])));
                     edges.Add(Tuple.Create(temp2d, vertices2D.Last()));
                 }
