@@ -225,9 +225,10 @@ namespace Task
 
 			t1 = _form.matrix_multiplication(t1, transfer);
 
-			PointPol p2 = p.shift(-a, -b, -c);
+            PointPol p2 = translatePol(t1);
+            PointPol p3 = p2.shift(a, b, c);
 
-			return p2;
+			return p3;
 		}
 
 		private PointPol translatePol(double[,] f)
