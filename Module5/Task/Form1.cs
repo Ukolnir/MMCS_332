@@ -207,8 +207,9 @@ namespace Task
 			return translatePol(t1);
 		}
 
-		public PointPol rotate(Edge direction, double phi, double a, double b, double c)
+		public PointPol rotate(Edge direction, double angle, double a, double b, double c)
 		{
+            double phi =  Math.PI / 180 * angle; 
 			PointPol p = shift(-a, -b, -c);
 
 			double x1 = direction.P1.X;
