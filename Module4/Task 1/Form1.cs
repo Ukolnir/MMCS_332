@@ -130,7 +130,7 @@ namespace Task_1{
             fractal_dict = new Dictionary<Point, Tuple<Color, Tuple<int, int>>>();
             fractal_dict.Add(new Point(0, ht), Tuple.Create(color, Tuple.Create(len, wh)));            
             int countPoint = 0; //Первая точка - нулевая
-            
+            Stack<int> check_cobaka = new Stack<int>();
             memory = new Stack<Tuple<Point, double>>();
             nolinepoint = new List<int>();
             Random rand = new Random();
@@ -158,22 +158,34 @@ namespace Task_1{
                         ang = ang - rand.Next(Convert.ToInt32(angle));
                         break;
                     case '[':
+                        var t = check_cobaka.Pop();
+                        ++t;
+                        check_cobaka.Push(t);
                         var temp = Tuple.Create(fractal_dict.Last().Key, ang);
                         memory.Push(temp);
                         
-                        //Проблема - к какой скобке соотносить @
-
                         break;
                     case ']':
+                        var c = check_cobaka.Pop();
+                        --c;
+                        if (c == -1){
+                            var clw = _memory.Pop();
+                            color = clw.Item1;
+                            len = clw.Item2.Item1;
+                            wh = clw.Item2.Item2;
+                        }
                         var t0 = memory.Pop();
                         nolinepoint.Add(countPoint);
-                        fractal.Add(t0.Item1);
+                        fractal_dict.Add(t0.Item1, Tuple.Create(color, Tuple.Create(len, wh)));
                         ang = t0.Item2;
                         ++countPoint;
-                        //достаем здесь 
                         break;
                     case '@':
-                        _memory.Push(Tuple.Create(color, Tuple.Create(len, width)));
+                        _memory.Push(Tuple.Create(color, Tuple.Create(len, wh)));
+                        color = Color.FromArgb(color.R + 10, color.G + 10, color.B + 10);
+                        len -= 10;
+                        wh -= 1;
+                        check_cobaka.Push(0);
                         break;
                     default:
                         break;
@@ -215,6 +227,21 @@ namespace Task_1{
             pictureBox1.Image = pictureBox1.Image;
             pen.Dispose();
         }
+
+        private void render_rand(string str)
+        {
+           
+           // for (int i = 0; i < fractal_dict.Count - 1; ++i){
+                //if (nolinepoint.Any(x => x == i)) continue;
+                   // g.DrawLine(new Pen(fractal_dict), fractal[i], fractal[i + 1]);
+           // }
+            //pictureBox1.Image = pictureBox1.Image;
+           // pen.Dispose();
+        }
+
+
+
+
 
         private void button1_Click(object sender, EventArgs e)
         {
