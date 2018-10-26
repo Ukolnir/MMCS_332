@@ -64,7 +64,7 @@
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(145, 15);
             this.label1.TabIndex = 1;
-            this.label1.Text = "Выбирете функцию: ";
+            this.label1.Text = "Выберите функцию: ";
             // 
             // label2
             // 
@@ -139,13 +139,14 @@
             this.comboBox1.FormattingEnabled = true;
             this.comboBox1.Items.AddRange(new object[] {
             "... ",
-            "x^2 + y^2 ",
-            "sqrt( 1 - x^2 - y^2 )",
-            "x^2 - y^2"});
+            "x^2 + y^2 = z",
+            "sqrt( 1 - x^2 - y^2 ) = z",
+            "x^2 - y^2 = z"});
             this.comboBox1.Location = new System.Drawing.Point(15, 59);
             this.comboBox1.Name = "comboBox1";
             this.comboBox1.Size = new System.Drawing.Size(145, 21);
             this.comboBox1.TabIndex = 10;
+            this.comboBox1.SelectedIndexChanged += new System.EventHandler(this.comboBox1_SelectedIndexChanged);
             // 
             // button1
             // 
@@ -156,6 +157,7 @@
             this.button1.TabIndex = 11;
             this.button1.Text = "Построить";
             this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
             // button2
             // 
