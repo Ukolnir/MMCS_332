@@ -271,6 +271,28 @@ namespace Task
 
 	}
 
+    public class Polygon
+    {
+        public List<PointPol> points = new List<PointPol>();
+        public List<Edge> edges = new List<Edge>();
+
+        public Polygon(List<Edge> edg)
+        {
+            foreach (var el in edg)
+            {
+                edges.Add(el);
+                points.Add(el.P1);
+                points.Add(el.P2);
+            }
+        }
+        //грани
+        public Polygon(List<PointPol> poins)
+        {
+            foreach (var v in poins)
+                points.Add(v);
+        }
+
+    }
 
 		public class Polyhedron
     {
@@ -280,6 +302,7 @@ namespace Task
         public List<Point> vertices2D;
         public Dictionary<PointPol, List<PointPol>> neighbors = new Dictionary<PointPol, List<PointPol>>();
         public List<Tuple<Point, Point>> edges;
+        public List<Polygon> polygons = new List<Polygon>();
 
         //Изометрическая проекция
         double[,] displayMatrix = new double[3, 3] { { Math.Sqrt(0.5), 0, -Math.Sqrt(0.5) }, { 1 / Math.Sqrt(6), Math.Sqrt(2) / 3, 1 / Math.Sqrt(6) }, { 1 / Math.Sqrt(3), -1 / Math.Sqrt(3), 1 / Math.Sqrt(3) } };
@@ -347,6 +370,60 @@ namespace Task
             neighbors[c].Add(d);
             neighbors[a].Add(d);
             neighbors[d1].Add(d);
+
+            List<Edge> e1 = new List<Edge>();
+            e1.Add(new Edge(a, b));
+            e1.Add(new Edge(a, d));
+            e1.Add(new Edge(c, b));
+            e1.Add(new Edge(c, d));
+
+            polygons.Add(new Polygon(e1));
+            e1.Clear();
+
+            e1 = new List<Edge>();
+            e1.Add(new Edge(a, b));
+            e1.Add(new Edge(a, a1));
+            e1.Add(new Edge(a1, b1));
+            e1.Add(new Edge(b, b1));
+
+            polygons.Add(new Polygon(e1));
+            e1.Clear();
+
+            e1 = new List<Edge>();
+            e1.Add(new Edge(a, d));
+            e1.Add(new Edge(a, a1));
+            e1.Add(new Edge(a1, d1));
+            e1.Add(new Edge(d, d1));
+
+            polygons.Add(new Polygon(e1));
+            e1.Clear();
+
+            e1 = new List<Edge>();
+            e1.Add(new Edge(c, d));
+            e1.Add(new Edge(c, c1));
+            e1.Add(new Edge(c1, d1));
+            e1.Add(new Edge(d, d1));
+
+            polygons.Add(new Polygon(e1));
+            e1.Clear();
+
+            e1 = new List<Edge>();
+            e1.Add(new Edge(c, b));
+            e1.Add(new Edge(c, c1));
+            e1.Add(new Edge(c1, b1));
+            e1.Add(new Edge(b, b1));
+
+            polygons.Add(new Polygon(e1));
+            e1.Clear();
+
+            e1 = new List<Edge>();
+            e1.Add(new Edge(a1, d1));
+            e1.Add(new Edge(c1, d1));
+            e1.Add(new Edge(b1, c1));
+            e1.Add(new Edge(a1, b1));
+
+            polygons.Add(new Polygon(e1));
+            e1.Clear();
 
         }
 
