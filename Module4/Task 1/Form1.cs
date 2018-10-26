@@ -51,10 +51,10 @@ namespace Task_1{
         List<int> nolinepoint;
         Stack<Tuple<Point,double>> memory;
         Stack<Tuple<Color, Tuple<int,int>>> _memory;
-        Dictionary<Point, Tuple<Color, Tuple<int, int>>> fractal_dict;
+        Dictionary<int, Tuple<Point, Tuple<Color, int>>> fractal_dict; //Какая по счету, точка, цвет, ширина
         Color color;
-        int width = 7;
-        int height = 100;
+        int width = 10;
+        int height = 120;
         
         private double[,] matrix_multiplication(double[,] m1, double[,] m2){
             double[,] res = new double[m1.GetLength(0), m2.GetLength(1)];
@@ -126,78 +126,65 @@ namespace Task_1{
             int len = height;
             int ht = pictureBox1.Height;
             int wh = width;
-            color = Color.ForestGreen;
-            fractal_dict = new Dictionary<Point, Tuple<Color, Tuple<int, int>>>();
-            fractal_dict.Add(new Point(0, ht), Tuple.Create(color, Tuple.Create(len, wh)));            
+            color = Color.DarkGreen;
+            fractal_dict = new Dictionary<int, Tuple<Point, Tuple<Color, int>>>();
+            fractal_dict.Add(0, Tuple.Create(new Point(pictureBox1.Width/2, ht), Tuple.Create(color, wh)));            
             int countPoint = 0; //Первая точка - нулевая
-            Stack<int> check_cobaka = new Stack<int>();
             memory = new Stack<Tuple<Point, double>>();
             nolinepoint = new List<int>();
             Random rand = new Random();
             _memory = new Stack<Tuple<Color, Tuple<int, int>>>();
             
-            double ang = 0;
+            double ang = -90;
             //Здесь идет разветвление по режиму
             for (int i = 0; i < str.Length; ++i)
             {
                 switch (str[i])
                 {
                     case 'F':
-                        Point p0 = fractal_dict.Last().Key;
+                        Point p0 = fractal_dict.Last().Value.Item1;
+                        ++countPoint;
                         int x, y;
-                        x = p0.X + fractal_dict.Last().Value.Item2.Item1;
+                        x = p0.X + len;
                         y = p0.Y;
                         var p = rotation(ang, p0.X, p0.Y, x, y);
-                        fractal_dict.Add(p, Tuple.Create(color, Tuple.Create(len, wh)));
-                        ++countPoint;
+                        fractal_dict.Add(countPoint, Tuple.Create(p, Tuple.Create(color, wh)));
                         break;
                     case '+':
-                        ang = ang + rand.Next(Convert.ToInt32(angle)); //Здесь аккуратнее
+                        ang = ang + rand.Next(Convert.ToInt32(angle));
                         break;
                     case '-':
                         ang = ang - rand.Next(Convert.ToInt32(angle));
                         break;
                     case '[':
-                        var t = check_cobaka.Pop();
-                        ++t;
-                        check_cobaka.Push(t);
-                        var temp = Tuple.Create(fractal_dict.Last().Key, ang);
-                        memory.Push(temp);
-                        
-                        break;
-                    case ']':
-                        var c = check_cobaka.Pop();
-                        --c;
-                        if (c == -1){
-                            var clw = _memory.Pop();
-                            color = clw.Item1;
-                            len = clw.Item2.Item1;
-                            wh = clw.Item2.Item2;
-                        }
-                        var t0 = memory.Pop();
-                        nolinepoint.Add(countPoint);
-                        fractal_dict.Add(t0.Item1, Tuple.Create(color, Tuple.Create(len, wh)));
-                        ang = t0.Item2;
-                        ++countPoint;
-                        break;
-                    case '@':
                         _memory.Push(Tuple.Create(color, Tuple.Create(len, wh)));
-                        color = Color.FromArgb(color.R + 10, color.G + 10, color.B + 10);
+                        color = Color.FromArgb((color.R + 10 > 255 ? 255 : color.R + 10),
+                               (color.G + 10 > 255 ? 255 : color.G + 10), (color.B + 10 > 255 ? 255 : color.B + 10));
                         len -= 10;
                         wh -= 1;
-                        check_cobaka.Push(0);
+                       
+                        var temp = Tuple.Create(fractal_dict.Last().Value.Item1, ang);
+                        memory.Push(temp);
+                        break;
+                    case ']':
+                        var clw = _memory.Pop();
+                        color = clw.Item1;
+                        len = clw.Item2.Item1;
+                        wh = clw.Item2.Item2;
+                        
+                        var t0 = memory.Pop();
+                        nolinepoint.Add(countPoint);
+                        ++countPoint;
+                        fractal_dict.Add(countPoint, Tuple.Create(t0.Item1,Tuple.Create(color, wh)));
+                        ang = t0.Item2;
                         break;
                     default:
                         break;
                 }
             }
-            /*string s = "";
-            for (int j = 0; j < fractal.Count; ++j)
-                s += "(" + fractal[j].X + " ; " + fractal[j].Y + ")";
-            textBox1.Text = s;*/
         }
 
-        private void render(string str) {
+        private void render() {
             int minx, maxx, miny, maxy;
             IEnumerable<Point> query = fractal.OrderBy(x => x.X);
             minx = query.First().X;
@@ -205,17 +192,12 @@ namespace Task_1{
             query = fractal.OrderBy(y => y.Y);
             miny = query.First().Y;
             maxy = query.Last().Y;
-
-           // string s = "(" + minx + " ; " + miny + ") " + "(" + maxx + " ; " + maxy + ")";
-          //  textBox1.Text = s;
-
             if (maxy == miny)
                 fractal = fractal.Select(p => new Point(Convert.ToInt32((pictureBox1.Width - 1) * (p.X - minx) / (maxx - minx)),
                     pictureBox1.Height - 5)).ToList();
             else
                 fractal = fractal.Select(p => new Point(Convert.ToInt32((pictureBox1.Width - 1) * (p.X - minx) / (maxx - minx)),
                     Convert.ToInt32((pictureBox1.Height - 1) * (p.Y - miny) / (maxy - miny)))).ToList();
-            
             var pen = new Pen(Color.Black);
             if (nolinepoint.Count == 0)
                 g.DrawLines(pen, fractal.ToArray());
@@ -228,20 +210,16 @@ namespace Task_1{
             pen.Dispose();
         }
 
-        private void render_rand(string str)
+        private void render_rand()
         {
-           
-           // for (int i = 0; i < fractal_dict.Count - 1; ++i){
-                //if (nolinepoint.Any(x => x == i)) continue;
-                   // g.DrawLine(new Pen(fractal_dict), fractal[i], fractal[i + 1]);
-           // }
-            //pictureBox1.Image = pictureBox1.Image;
+           for (int i = 0; i < fractal_dict.Count - 1; ++i){
+                if (nolinepoint.Any(x => x == i)) continue;
+                    g.DrawLine(new Pen(fractal_dict[i].Item2.Item1, fractal_dict[i].Item2.Item2), 
+                        fractal_dict[i].Item1, fractal_dict[i + 1].Item1);
+            }
+            pictureBox1.Image = pictureBox1.Image;
            // pen.Dispose();
         }
-
-
-
-
 
         private void button1_Click(object sender, EventArgs e)
         {
@@ -268,11 +246,17 @@ namespace Task_1{
                 }
                 pred = result;
             }
-            //textBox1.Text = result;
+            textBox1.Text = result;
             if (result.Any(x => x == '@'))
+            {
                 label2.Text = "Включен режим случайности";
-            //perform_fractal(result);
-            //render(result);
+                perform_fractal_ac(result);
+                render_rand();
+            }
+            else {
+                perform_fractal(result);
+                render();
+            }
         }
 
         private void очиститьToolStripMenuItem_Click(object sender, EventArgs e){
