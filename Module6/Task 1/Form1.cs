@@ -161,6 +161,36 @@ namespace Task_1
                 }
             }
         }
+
+        private string save() {
+            string result = "";
+            foreach (var p in pol.polygons){
+                foreach (var t in p.points){
+                    t.X -= pictureBox1.Width / 2;
+                    if (p.points.Last() == t)
+                        result += t.X.ToString() + ";" + t.Y.ToString() + ";" + t.Z.ToString();
+                    else
+                        result += t.X.ToString() + ";" + t.Y.ToString() + ";" + t.Z.ToString() + " ";
+                }
+                if (p != pol.polygons.Last())
+                    result += Environment.NewLine;
+            }
+            textBox1.Text = result;
+            return result;
+        }
+
+        private void saveToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            SaveFileDialog saveFileDialog1 = new SaveFileDialog();
+            saveFileDialog1.RestoreDirectory = true;
+            saveFileDialog1.Filter = "Text Files(*.txt)|*.txt|All files (*.*)|*.*";
+            if (saveFileDialog1.ShowDialog() == DialogResult.OK){
+                using (System.IO.StreamWriter sw = new System.IO.StreamWriter(saveFileDialog1.FileName, false, System.Text.Encoding.Default)){
+                    string text = save();
+                    sw.WriteLine(text);
+                }
+            }
+        }
     }
 
     public class PointPol
@@ -300,7 +330,6 @@ namespace Task_1
         public Dictionary<PointPol, List<PointPol>> neighbors;
         public List<Tuple<Point, Point>> edges; //Список ребер в 2d
         public List<Polygon> polygons;
-
         //Изометрическая проекция
         double[,] displayMatrix = new double[3, 3] { { Math.Sqrt(0.5), 0, -Math.Sqrt(0.5) }, { 1 / Math.Sqrt(6), Math.Sqrt(2) / 3, 1 / Math.Sqrt(6) }, { 1 / Math.Sqrt(3), -1 / Math.Sqrt(3), 1 / Math.Sqrt(3) } };
 
