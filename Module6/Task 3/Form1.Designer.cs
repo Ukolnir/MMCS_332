@@ -333,6 +333,7 @@
             this.button6.TabIndex = 35;
             this.button6.Text = "Поворот";
             this.button6.UseVisualStyleBackColor = true;
+            this.button6.Click += new System.EventHandler(this.button6_Click);
             // 
             // button5
             // 
@@ -354,6 +355,7 @@
             this.button4.TabIndex = 33;
             this.button4.Text = "Смещение";
             this.button4.UseVisualStyleBackColor = true;
+            this.button4.Click += new System.EventHandler(this.button4_Click);
             // 
             // textBox9
             // 
@@ -371,6 +373,7 @@
             this.button7.TabIndex = 31;
             this.button7.Text = "Масштабирование";
             this.button7.UseVisualStyleBackColor = true;
+            this.button7.Click += new System.EventHandler(this.button7_Click);
             // 
             // Form1
             // 

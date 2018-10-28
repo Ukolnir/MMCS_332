@@ -50,6 +50,9 @@ namespace Task_3
         {
             g = Graphics.FromImage(pictureBox1.Image);
 
+            g.ScaleTransform(1, -1);
+            g.TranslateTransform(pictureBox1.Width / 2, -pictureBox1.Height / 2);
+
             PointPol p0 = new PointPol(0, 0, 0);
             PointPol p1 = new PointPol(pictureBox1.Width, 0, 0);
             PointPol p2 = new PointPol(0, pictureBox1.Width, 0);
@@ -60,7 +63,9 @@ namespace Task_3
             my_pen.Color = Color.Red;
             g.DrawLine(my_pen, p0.To2D(), p2.To2D());
             my_pen.Color = Color.Green;
-            g.DrawLine(my_pen, p0.To2D(), p3.To2D());
+
+            Point p3n = p3.To2D();
+            g.DrawLine(my_pen, p0.To2D(), p3n);
 
             pictureBox1.Image = pictureBox1.Image;
         }
@@ -134,8 +139,15 @@ namespace Task_3
 
             foreach (var e in l1)
                 l.Add(e);
-            for (int i = l2.Count() - 1; i > 0; --i)
-                l.Add(l2[i]);
+
+            foreach (var e in l2)
+                l.Add(e);
+
+            for (int i = 0; i < l1.Count(); i ++)
+            {
+                if (i < l2.Count())
+                    l.Add(new Edge(l1[i].P1, l2[i].P2));
+            }
 
             return l;
         }
@@ -161,20 +173,39 @@ namespace Task_3
                 l1 = l2;
             }
 
+            if (Math.Abs(x0 - x1) < 0.001)
+            {
+                l1.Add(new Edge(l1.Last().P2, l1.First().P1));
+                polygons.Add(new Polygon(l1));
+
+            }
+
             figure = new Polyhedron(polygons);
         }
 
         private void print_figure()
         {
-            ClearWithout();
-            pictureBox1.Image = figure.print(pictureBox1.Image);
+            //ClearWithout();
+           // g = Graphics.FromImage(pictureBox1.Image);
+            //pictureBox1.Image = figure.print(pictureBox1.Image, ref g);
+            Point p = figure.pol.First().edges.First().P1.To2D();
+           // Pen pen = new Pen(Color.Black);
+
+            foreach (var pl in figure.pol)
+                foreach (var e in pl.edges)
+                {
+                    g.DrawLine(new Pen(Color.Black), p, e.P1.To2D());
+                    g.DrawLine(new Pen(Color.Black), e.P1.To2D(), e.P2.To2D());
+                    p = e.P2.To2D();
+                }
+            pictureBox1.Image = pictureBox1.Image;
         }
 
         private void button1_Click(object sender, EventArgs e)
         {
-            write_axes();
-
             create_pol();
+            ClearWithout();
+            write_axes();
             print_figure();
 
             button4.Visible = true;
@@ -218,7 +249,52 @@ namespace Task_3
 
         private void button5_Click(object sender, EventArgs e)
         {
+            ClearWithout();
+            write_axes();
+            figure.reflection(comboBox2.SelectedItem.ToString());
+            print_figure();
+        }
 
+        private void button7_Click(object sender, EventArgs e)
+        {
+            ClearWithout();
+            write_axes();
+            double ind_scale = Double.Parse(textBox9.Text.ToString());
+            figure.scale(ind_scale);
+            print_figure();
+        }
+
+        private void button4_Click(object sender, EventArgs e)
+        {
+            ClearWithout();
+            write_axes();
+            double x = Double.Parse(textBox6.Text.ToString());
+            double y = Double.Parse(textBox7.Text.ToString());
+            double z = Double.Parse(textBox8.Text.ToString());
+
+            figure.shift(x, y, z);
+            print_figure();
+        }
+
+        private void button6_Click(object sender, EventArgs e)
+        {
+            ClearWithout();
+            write_axes();
+
+            double x1 = Double.Parse(textBoxX1.Text.ToString());
+            double y1 = Double.Parse(textBoxY1.Text.ToString());
+            double z1 = Double.Parse(textBoxZ1.Text.ToString());
+            double x2 = Double.Parse(textBoxX2.Text.ToString());
+            double y2 = Double.Parse(textBoxY2.Text.ToString());
+            double z2 = Double.Parse(textBoxZ2.Text.ToString());
+
+            double angle = Double.Parse(textBoxAngle.Text.ToString());
+
+            PointPol p1 = new PointPol(x1, y1, z1);
+            PointPol p2 = new PointPol(x2, y2, z2);
+
+            figure.rotate(new Edge(p1, p2), angle);
+            print_figure();
         }
     }
 
@@ -320,12 +396,25 @@ namespace Task_3
             double[,] shiftMatrix = new double[4, 4] { { 1, 0, 0, x }, { 0, 1, 0, y }, { 0, 0, 1, z }, { 0, 0, 0, 1 } };
             return translatePol1(_form.matrix_multiplication(shiftMatrix, getPol()));
         }
-            //Изометрическая проекция
+        //Изометрическая проекция
         double[,] displayMatrix = new double[3, 3] { { Math.Sqrt(0.5), 0, -Math.Sqrt(0.5) }, { 1 / Math.Sqrt(6), Math.Sqrt(2) / 3, 1 / Math.Sqrt(6) }, { 1 / Math.Sqrt(3), -1 / Math.Sqrt(3), 1 / Math.Sqrt(3) } };
-
+      
         public Point To2D()
         {
-            var temp = _form.matrix_multiplication(displayMatrix, getP1());
+            /*double c = 2;
+            double a = 2;
+            double b = 2;
+
+            if (Math.Abs(Z / c - 1) < 0.0001)
+                c += 0.1;
+            double[,] displayMatrix = new double[4, 4] { { 1.0, 0, 0, -1.0/a }, { 0, 1.0, 0, -1.0/b}, { 0,0,0, (-1.0 / c) }, { 0, 0, 0, 1.0 } };
+
+            var temp = _form.matrix_multiplication(getP(), displayMatrix);
+            for (int i = 0; i < 4; ++i)
+                temp[0, i] = temp[0, i] / (1 - Z / c);
+            */
+            var temp = _form.matrix_multiplication( displayMatrix, getP1());
+            //var temp2d = new Point(Convert.ToInt32(temp[0, 0]), Convert.ToInt32(temp[0, 1]));
             var temp2d = new Point(Convert.ToInt32(temp[0, 0]), Convert.ToInt32(temp[1, 0]));
             return temp2d;
         }
@@ -338,12 +427,10 @@ namespace Task_3
 
         public Edge(PointPol p1, PointPol p2) { P1 = p1; P2 = p2; }
 
-        public Image print(Image I)
+        public Image print(Image I, ref Graphics g)
         {
             Point p1 = P1.To2D();
             Point p2 = P2.To2D();
-
-            Graphics g = Graphics.FromImage(I);
             Pen my_pen = new Pen(Color.Black);
             g.DrawLine(my_pen, p1, p2);
             return I;
@@ -420,10 +507,10 @@ namespace Task_3
         }
 
 
-        public Image print(Image I)
+        public Image print(Image I, ref Graphics g)
         {
             foreach (var e in edges)
-                I = e.print(I);
+                I = e.print(I, ref g);
 
             return I;
         }
@@ -475,10 +562,10 @@ namespace Task_3
             }
         }
 
-        public Image print(Image I)
+        public Image print(Image I, ref Graphics g)
         {
             foreach (var el in pol)
-                I = el.print(I);
+                I = el.print(I, ref g);
 
             return I;
         }
