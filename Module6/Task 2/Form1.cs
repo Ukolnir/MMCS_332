@@ -14,9 +14,6 @@ namespace Task_3
     {
         Graphics g;
 
-        delegate double lambda(double a, double b, double c);
-        lambda f;
-
         List<PointPol> points = new List<PointPol>();
 
         public Form1()
@@ -60,6 +57,13 @@ namespace Task_3
             Point y = p2.To2D();
             Point z = p3.To2D();
 
+            Font font = new Font("Arial", 8);
+            SolidBrush brush = new SolidBrush(Color.Black);
+            
+            g.DrawString("X", font, brush, x);
+            g.DrawString("Y", font, brush, y);
+            g.DrawString("Z", font, brush, z);
+
             Pen my_pen = new Pen(Color.Blue);
             g.DrawLine(my_pen, o, x);
             my_pen.Color = Color.Red;
@@ -97,20 +101,22 @@ namespace Task_3
             return res;
         }
 
-        private void printPolygon(Polygon pol, Color c)
+        private void drawPolygon(Polygon pol, Color c)
         {
             List<Tuple<Point, Point>> l = pol.to2d();
             foreach (var p in l)
             {
                 g.DrawLine(new Pen(c), p.Item1, p.Item2);
             }
-            pictureBox1.Image = pictureBox1.Image;
+            //g.DrawLine(new Pen(c), l.Last().Item2, l.First().Item1);
+            //g.DrawLine(new Pen(c), l.First().Item1, l.First().Item2);
+            
         }
 
-        private void buildFigure(string axis, int cnt)
+        private List<Polygon> buildFigure(string axis, int cnt)
         {
             List<PointPol> l1 = new List<PointPol>(points);
-            List<PointPol> l2 = new List<PointPol>(points);
+            List<Polygon> polygons = new List<Polygon>();
 
             Edge dir = new Edge(new PointPol(0, 0, 0), new PointPol(1, 0, 0));
             if (axis == "X")
@@ -130,39 +136,42 @@ namespace Task_3
 
             for (int i = 0; i < cnt; ++i)
             {
+                List<PointPol> l2 = new List<PointPol>(l1);
                 Polygon pol = new Polygon(l2);
                 double a = 0, b = 0, c = 0;
                 pol.find_center(ref a, ref b, ref c);
-
-                foreach (var item in l2)
+                
+                for (int j = 0; j < l2.Count(); ++j)
                 {
-                    item.rotate(dir, angle, a, b, c);
+                    l2[j] = l2[j].rotate(dir, angle, a, b, c);
                 }
 
+                List<PointPol> lsum = new List<PointPol>(l1);
+                lsum.AddRange(l2);
+                polygons.Add(new Polygon(lsum));
+                //polygons.Add(new Polygon(l1));
 
+                l1 = l2;
             }
+
+            return polygons;
         }
 
         private void button1_Click(object sender, EventArgs e)
         {
             //Polygon pol = new Polygon(points);
-            //printPolygon(pol, Color.Black);
-        }
+            //drawPolygon(pol, Color.Black);
 
-        private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            switch (comboBoxBuildAxis.SelectedItem.ToString())
+            string ax = comboBoxBuildAxis.SelectedItem.ToString();
+            int cnt = Int32.Parse(textBoxBuildCount.Text);
+            List<Polygon> pols = buildFigure(ax, cnt);
+
+            foreach (var item in pols)
             {
-                case "x^2 + y^2 = z":
-                    f = (x, y, z) => x * x + y * y - z;
-                    break;
-                case "sqrt( 1 - x^2 - y^2 ) = z":
-                    f = (x, y, z) => Math.Sqrt(1 - x * x - y * y) - z;
-                    break;
-                case "x^2 - y^2 = z":
-                    f = (x, y, z) => x*x - y*y - z;
-                    break;
+                drawPolygon(item, Color.Black);
             }
+            //drawPolygon(pols.First(), Color.Black);
+            pictureBox1.Image = pictureBox1.Image;
         }
 
         private void pictureBox1_MouseClick(object sender, MouseEventArgs e)
@@ -431,7 +440,7 @@ namespace Task_3
             {
                 l.Add(item.to2d());
             }
-
+            //l.Add(Tuple.Create(edges.Last().P2.To2D(), edges.First().P1.To2D()));
             return l;
         }
     }

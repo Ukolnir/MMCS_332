@@ -94,7 +94,6 @@
             this.comboBoxBuildAxis.Name = "comboBoxBuildAxis";
             this.comboBoxBuildAxis.Size = new System.Drawing.Size(100, 21);
             this.comboBoxBuildAxis.TabIndex = 10;
-            this.comboBoxBuildAxis.SelectedIndexChanged += new System.EventHandler(this.comboBox1_SelectedIndexChanged);
             // 
             // buttonBuild
             // 
@@ -143,7 +142,7 @@
             this.textBoxBuildCount.Name = "textBoxBuildCount";
             this.textBoxBuildCount.Size = new System.Drawing.Size(60, 20);
             this.textBoxBuildCount.TabIndex = 16;
-            this.textBoxBuildCount.Text = "4";
+            this.textBoxBuildCount.Text = "3";
             // 
             // label7
             // 
