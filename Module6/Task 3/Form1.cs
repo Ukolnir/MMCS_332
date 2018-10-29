@@ -185,11 +185,7 @@ namespace Task_3
 
         private void print_figure()
         {
-            //ClearWithout();
-           // g = Graphics.FromImage(pictureBox1.Image);
-            //pictureBox1.Image = figure.print(pictureBox1.Image, ref g);
             Point p = figure.pol.First().edges.First().P1.To2D();
-           // Pen pen = new Pen(Color.Black);
 
             foreach (var pl in figure.pol)
                 foreach (var e in pl.edges)
@@ -238,8 +234,8 @@ namespace Task_3
                 case "x^2 + y^2 = z":
                     f = (x, y) => x * x + y * y;
                     break;
-                case "sqrt( 1 - x^2 - y^2 ) = z":
-                    f = (x, y) => Math.Sqrt(1 - x * x - y * y);
+                case "1/(1+x^2) + 1/(1+y^2) = z":
+                    f = (x, y) => 1.0 / (1 + x * x) + 1.0 / (1 + y * y);
                     break;
                 case "x^2 - y^2 = z":
                     f = (x, y) => x*x - y*y;
@@ -367,10 +363,10 @@ namespace Task_3
             double n = vecz / len;
 
             double[,] transfer = new double[4, 4] {
-                    { l*l+Math.Cos(phi)*(1 - l*l), l*(1-Math.Cos(phi))*m + n*Math.Sin(phi), l*(1-Math.Cos(phi))*n - m*Math.Sin(phi), 0 },
-                    { l*(1-Math.Cos(phi))*m - n*Math.Sin(phi), m*m+Math.Cos(phi)*(1 - m*m), m*(1-Math.Cos(phi))*n + l*Math.Sin(phi), 0 },
-                    { l*(1-Math.Cos(phi))*n + m*Math.Sin(phi), m*(1-Math.Cos(phi))*n - l*Math.Sin(phi), n*n+Math.Cos(phi)*(1 - n*n), 0 },
-                    { 0, 0, 0, 1 } };
+                { l*l+Math.Cos(phi)*(1 - l*l), l*(1-Math.Cos(phi))*m + n*Math.Sin(phi), l*(1-Math.Cos(phi))*n - m*Math.Sin(phi), 0 },
+                { l*(1-Math.Cos(phi))*m - n*Math.Sin(phi), m*m+Math.Cos(phi)*(1 - m*m), m*(1-Math.Cos(phi))*n + l*Math.Sin(phi), 0 },
+                { l*(1-Math.Cos(phi))*n + m*Math.Sin(phi), m*(1-Math.Cos(phi))*n - l*Math.Sin(phi), n*n+Math.Cos(phi)*(1 - n*n), 0 },
+                { 0, 0, 0, 1 } };
             var t1 = _form.matrix_multiplication(p.getP(), transfer);
 
             t1 = _form.matrix_multiplication(t1, transfer);
@@ -400,21 +396,8 @@ namespace Task_3
         double[,] displayMatrix = new double[3, 3] { { Math.Sqrt(0.5), 0, -Math.Sqrt(0.5) }, { 1 / Math.Sqrt(6), Math.Sqrt(2) / 3, 1 / Math.Sqrt(6) }, { 1 / Math.Sqrt(3), -1 / Math.Sqrt(3), 1 / Math.Sqrt(3) } };
       
         public Point To2D()
-        {
-            /*double c = 2;
-            double a = 2;
-            double b = 2;
-
-            if (Math.Abs(Z / c - 1) < 0.0001)
-                c += 0.1;
-            double[,] displayMatrix = new double[4, 4] { { 1.0, 0, 0, -1.0/a }, { 0, 1.0, 0, -1.0/b}, { 0,0,0, (-1.0 / c) }, { 0, 0, 0, 1.0 } };
-
-            var temp = _form.matrix_multiplication(getP(), displayMatrix);
-            for (int i = 0; i < 4; ++i)
-                temp[0, i] = temp[0, i] / (1 - Z / c);
-            */
+        { 
             var temp = _form.matrix_multiplication( displayMatrix, getP1());
-            //var temp2d = new Point(Convert.ToInt32(temp[0, 0]), Convert.ToInt32(temp[0, 1]));
             var temp2d = new Point(Convert.ToInt32(temp[0, 0]), Convert.ToInt32(temp[1, 0]));
             return temp2d;
         }
@@ -426,15 +409,6 @@ namespace Task_3
         public PointPol P2;
 
         public Edge(PointPol p1, PointPol p2) { P1 = p1; P2 = p2; }
-
-        public Image print(Image I, ref Graphics g)
-        {
-            Point p1 = P1.To2D();
-            Point p2 = P2.To2D();
-            Pen my_pen = new Pen(Color.Black);
-            g.DrawLine(my_pen, p1, p2);
-            return I;
-        }
 
         public void scale(double ind_scale, double a, double b, double c)
         {
@@ -454,26 +428,6 @@ namespace Task_3
             P2 = P2.rotate(e, angle, a, b, c);
         }
 
-        public void reflection(string axis, double a, double b, double c)
-        {
-
-            if (axis == "X")
-            {
-                rotate(new Edge(new PointPol(0, 0, 0), new PointPol(1, 0, 0)), 180, a, b, c);
-                shift(-a * 2, 0, 0);
-            }
-            if (axis == "Y")
-            {
-                rotate(new Edge(new PointPol(0, 0, 0), new PointPol(0, 1, 0)), 180, a, b, c);
-                shift(0, -b * 2, 0);
-            }
-            if (axis == "Z")
-            {
-                rotate(new Edge(new PointPol(0, 0, 0), new PointPol(0, 0, 1)), 180, a, b, c);
-                shift(0, 0, -c * 2);
-            }
-        }
-
     }
 
     public class Polygon
@@ -481,6 +435,7 @@ namespace Task_3
         public List<PointPol> points = new List<PointPol>();
         public List<Edge> edges = new List<Edge>();
 
+        //по граням
         public Polygon(List<Edge> edg)
         {
             foreach (var el in edg)
@@ -491,7 +446,7 @@ namespace Task_3
             }
         }
 
-        //грани
+        //по точкам
         public Polygon(List<PointPol> poins)
         {
             PointPol p1 = poins.First();
@@ -507,37 +462,38 @@ namespace Task_3
         }
 
 
-        public Image print(Image I, ref Graphics g)
-        {
-            foreach (var e in edges)
-                I = e.print(I, ref g);
-
-            return I;
-        }
 
         public void scale(double ind_scale, double a, double b, double c)
         {
+            points.Clear();
             foreach (var e in edges)
+            {
                 e.scale(ind_scale, a, b, c);
+                points.Add(e.P1);
+                points.Add(e.P2);
+            }
         }
 
         public void shift(double a, double b, double c)
         {
+            points.Clear();
             foreach (var e in edges)
+            {
                 e.shift(a, b, c);
+                points.Add(e.P1);
+                points.Add(e.P2);
+            }
         }
 
         public void rotate(Edge edge, double angle, double a, double b, double c)
         {
+            points.Clear();
             foreach (var e in edges)
+            {
                 e.rotate(edge, angle, a, b, c);
-        }
-
-        public void reflection(string axis, double a, double b, double c)
-        {
-
-            foreach (var e in edges)
-                e.reflection(axis, a, b, c);
+                points.Add(e.P1);
+                points.Add(e.P2);
+            }
         }
 
     }
@@ -562,17 +518,25 @@ namespace Task_3
             }
         }
 
-        public Image print(Image I, ref Graphics g)
-        {
-            foreach (var el in pol)
-                I = el.print(I, ref g);
-
-            return I;
-        }
-
         public void AddPolygon(Polygon p)
         {
             pol.Add(p);
+            foreach(var e in p.edges)
+            {
+                points.Add(e.P1);
+                points.Add(e.P2);
+            }
+        }
+
+        public void update_points()
+        {
+            points.Clear();
+            foreach (var el in pol)
+                foreach (var e in el.edges)
+                {
+                    points.Add(e.P1);
+                    points.Add(e.P2);
+                }
         }
 
         public void scale(double ind_scale)
@@ -584,12 +548,16 @@ namespace Task_3
             _form.find_center(points, ref a, ref b, ref c);
             foreach (var e in pol)
                 e.scale(ind_scale, a, b, c);
+
+            update_points();
         }
 
         public void shift(double a, double b, double c)
         { 
             foreach (var e in pol)
                 e.shift(a, b, c);
+
+            update_points();
         }
 
         public void rotate(Edge edge, double angle)
@@ -601,6 +569,8 @@ namespace Task_3
             _form.find_center(points, ref a, ref b, ref c);
             foreach (var e in pol)
                 e.rotate(edge, angle, a, b, c);
+
+            update_points();
         }
 
         public void reflection(string axis)
@@ -608,10 +578,23 @@ namespace Task_3
             double a = 0;
             double b = 0;
             double c = 0;
-
             _form.find_center(points, ref a, ref b, ref c);
-            foreach (var e in pol)
-                e.reflection(axis, a, b, c);
+
+            if (axis == "X")
+            {
+                rotate(new Edge(new PointPol(0, 0, 0), new PointPol(1, 0, 0)), 180);
+                shift(-a * 2, 0, 0);
+            }
+            if (axis == "Y")
+            {
+                rotate(new Edge(new PointPol(0, 0, 0), new PointPol(0, 1, 0)), 180);
+                shift(0, -b * 2, 0);
+            }
+            if (axis == "Z")
+            {
+                rotate(new Edge(new PointPol(0, 0, 0), new PointPol(0, 0, 1)), 180);
+                shift(0, 0, -c * 2);
+            }
         }
     }
 
