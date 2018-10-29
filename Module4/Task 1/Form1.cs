@@ -52,9 +52,10 @@ namespace Task_1{
         Stack<Tuple<Point,double>> memory;
         Stack<Tuple<Color, Tuple<int,int>>> _memory;
         Dictionary<int, Tuple<Point, Tuple<Color, int>>> fractal_dict; //Какая по счету, точка, цвет, ширина
+        Dictionary<int, Tuple<Point, Tuple<Color, int>>> fd;
         Color color;
-        int width = 10;
-        int height = 120;
+        int width = 7;
+        int height = 7;
         
         private double[,] matrix_multiplication(double[,] m1, double[,] m2){
             double[,] res = new double[m1.GetLength(0), m2.GetLength(1)];
@@ -124,18 +125,18 @@ namespace Task_1{
         private void perform_fractal_ac(string str)
         {
             int len = height;
-            int ht = pictureBox1.Height;
+            int ht = pictureBox1.Height/2;
             int wh = width;
             color = Color.DarkGreen;
             fractal_dict = new Dictionary<int, Tuple<Point, Tuple<Color, int>>>();
-            fractal_dict.Add(0, Tuple.Create(new Point(pictureBox1.Width/2, ht), Tuple.Create(color, wh)));            
+            fractal_dict.Add(0, Tuple.Create(new Point(0, ht), Tuple.Create(color, wh)));            
             int countPoint = 0; //Первая точка - нулевая
             memory = new Stack<Tuple<Point, double>>();
             nolinepoint = new List<int>();
             Random rand = new Random();
             _memory = new Stack<Tuple<Color, Tuple<int, int>>>();
             
-            double ang = -90;
+            double ang = 0;
             //Здесь идет разветвление по режиму
             for (int i = 0; i < str.Length; ++i)
             {
@@ -157,11 +158,13 @@ namespace Task_1{
                         ang = ang - rand.Next(Convert.ToInt32(angle));
                         break;
                     case '[':
+                        //color.G + 20 > 255 ? 255 : color.G + 20)
                         _memory.Push(Tuple.Create(color, Tuple.Create(len, wh)));
-                        color = Color.FromArgb((color.R + 10 > 255 ? 255 : color.R + 10),
-                               (color.G + 10 > 255 ? 255 : color.G + 10), (color.B + 10 > 255 ? 255 : color.B + 10));
-                        len -= 10;
-                        wh -= 1;
+                        color = Color.FromArgb((color.R + 40 > 255 ? 255 : color.R + 40),
+                               color.G, (color.B + 40 > 255 ? 255 : color.B + 40));
+                        len -= 1;
+                        wh = wh - 1 <= 0 ? 1 : wh - 1;
+                        
                        
                         var temp = Tuple.Create(fractal_dict.Last().Value.Item1, ang);
                         memory.Push(temp);
@@ -212,10 +215,27 @@ namespace Task_1{
 
         private void render_rand()
         {
+            int minx, maxx, miny, maxy;
+            var query = fractal_dict.OrderBy(x => x.Value.Item1.X);
+            minx = query.First().Value.Item1.X;
+            maxx = query.Last().Value.Item1.X;
+            query = fractal_dict.OrderBy(y => y.Value.Item1.Y);
+            miny = query.First().Value.Item1.Y;
+            maxy = query.Last().Value.Item1.Y;
+
+            fd = new Dictionary<int, Tuple<Point, Tuple<Color, int>>>();
+
+            foreach (var z in fractal_dict.Keys) {
+                fd[z] = Tuple.Create(new Point(Convert.ToInt32((pictureBox1.Width - 1) * (fractal_dict[z].Item1.X - minx) / (maxx - minx)),
+                    Convert.ToInt32((pictureBox1.Height - 1) * (fractal_dict[z].Item1.Y - miny) / (maxy - miny))),
+                    Tuple.Create(fractal_dict[z].Item2.Item1, fractal_dict[z].Item2.Item2));
+            
+            }
+
            for (int i = 0; i < fractal_dict.Count - 1; ++i){
                 if (nolinepoint.Any(x => x == i)) continue;
-                    g.DrawLine(new Pen(fractal_dict[i].Item2.Item1, fractal_dict[i].Item2.Item2), 
-                        fractal_dict[i].Item1, fractal_dict[i + 1].Item1);
+                    g.DrawLine(new Pen(fd[i].Item2.Item1, fd[i].Item2.Item2), 
+                        fd[i].Item1, fd[i + 1].Item1);
             }
             pictureBox1.Image = pictureBox1.Image;
            // pen.Dispose();
