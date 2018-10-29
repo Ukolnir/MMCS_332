@@ -238,7 +238,7 @@ namespace Task_1
 
         public PointPol rotate(Edge direction, double angle, double a, double b, double c)
         {
-            double phi = Math.PI / 180 * angle;
+            double phi = angle * Math.PI / 180;
             PointPol p = shift(-a, -b, -c);
 
             double x1 = direction.P1.X;
@@ -391,7 +391,9 @@ namespace Task_1
             var temp_vertices = vertices.Select(u => u.shift(x, y, z)).ToList();
 
             Dictionary<PointPol, List<PointPol>> temp_dict = new Dictionary<PointPol, List<PointPol>>();
-
+            foreach (var f in polygons)
+                f.points = f.points.Select(f1 => f1.shift(x, y, z)).ToList();
+            
             for (int i = 0; i < neighbors.Count; ++i)
             {
                 var key = temp_vertices[i];
@@ -413,7 +415,8 @@ namespace Task_1
 
             foreach (var p in vertices)
                 temp_vertices.Add(p.scale(ind_scale, a, b, c));
-
+            foreach (var f in polygons)
+                f.points = f.points.Select(f1 => f1.scale(ind_scale, a, b, c)).ToList();
             Dictionary<PointPol, List<PointPol>> temp_dict = new Dictionary<PointPol, List<PointPol>>();
 
             for (int i = 0; i < neighbors.Count; ++i)
@@ -435,7 +438,8 @@ namespace Task_1
 
             foreach (var p in vertices)
                 temp_vertices.Add(p.rotate(direction, phi, a, b, c));
-
+            foreach (var f in polygons)
+                f.points = f.points.Select(f1 => f1.rotate(direction, phi, a, b, c)).ToList();
             Dictionary<PointPol, List<PointPol>> temp_dict = new Dictionary<PointPol, List<PointPol>>();
 
             for (int i = 0; i < neighbors.Count; ++i)
