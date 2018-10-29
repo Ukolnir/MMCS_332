@@ -158,7 +158,7 @@
             this.comboBox1.Items.AddRange(new object[] {
             "... ",
             "x^2 + y^2 = z",
-            "sqrt( 1 - x^2 - y^2 ) = z",
+            "1/(1+x^2) + 1/(1+y^2) = z",
             "x^2 - y^2 = z"});
             this.comboBox1.Location = new System.Drawing.Point(55, 31);
             this.comboBox1.Name = "comboBox1";
