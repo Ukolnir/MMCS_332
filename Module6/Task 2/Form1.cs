@@ -16,6 +16,8 @@ namespace Task_3
 
         List<PointPol> points = new List<PointPol>();
 
+        List<Polygon> fig = new List<Polygon>();
+
         public Form1()
         {
             InitializeComponent();
@@ -79,8 +81,6 @@ namespace Task_3
             g.Clear(pictureBox1.BackColor);
             pictureBox1.Image = pictureBox1.Image;
 
-            points.Clear();
-
             write_axes();
 
             //comboBox1.SelectedItem = "...";
@@ -89,6 +89,7 @@ namespace Task_3
         private void button2_Click(object sender, EventArgs e)
         {
             Clear();
+            points.Clear();
         }
 
         public double[,] matrix_multiplication(double[,] m1, double[,] m2)
@@ -113,10 +114,11 @@ namespace Task_3
             
         }
 
-        private List<Polygon> buildFigure(string axis, int cnt)
+        private void buildFigure(string axis, int cnt)
         {
+            fig.Clear();
             List<PointPol> l1 = new List<PointPol>(points);
-            List<Polygon> polygons = new List<Polygon>();
+
 
             Edge dir = new Edge(new PointPol(0, 0, 0), new PointPol(1, 0, 0));
             if (axis == "X")
@@ -132,7 +134,7 @@ namespace Task_3
                 dir = new Edge(new PointPol(0, 0, 0), new PointPol(0, 0, 1));
             }
 
-            double angle = 360 / cnt;
+            double angle = 360.0 / cnt;
 
             for (int i = 0; i < cnt; ++i)
             {
@@ -148,13 +150,20 @@ namespace Task_3
 
                 List<PointPol> lsum = new List<PointPol>(l1);
                 lsum.AddRange(l2);
-                polygons.Add(new Polygon(lsum));
-                //polygons.Add(new Polygon(l1));
+                //fig.Add(new Polygon(lsum));
+                fig.Add(new Polygon(l1));
 
                 l1 = l2;
             }
+        }
 
-            return polygons;
+        private void drawFig()
+        {
+            foreach (var item in fig)
+            {
+                drawPolygon(item, Color.Black);
+            }
+            pictureBox1.Image = pictureBox1.Image;
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -164,14 +173,9 @@ namespace Task_3
 
             string ax = comboBoxBuildAxis.SelectedItem.ToString();
             int cnt = Int32.Parse(textBoxBuildCount.Text);
-            List<Polygon> pols = buildFigure(ax, cnt);
 
-            foreach (var item in pols)
-            {
-                drawPolygon(item, Color.Black);
-            }
-            //drawPolygon(pols.First(), Color.Black);
-            pictureBox1.Image = pictureBox1.Image;
+            buildFigure(ax, cnt);
+            drawFig();
         }
 
         private void pictureBox1_MouseClick(object sender, MouseEventArgs e)
@@ -181,8 +185,81 @@ namespace Task_3
             int z = Int32.Parse(textBoxBuildZ.Text);
 
             points.Add(new PointPol(x, y, z));
+
+            if (points.Count() > 1)
+            {
+                Clear();
+                Polygon pol = new Polygon(points);
+                drawPolygon(pol, Color.Black);
+                pictureBox1.Image = pictureBox1.Image;
+            }
+
             labelDebug.Text = "x = " + x.ToString() +
-                "; y = " + y.ToString() + "; z = " + z.ToString();
+                " | y = " + y.ToString() + " | z = " + z.ToString();
+        }
+
+        private void pictureBox1_MouseMove(object sender, MouseEventArgs e)
+        {
+            int x = e.X - pictureBox1.Width / 2;
+            int y = pictureBox1.Height / 2 - e.Y;
+            labelDebug2.Text = "x = " + x.ToString() + " | y = " + y.ToString();
+        }
+
+        private void buttonScale_Click(object sender, EventArgs e)
+        {
+            double ind = Double.Parse(textBoxScale.Text);
+            foreach (var item in fig)
+            {
+                item.scale(ind);
+            }
+            Clear();
+            drawFig();
+        }
+
+        private void buttonShift_Click(object sender, EventArgs e)
+        {
+            int x = Int32.Parse(textBoxShiftX.Text);
+            int y = Int32.Parse(textBoxShiftY.Text);
+            int z = Int32.Parse(textBoxShiftZ.Text);
+            foreach (var item in fig)
+            {
+                item.shift(x, y, z);
+            }
+            Clear();
+            drawFig();
+        }
+
+        private void buttonReflection_Click(object sender, EventArgs e)
+        {
+            string axis = comboBoxReflection.SelectedItem.ToString();
+            foreach (var item in fig)
+            {
+                item.reflection(axis);
+            }
+            Clear();
+            drawFig();
+        }
+
+        private void buttonRotate_Click(object sender, EventArgs e)
+        {
+            int x1 = Int32.Parse(textBoxX1.Text);
+            int y1 = Int32.Parse(textBoxY1.Text);
+            int z1 = Int32.Parse(textBoxZ1.Text);
+            int x2 = Int32.Parse(textBoxX2.Text);
+            int y2 = Int32.Parse(textBoxY2.Text);
+            int z2 = Int32.Parse(textBoxZ2.Text);
+            double angle = Double.Parse(textBoxAngle.Text);
+
+            PointPol p1 = new PointPol(x1, y1, z1);
+            PointPol p2 = new PointPol(x2, y2, z2);
+            Edge ed = new Edge(p1, p2);
+
+            foreach (var item in fig)
+            {
+                item.rotate(ed, angle);
+            }
+            Clear();
+            drawFig();
         }
     }
 
@@ -242,7 +319,7 @@ namespace Task_3
 
         public PointPol rotate(Edge direction, double angle, double a, double b, double c)
         {
-            double phi = Math.PI / 180 * angle;
+            double phi = Math.PI / 360 * angle;
             PointPol p = shift(-a, -b, -c);
 
             double x1 = direction.P1.X;
@@ -360,7 +437,7 @@ namespace Task_3
 
     public class Polygon
     {
-        public List<PointPol> points = new List<PointPol>();
+        //public List<PointPol> points = new List<PointPol>();
         public List<Edge> edges = new List<Edge>();
 
         public Polygon(List<Edge> edg)
@@ -368,25 +445,25 @@ namespace Task_3
             foreach (var el in edg)
             {
                 edges.Add(el);
-                points.Add(el.P1);
-                points.Add(el.P2);
+                //points.Add(el.P1);
+                //points.Add(el.P2);
             }
         }
         //грани
         public Polygon(List<PointPol> ps)
         {
             PointPol p1 = ps.First();
-            points.Add(p1);
+            //points.Add(p1);
             for (int i = 1; i < ps.Count(); ++i)
             {
-                points.Add(ps[i]);
+                //points.Add(ps[i]);
                 edges.Add(new Edge(p1, ps[i]));
                 p1 = ps[i];
             }
 
             edges.Add(new Edge(p1, ps.First()));
         }
-
+        /*
         public void find_center(ref double x, ref double y, ref double z)
         {
             x = 0; y = 0; z = 0;
@@ -401,6 +478,23 @@ namespace Task_3
             x /= points.Count();
             y /= points.Count();
             z /= points.Count();
+        }
+        */
+
+        public void find_center(ref double x, ref double y, ref double z)
+        {
+            x = 0; y = 0; z = 0;
+
+            foreach (var e in edges)
+            {
+                x += (e.P1.X + e.P2.X) /2;
+                y += (e.P1.Y + e.P2.Y) /2;
+                z += (e.P1.Z + e.P2.Z) /2;
+            }
+
+            x /= edges.Count();
+            y /= edges.Count();
+            z /= edges.Count();
         }
 
         public void scale(double ind_scale)
@@ -440,7 +534,7 @@ namespace Task_3
             {
                 l.Add(item.to2d());
             }
-            //l.Add(Tuple.Create(edges.Last().P2.To2D(), edges.First().P1.To2D()));
+            l.Add(Tuple.Create(edges.Last().P2.To2D(), edges.First().P1.To2D()));
             return l;
         }
     }
