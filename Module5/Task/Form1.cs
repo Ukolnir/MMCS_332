@@ -209,7 +209,7 @@ namespace Task
 
 		public PointPol rotate(Edge direction, double angle, double a, double b, double c)
 		{
-            double phi =  Math.PI / 180 * angle; 
+            double phi =  Math.PI / 360 * angle; 
 			PointPol p = shift(-a, -b, -c);
 
 			double x1 = direction.P1.X;

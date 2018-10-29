@@ -47,7 +47,7 @@
             this.textBoxX2 = new System.Windows.Forms.TextBox();
             this.textBoxShiftZ = new System.Windows.Forms.TextBox();
             this.textBoxShiftY = new System.Windows.Forms.TextBox();
-            this.textBoxSfhiftX = new System.Windows.Forms.TextBox();
+            this.textBoxShiftX = new System.Windows.Forms.TextBox();
             this.buttonRotate = new System.Windows.Forms.Button();
             this.buttonReflection = new System.Windows.Forms.Button();
             this.buttonShift = new System.Windows.Forms.Button();
@@ -62,6 +62,7 @@
             this.groupBox5 = new System.Windows.Forms.GroupBox();
             this.groupBox6 = new System.Windows.Forms.GroupBox();
             this.labelDebug = new System.Windows.Forms.Label();
+            this.labelDebug2 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
@@ -82,6 +83,7 @@
             this.pictureBox1.TabIndex = 0;
             this.pictureBox1.TabStop = false;
             this.pictureBox1.MouseClick += new System.Windows.Forms.MouseEventHandler(this.pictureBox1_MouseClick);
+            this.pictureBox1.MouseMove += new System.Windows.Forms.MouseEventHandler(this.pictureBox1_MouseMove);
             // 
             // comboBoxBuildAxis
             // 
@@ -94,6 +96,7 @@
             this.comboBoxBuildAxis.Name = "comboBoxBuildAxis";
             this.comboBoxBuildAxis.Size = new System.Drawing.Size(100, 21);
             this.comboBoxBuildAxis.TabIndex = 10;
+            this.comboBoxBuildAxis.Text = "Y";
             // 
             // buttonBuild
             // 
@@ -223,6 +226,7 @@
             this.comboBoxReflection.Name = "comboBoxReflection";
             this.comboBoxReflection.Size = new System.Drawing.Size(120, 21);
             this.comboBoxReflection.TabIndex = 59;
+            this.comboBoxReflection.Text = "X";
             // 
             // textBoxX2
             // 
@@ -238,6 +242,7 @@
             this.textBoxShiftZ.Name = "textBoxShiftZ";
             this.textBoxShiftZ.Size = new System.Drawing.Size(32, 20);
             this.textBoxShiftZ.TabIndex = 57;
+            this.textBoxShiftZ.Text = "10";
             // 
             // textBoxShiftY
             // 
@@ -245,13 +250,15 @@
             this.textBoxShiftY.Name = "textBoxShiftY";
             this.textBoxShiftY.Size = new System.Drawing.Size(32, 20);
             this.textBoxShiftY.TabIndex = 56;
+            this.textBoxShiftY.Text = "10";
             // 
-            // textBoxSfhiftX
+            // textBoxShiftX
             // 
-            this.textBoxSfhiftX.Location = new System.Drawing.Point(137, 44);
-            this.textBoxSfhiftX.Name = "textBoxSfhiftX";
-            this.textBoxSfhiftX.Size = new System.Drawing.Size(32, 20);
-            this.textBoxSfhiftX.TabIndex = 55;
+            this.textBoxShiftX.Location = new System.Drawing.Point(137, 44);
+            this.textBoxShiftX.Name = "textBoxShiftX";
+            this.textBoxShiftX.Size = new System.Drawing.Size(32, 20);
+            this.textBoxShiftX.TabIndex = 55;
+            this.textBoxShiftX.Text = "10";
             // 
             // buttonRotate
             // 
@@ -262,6 +269,7 @@
             this.buttonRotate.TabIndex = 54;
             this.buttonRotate.Text = "Поворот";
             this.buttonRotate.UseVisualStyleBackColor = true;
+            this.buttonRotate.Click += new System.EventHandler(this.buttonRotate_Click);
             // 
             // buttonReflection
             // 
@@ -272,6 +280,7 @@
             this.buttonReflection.TabIndex = 53;
             this.buttonReflection.Text = "Отражение";
             this.buttonReflection.UseVisualStyleBackColor = true;
+            this.buttonReflection.Click += new System.EventHandler(this.buttonReflection_Click);
             // 
             // buttonShift
             // 
@@ -282,6 +291,7 @@
             this.buttonShift.TabIndex = 52;
             this.buttonShift.Text = "Смещение";
             this.buttonShift.UseVisualStyleBackColor = true;
+            this.buttonShift.Click += new System.EventHandler(this.buttonShift_Click);
             // 
             // textBoxScale
             // 
@@ -289,6 +299,7 @@
             this.textBoxScale.Name = "textBoxScale";
             this.textBoxScale.Size = new System.Drawing.Size(56, 20);
             this.textBoxScale.TabIndex = 51;
+            this.textBoxScale.Text = "2";
             // 
             // buttonScale
             // 
@@ -299,6 +310,7 @@
             this.buttonScale.TabIndex = 50;
             this.buttonScale.Text = "Масштабирование";
             this.buttonScale.UseVisualStyleBackColor = true;
+            this.buttonScale.Click += new System.EventHandler(this.buttonScale_Click);
             // 
             // groupBox1
             // 
@@ -316,7 +328,7 @@
             this.groupBox2.Controls.Add(this.buttonShift);
             this.groupBox2.Controls.Add(this.label8);
             this.groupBox2.Controls.Add(this.textBoxShiftY);
-            this.groupBox2.Controls.Add(this.textBoxSfhiftX);
+            this.groupBox2.Controls.Add(this.textBoxShiftX);
             this.groupBox2.Controls.Add(this.textBoxShiftZ);
             this.groupBox2.Location = new System.Drawing.Point(2, 283);
             this.groupBox2.Name = "groupBox2";
@@ -405,11 +417,21 @@
             this.labelDebug.TabIndex = 75;
             this.labelDebug.Text = "labelDebug";
             // 
+            // labelDebug2
+            // 
+            this.labelDebug2.AutoSize = true;
+            this.labelDebug2.Location = new System.Drawing.Point(12, 580);
+            this.labelDebug2.Name = "labelDebug2";
+            this.labelDebug2.Size = new System.Drawing.Size(41, 15);
+            this.labelDebug2.TabIndex = 76;
+            this.labelDebug2.Text = "label2";
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(950, 585);
+            this.ClientSize = new System.Drawing.Size(950, 604);
+            this.Controls.Add(this.labelDebug2);
             this.Controls.Add(this.labelDebug);
             this.Controls.Add(this.groupBox5);
             this.Controls.Add(this.groupBox4);
@@ -461,7 +483,7 @@
         private System.Windows.Forms.TextBox textBoxX2;
         private System.Windows.Forms.TextBox textBoxShiftZ;
         private System.Windows.Forms.TextBox textBoxShiftY;
-        private System.Windows.Forms.TextBox textBoxSfhiftX;
+        private System.Windows.Forms.TextBox textBoxShiftX;
         private System.Windows.Forms.Button buttonRotate;
         private System.Windows.Forms.Button buttonReflection;
         private System.Windows.Forms.Button buttonShift;
@@ -476,6 +498,7 @@
         private System.Windows.Forms.GroupBox groupBox5;
         private System.Windows.Forms.GroupBox groupBox6;
         private System.Windows.Forms.Label labelDebug;
+        private System.Windows.Forms.Label labelDebug2;
     }
 }
 
