@@ -76,9 +76,9 @@ namespace UnionPolygons
             }
         }
 
-        private void button2_Click(object sender, EventArgs e)
-        {
-            /*case "Положение точки относительно ребра":
+		private int check_dir() {
+
+			/*case "Положение точки относительно ребра":
                     if (dot.Item1 == -1 || primitiv.Count != 2)
                         return;
                     Tuple<double, double> cm1 = primitiv.First();
@@ -98,6 +98,17 @@ namespace UnionPolygons
                         else
                             label5.Text += " лежит на прямой";
                     break;*/
+
+
+			return 0;
+		}
+
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+			var t = general.OrderBy(x => x.X);
+			
+            
         }
     }
 }
