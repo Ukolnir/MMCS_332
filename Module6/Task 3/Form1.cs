@@ -140,8 +140,9 @@ namespace Task_3
             foreach (var e in l1)
                 l.Add(e);
 
-            foreach (var e in l2)
-                l.Add(e);
+            l.Add(new Edge(l1.Last().P2, l2.Last().P2));
+
+            for(int i = l2.Count() - 1;)
 
             for (int i = 0; i < l1.Count(); i ++)
             {
@@ -510,12 +511,9 @@ namespace Task_3
             foreach (var el in pl)
             {
                 pol.Add(el);
-                foreach (var e in el.edges)
-                {
-                    points.Add(e.P1);
-                    points.Add(e.P2);
-                }
             }
+
+            update_points();
         }
 
         public void AddPolygon(Polygon p)
@@ -535,7 +533,6 @@ namespace Task_3
                 foreach (var e in el.edges)
                 {
                     points.Add(e.P1);
-                    points.Add(e.P2);
                 }
         }
 

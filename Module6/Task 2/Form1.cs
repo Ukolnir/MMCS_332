@@ -12,7 +12,7 @@ namespace Task_3
 {
     public partial class Form1 : Form
     {
-        Graphics g;
+        Graphics g, g2;
 
         List<PointPol> points = new List<PointPol>();
 
@@ -26,6 +26,12 @@ namespace Task_3
             g = Graphics.FromImage(pictureBox1.Image);
             g.ScaleTransform(1, -1);
             g.TranslateTransform(pictureBox1.Width / 2, -pictureBox1.Height / 2);
+
+            pictureBox2.Image = new Bitmap(pictureBox2.Width, pictureBox2.Height);
+
+            g2 = Graphics.FromImage(pictureBox2.Image);
+            g2.ScaleTransform(1, -1);
+            g2.TranslateTransform(pictureBox2.Width / 2, -pictureBox2.Height / 2);
 
             write_axes();
         
@@ -74,12 +80,21 @@ namespace Task_3
             g.DrawLine(my_pen, o, z);
 
             pictureBox1.Image = pictureBox1.Image;
+
+
+
+            g2.DrawLine(new Pen(Color.Red), -pictureBox1.Width / 2, 0, pictureBox1.Width / 2, 0);
+            g2.DrawLine(new Pen(Color.Red), 0, -pictureBox1.Height / 2, 0, pictureBox1.Height / 2);
+            pictureBox2.Image = pictureBox2.Image;
         }
 
         public void Clear()
         {
             g.Clear(pictureBox1.BackColor);
             pictureBox1.Image = pictureBox1.Image;
+
+            g2.Clear(pictureBox2.BackColor);
+            pictureBox2.Image = pictureBox2.Image;
 
             write_axes();
 
@@ -136,13 +151,15 @@ namespace Task_3
 
             double angle = 360.0 / cnt;
 
+            Polygon pol = new Polygon(l1);
+            double a = 0, b = 0, c = 0;
+            //pol.find_center(ref a, ref b, ref c);
+            pol.closest_to_zero(ref a, ref b, ref c);
+
             for (int i = 0; i < cnt; ++i)
             {
                 List<PointPol> l2 = new List<PointPol>(l1);
-                Polygon pol = new Polygon(l2);
-                double a = 0, b = 0, c = 0;
-                pol.find_center(ref a, ref b, ref c);
-                
+
                 for (int j = 0; j < l2.Count(); ++j)
                 {
                     l2[j] = l2[j].rotate(dir, angle, a, b, c);
@@ -154,6 +171,45 @@ namespace Task_3
                 fig.Add(new Polygon(l1));
 
                 l1 = l2;
+            }
+
+            int cnt_e = fig[0].edges.Count();
+            for (int i =1; i < fig.Count(); ++i)
+            {
+                for (int j =0; j < cnt_e; ++j)
+                {
+                    //fig[i - 1].edges.Add(new Edge(fig[i - 1].edges[j].P1, fig[i].edges[j].P2));
+                    //fig[i - 1].edges.Add(new Edge(fig[i - 1].edges[j].P2, fig[i].edges[j].P1));
+                    fig[i - 1].edges.Add(new Edge(fig[i - 1].edges[j].P1, fig[i].edges[j].P1));
+                    fig[i - 1].edges.Add(new Edge(fig[i - 1].edges[j].P2, fig[i].edges[j].P2));
+                    //fig[i].edges.Add(new Edge(fig[i - 1].edges[j].P1, fig[i].edges[j].P2));
+                    //fig[i].edges.Add(new Edge(fig[i - 1].edges[j].P2, fig[i].edges[j].P1));
+                    fig[i].edges.Add(new Edge(fig[i - 1].edges[j].P1, fig[i].edges[j].P1));
+                    fig[i].edges.Add(new Edge(fig[i - 1].edges[j].P2, fig[i].edges[j].P2));
+                }
+            }
+
+            for (int j = 0; j < cnt_e; ++j)
+            {
+                //fig.First().edges.Add(new Edge(fig.First().edges[j].P1, fig.Last().edges[j].P2));
+                //fig.First().edges.Add(new Edge(fig.First().edges[j].P2, fig.Last().edges[j].P1));
+                fig.First().edges.Add(new Edge(fig.First().edges[j].P1, fig.Last().edges[j].P1));
+                fig.First().edges.Add(new Edge(fig.First().edges[j].P2, fig.Last().edges[j].P2));
+                //fig.Last().edges.Add(new Edge(fig.First().edges[j].P1, fig.Last().edges[j].P2));
+                //fig.Last().edges.Add(new Edge(fig.First().edges[j].P2, fig.Last().edges[j].P1));
+                fig.Last().edges.Add(new Edge(fig.First().edges[j].P1, fig.Last().edges[j].P1));
+                fig.Last().edges.Add(new Edge(fig.First().edges[j].P2, fig.Last().edges[j].P2));
+            }
+
+            for (int i = 0; i < fig.Count(); ++i)
+            {
+                for (int j = 0; j < cnt_e; ++j)
+                {
+                    //fig[i].edges.Add(new Edge(fig[i - 1].edges[j].P1, fig[i].edges[j].P1));
+                    //fig[i].edges.Add(new Edge(fig[i - 1].edges[j].P2, fig[i].edges[j].P2));
+                    
+                }
+                //fig[i].edges.RemoveRange(0, cnt_e/2);
             }
         }
 
@@ -261,6 +317,35 @@ namespace Task_3
             Clear();
             drawFig();
         }
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+
+        }
+
+        private void pictureBox2_MouseClick(object sender, MouseEventArgs e)
+        {
+            int x = e.X - pictureBox2.Width/2;
+            int y = pictureBox2.Height/2 - e.Y;
+            int z = 0;
+
+            points.Add(new PointPol(x, y, z));
+
+            g2.DrawEllipse(new Pen(Color.Green), x - 1, y - 1, 2, 2);
+            pictureBox2.Image = pictureBox2.Image;
+
+            if (points.Count() > 1)
+            {
+                Clear();
+                Polygon pol = new Polygon(points);
+                drawPolygon(pol, Color.Black);
+                pictureBox1.Image = pictureBox1.Image;
+            }
+
+            labelDebug.Text = "x = " + x.ToString() +
+                " | y = " + y.ToString() + " | z = " + z.ToString();
+        }
+        
     }
 
 
@@ -485,16 +570,51 @@ namespace Task_3
         {
             x = 0; y = 0; z = 0;
 
-            foreach (var e in edges)
+            List<PointPol> l = new List<PointPol>();
+            for (int i = 0; i < edges.Count(); i += 2)
             {
-                x += (e.P1.X + e.P2.X) /2;
-                y += (e.P1.Y + e.P2.Y) /2;
-                z += (e.P1.Z + e.P2.Z) /2;
+                l.Add(edges[i].P1);
+                l.Add(edges[i].P2);
+            }
+            if (edges.Count() % 2 != 0)
+                l.RemoveAt(l.Count() - 1);
+
+            foreach (var p in l)
+            {
+                x += p.X;
+                y += p.Y;
+                z += p.Z;
             }
 
-            x /= edges.Count();
-            y /= edges.Count();
-            z /= edges.Count();
+            x /= l.Count();
+            y /= l.Count();
+            z /= l.Count();
+        }
+
+        public void closest_to_zero(ref double x, ref double y, ref double z)
+        {
+            List<PointPol> l = new List<PointPol>();
+            for (int i = 0; i < edges.Count(); i += 2)
+            {
+                l.Add(edges[i].P1);
+                l.Add(edges[i].P2);
+            }
+            if (edges.Count() % 2 != 0)
+                l.RemoveAt(l.Count() - 1);
+
+            x = l.First().X; y = l.First().Y; z = l.First().Z;
+            double min_dist = x * x + y * y + z * z;
+
+            foreach (var p in l)
+            {
+                double dist = p.X * p.X;// + p.Y * p.Y + p.Z * p.Z;
+                if (dist < min_dist)
+                {
+                    min_dist = dist;
+                    x = p.X; y = p.Y; z = p.Z;
+                }
+            }
+            
         }
 
         public void scale(double ind_scale)
