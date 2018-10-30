@@ -16,7 +16,7 @@ namespace Task_3
 
         List<PointPol> points = new List<PointPol>();
 
-        List<Polygon> fig = new List<Polygon>();
+        List<Polygon> pols_rotate = new List<Polygon>();
 
         public Form1()
         {
@@ -34,8 +34,8 @@ namespace Task_3
             g2.TranslateTransform(pictureBox2.Width / 2, -pictureBox2.Height / 2);
 
             write_axes();
-        
-        }
+			write_axes2();
+		}
 
         public void find_center(List<PointPol> pol, ref double x, ref double y, ref double z)
         {
@@ -80,31 +80,41 @@ namespace Task_3
             g.DrawLine(my_pen, o, z);
 
             pictureBox1.Image = pictureBox1.Image;
-
-
-
-            g2.DrawLine(new Pen(Color.Red), -pictureBox1.Width / 2, 0, pictureBox1.Width / 2, 0);
-            g2.DrawLine(new Pen(Color.Red), 0, -pictureBox1.Height / 2, 0, pictureBox1.Height / 2);
-            pictureBox2.Image = pictureBox2.Image;
         }
 
-        public void Clear()
+		public void write_axes2()
+		{
+			g2.DrawLine(new Pen(Color.Red), -pictureBox1.Width / 2, 0, pictureBox1.Width / 2, 0);
+			g2.DrawLine(new Pen(Color.Red), 0, -pictureBox1.Height / 2, 0, pictureBox1.Height / 2);
+			pictureBox2.Image = pictureBox2.Image;
+		}
+
+		public void Clear()
         {
             g.Clear(pictureBox1.BackColor);
             pictureBox1.Image = pictureBox1.Image;
-
-            g2.Clear(pictureBox2.BackColor);
-            pictureBox2.Image = pictureBox2.Image;
 
             write_axes();
 
             //comboBox1.SelectedItem = "...";
         }
 
-        private void button2_Click(object sender, EventArgs e)
+		public void Clear2()
+		{
+			g2.Clear(pictureBox2.BackColor);
+			pictureBox2.Image = pictureBox2.Image;
+
+			write_axes2();
+
+			//comboBox1.SelectedItem = "...";
+		}
+
+		private void button2_Click(object sender, EventArgs e)
         {
             Clear();
+			Clear2();
             points.Clear();
+
         }
 
         public double[,] matrix_multiplication(double[,] m1, double[,] m2)
@@ -129,9 +139,9 @@ namespace Task_3
             
         }
 
-        private void buildFigure(string axis, int cnt)
+        private void buildPolsRotate(string axis, int cnt)
         {
-            fig.Clear();
+            pols_rotate.Clear();
             List<PointPol> l1 = new List<PointPol>(points);
 
 
@@ -154,7 +164,7 @@ namespace Task_3
             Polygon pol = new Polygon(l1);
             double a = 0, b = 0, c = 0;
             //pol.find_center(ref a, ref b, ref c);
-            pol.closest_to_zero(ref a, ref b, ref c);
+            //pol.closest_to_zero(ref a, ref b, ref c);
 
             for (int i = 0; i < cnt; ++i)
             {
@@ -168,11 +178,11 @@ namespace Task_3
                 List<PointPol> lsum = new List<PointPol>(l1);
                 lsum.AddRange(l2);
                 //fig.Add(new Polygon(lsum));
-                fig.Add(new Polygon(l1));
+                pols_rotate.Add(new Polygon(l1));
 
                 l1 = l2;
             }
-
+			/*
             int cnt_e = fig[0].edges.Count();
             for (int i =1; i < fig.Count(); ++i)
             {
@@ -211,11 +221,13 @@ namespace Task_3
                 }
                 //fig[i].edges.RemoveRange(0, cnt_e/2);
             }
+			*/
         }
 
-        private void drawFig()
+        private void drawPolsRotate()
         {
-            foreach (var item in fig)
+			Clear();
+            foreach (var item in pols_rotate)
             {
                 drawPolygon(item, Color.Black);
             }
@@ -230,8 +242,8 @@ namespace Task_3
             string ax = comboBoxBuildAxis.SelectedItem.ToString();
             int cnt = Int32.Parse(textBoxBuildCount.Text);
 
-            buildFigure(ax, cnt);
-            drawFig();
+            buildPolsRotate(ax, cnt);
+            drawPolsRotate();
         }
 
         private void pictureBox1_MouseClick(object sender, MouseEventArgs e)
@@ -264,12 +276,12 @@ namespace Task_3
         private void buttonScale_Click(object sender, EventArgs e)
         {
             double ind = Double.Parse(textBoxScale.Text);
-            foreach (var item in fig)
+            foreach (var item in pols_rotate)
             {
                 item.scale(ind);
             }
             Clear();
-            drawFig();
+            drawPolsRotate();
         }
 
         private void buttonShift_Click(object sender, EventArgs e)
@@ -277,23 +289,23 @@ namespace Task_3
             int x = Int32.Parse(textBoxShiftX.Text);
             int y = Int32.Parse(textBoxShiftY.Text);
             int z = Int32.Parse(textBoxShiftZ.Text);
-            foreach (var item in fig)
+            foreach (var item in pols_rotate)
             {
                 item.shift(x, y, z);
             }
             Clear();
-            drawFig();
+			drawPolsRotate();
         }
 
         private void buttonReflection_Click(object sender, EventArgs e)
         {
             string axis = comboBoxReflection.SelectedItem.ToString();
-            foreach (var item in fig)
+            foreach (var item in pols_rotate)
             {
                 item.reflection(axis);
             }
             Clear();
-            drawFig();
+			drawPolsRotate();
         }
 
         private void buttonRotate_Click(object sender, EventArgs e)
@@ -310,12 +322,12 @@ namespace Task_3
             PointPol p2 = new PointPol(x2, y2, z2);
             Edge ed = new Edge(p1, p2);
 
-            foreach (var item in fig)
+            foreach (var item in pols_rotate)
             {
                 item.rotate(ed, angle);
             }
             Clear();
-            drawFig();
+			drawPolsRotate();
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -499,19 +511,16 @@ namespace Task_3
 
             if (axis == "X")
             {
-                rotate(new Edge(new PointPol(0, 0, 0), new PointPol(1, 0, 0)), 180, a, b, c);
-                shift(-a * 2, 0, 0);
+				P1.X = -P1.X;
             }
             if (axis == "Y")
             {
-                rotate(new Edge(new PointPol(0, 0, 0), new PointPol(0, 1, 0)), 180, a, b, c);
-                shift(0, -b * 2, 0);
-            }
+				P1.Y = -P1.Y;
+			}
             if (axis == "Z")
             {
-                rotate(new Edge(new PointPol(0, 0, 0), new PointPol(0, 0, 1)), 180, a, b, c);
-                shift(0, 0, -c * 2);
-            }
+				P1.Z = -P1.Z;
+			}
         }
 
         public Tuple<Point, Point> to2d()

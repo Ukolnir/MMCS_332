@@ -553,27 +553,65 @@ namespace Task
 
         public void reflection(string axis)
         {
-            double a = 0;
-            double b = 0;
-            double c = 0;
-            _form.find_center(vertices, ref a, ref b, ref c);
+			double a = 0;
+			double b = 0;
+			double c = 0;
+			_form.find_center(vertices, ref a, ref b, ref c);
 
-            if (axis == "X")
-            {
-                rotate(new Edge(new PointPol(0, 0, 0), new PointPol(1, 0, 0)), 180);
-                shift(-a*2, 0, 0);
-            }
-            if (axis == "Y")
-            {
-                rotate(new Edge(new PointPol(0, 0, 0), new PointPol(0, 1, 0)), 180);
-                shift(0, -b*2, 0);
-            }
-            if (axis == "Z")
-            {
-                rotate(new Edge(new PointPol(0, 0, 0), new PointPol(0, 0, 1)), 180);
-                shift(0, 0, -c*2);
-            }
-        }
+			if (axis == "X")
+			{
+				List<PointPol> temp_vertices = new List<PointPol>();
+
+				foreach (var p in vertices)
+					temp_vertices.Add(new PointPol(-p.X, p.Y, p.Z));
+
+				Dictionary<PointPol, List<PointPol>> temp_dict = new Dictionary<PointPol, List<PointPol>>();
+
+				for (int i = 0; i < neighbors.Count; ++i)
+				{
+					var key = temp_vertices[i];
+					temp_dict[key] = neighbors[vertices[i]].Select(h => new PointPol(-h.X, h.Y, h.Z)).ToList();
+				}
+				vertices = temp_vertices;
+				neighbors = temp_dict;
+			}
+
+			if (axis == "Y")
+			{
+				List<PointPol> temp_vertices = new List<PointPol>();
+
+				foreach (var p in vertices)
+					temp_vertices.Add(new PointPol(p.X, -p.Y, p.Z));
+
+				Dictionary<PointPol, List<PointPol>> temp_dict = new Dictionary<PointPol, List<PointPol>>();
+
+				for (int i = 0; i < neighbors.Count; ++i)
+				{
+					var key = temp_vertices[i];
+					temp_dict[key] = neighbors[vertices[i]].Select(h => new PointPol(h.X, -h.Y, h.Z)).ToList();
+				}
+				vertices = temp_vertices;
+				neighbors = temp_dict;
+			}
+
+			if (axis == "Z")
+			{
+				List<PointPol> temp_vertices = new List<PointPol>();
+
+				foreach (var p in vertices)
+					temp_vertices.Add(new PointPol(p.X, p.Y, -p.Z));
+
+				Dictionary<PointPol, List<PointPol>> temp_dict = new Dictionary<PointPol, List<PointPol>>();
+
+				for (int i = 0; i < neighbors.Count; ++i)
+				{
+					var key = temp_vertices[i];
+					temp_dict[key] = neighbors[vertices[i]].Select(h => new PointPol(h.X, h.Y, -h.Z)).ToList();
+				}
+				vertices = temp_vertices;
+				neighbors = temp_dict;
+			}
+		}
 
 	}
 }
