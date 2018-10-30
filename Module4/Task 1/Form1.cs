@@ -160,7 +160,7 @@ namespace Task_1{
                     case '[':
                         //color.G + 20 > 255 ? 255 : color.G + 20)
                         _memory.Push(Tuple.Create(color, Tuple.Create(len, wh)));
-                        color = Color.FromArgb((color.R + 40 > 255 ? 255 : color.R + 40),
+                        color = Color.FromArgb((color.R + 50 > 255 ? 255 : color.R + 50),
                                color.G, (color.B + 40 > 255 ? 255 : color.B + 40));
                         len -= 1;
                         wh = wh - 1 <= 0 ? 1 : wh - 1;
