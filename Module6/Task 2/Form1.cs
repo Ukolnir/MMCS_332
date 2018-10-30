@@ -18,7 +18,9 @@ namespace Task_3
 
         List<Polygon> pols_rotate = new List<Polygon>();
 
-        public Form1()
+		List<Polygon> fig = new List<Polygon>();
+
+		public Form1()
         {
             InitializeComponent();
             pictureBox1.Image = new Bitmap(pictureBox1.Width, pictureBox1.Height);
@@ -234,7 +236,26 @@ namespace Task_3
             pictureBox1.Image = pictureBox1.Image;
         }
 
-        private void button1_Click(object sender, EventArgs e)
+		public void find_center(List<Polygon> pols, ref double x, ref double y, ref double z)
+		{
+			x = 0; y = 0; z = 0;
+
+			double a = 0, b = 0, c = 0;
+
+			foreach (var p in pols)
+			{
+				p.find_center(ref a, ref b, ref c);
+				x += a;
+				y += b;
+				z += c;
+			}
+
+			x /= pols.Count();
+			y /= pols.Count();
+			z /= pols.Count();
+		}
+
+		private void button1_Click(object sender, EventArgs e)
         {
             //Polygon pol = new Polygon(points);
             //drawPolygon(pol, Color.Black);
@@ -276,13 +297,17 @@ namespace Task_3
         private void buttonScale_Click(object sender, EventArgs e)
         {
             double ind = Double.Parse(textBoxScale.Text);
+			double a = 0, b = 0, c = 0;
+			find_center(pols_rotate, ref a, ref b, ref c);
             foreach (var item in pols_rotate)
             {
-                item.scale(ind);
+                item.scale(ind, a, b, c);
             }
             Clear();
             drawPolsRotate();
         }
+
+
 
         private void buttonShift_Click(object sender, EventArgs e)
         {
@@ -400,8 +425,6 @@ namespace Task_3
             return res;
         }
 
-
-
         public PointPol scale(double ind_scale, double a, double b, double c)
         {
             double[,] transfer = new double[4, 4] { { 1, 0, 0, 0 }, { 0, 1, 0, 0 }, { 0, 0, 1, 0 }, { -a, -b, -c, 1 } };
@@ -506,7 +529,7 @@ namespace Task_3
             P2 = P2.rotate(e, angle, a, b, c);
         }
 
-        public void reflection(string axis, double a, double b, double c)
+        public void reflection(string axis)
         {
 
             if (axis == "X")
@@ -626,10 +649,8 @@ namespace Task_3
             
         }
 
-        public void scale(double ind_scale)
+        public void scale(double ind_scale, double a, double b, double c)
         {
-            double a = 0, b = 0, c = 0;
-            find_center(ref a, ref b, ref c);
             foreach (var e in edges)
                 e.scale(ind_scale, a, b, c);
         }
@@ -650,10 +671,8 @@ namespace Task_3
 
         public void reflection(string axis)
         {
-            double a = 0, b = 0, c = 0;
-            find_center(ref a, ref b, ref c);
             foreach (var e in edges)
-                e.reflection(axis, a, b, c);
+                e.reflection(axis);
         }
 
         public List<Tuple<Point, Point>> to2d()
