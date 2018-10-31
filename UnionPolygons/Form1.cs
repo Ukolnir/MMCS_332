@@ -13,6 +13,7 @@ namespace UnionPolygons
     public partial class Form1 : Form
     {
         Bitmap bmp;
+        List<Point> UNION = new List<Point>();
         public Form1()
         {
             InitializeComponent();
@@ -76,39 +77,61 @@ namespace UnionPolygons
             }
         }
 
-		private int check_dir() {
+		private bool check_dir(Point check, Tuple<Point, Point> cd) {
+            double yb = cd.Item2.Y - cd.Item1.Y;
+            double xb = cd.Item2.X - cd.Item1.X;
+            double ya = check.Y - cd.Item1.Y;
+            double xa = check.X - cd.Item1.X;
+            
+            if (yb * xa - xb * ya > 0)
+                return true;
+           /* else
+                if (yb * xa - xb * ya < 0)
+                    label5.Text += " правее";
+                else
+                    label5.Text += " лежит на прямой";*/
 
-			/*case "Положение точки относительно ребра":
-                    if (dot.Item1 == -1 || primitiv.Count != 2)
-                        return;
-                    Tuple<double, double> cm1 = primitiv.First();
-
-                    label5.Text = "Точка лежит относительно ребра: ";
-
-                    double yb = primitiv.Last().Item2 - cm1.Item2;
-                    double xb = primitiv.Last().Item1 - cm1.Item1;
-                    double ya = dot.Item2 - cm1.Item2;
-                    double xa = dot.Item1 - cm1.Item1;
-
-                    if (yb * xa - xb * ya > 0)
-                        label5.Text += " левее";
-                    else
-                        if (yb * xa - xb * ya < 0)
-                            label5.Text += " правее";
-                        else
-                            label5.Text += " лежит на прямой";
-                    break;*/
-
-
-			return 0;
+			return false;
 		}
+
+        //Функция берет список, стартовую точку в нем, ближайшее пересечение
+        //Действие - добавляет точки в список
+
+        //Функция возвращает следущую точку списка, если конец списка -> возвращает начало
 
 
         private void button2_Click(object sender, EventArgs e)
         {
-			var t = general.OrderBy(x => x.X);
-			
-            
+            List<Point> UNION = new List<Point>();
+            var general_min = general.OrderBy(x => x.X).ThenBy(x => x.Y).First();
+            var newPol_min = newPolygon.OrderBy(x => x.X).ThenBy(x => x.Y).First();
+            bool flag = true;
+            Point start_point;
+            if (general_min == newPol_min || general_min.X < newPol_min.X ||
+                (general_min.X == newPol_min.X && general_min.Y < newPol_min.Y))
+                start_point = general_min;
+            else{
+                start_point = newPol_min;
+                flag = false;
+            }
+
+            UNION.Add(start_point);
+
+            /*if (flag) {
+                var index = general.FindIndex(p => p == start_point);
+                Point temp = general[index];
+                while (temp != general[index - 1]) {
+                    var ff = general.FindIndex(p => p == temp);
+                    if(newPolygon.Any(g=>g == temp)){
+                        var ind = newPolygon.FindIndex(p => p == temp);
+                        if (check_dir(newPolygon[ind + 1], Tuple.Create(temp, general[ff + 1]))) { 
+                            
+                        
+                        }
+                    }
+                }
+            }*/
+
         }
     }
 }
