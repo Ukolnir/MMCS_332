@@ -30,23 +30,19 @@ namespace Task_3
             textBox5.Text = "1";
         }
 
-        public void find_center(List<Polygon> pol, ref double x, ref double y, ref double z)
+        public void find_center(List<PointPol> pList, ref double x, ref double y, ref double z)
         {
             x = 0; y = 0; z = 0;
 
 			int count = 0;
 
-			foreach (var p in pol)
-				foreach (var el in p.edges)
-				{
-					count += 2;
-					x += el.P1.X;
-					x += el.P2.X;
-					y += el.P1.Y;
-					y += el.P2.Y;
-					z += el.P1.Z;
-					z += el.P2.Z;
-				}
+			foreach (var p in pList)
+			{
+				count ++;
+                x += p.X;
+                y += p.X;
+                z += p.X;
+			}
 
             x /= count;
             y /= count;
@@ -129,14 +125,12 @@ namespace Task_3
             return res;
         }
 
-        private void make_curve(ref List<Edge> l, double x, double y0, double y1, double step)
+        private void make_curve(ref List<PointPol> l, double x, double y0, double y1, double step)
         {
-            PointPol p1 = new PointPol(x, y0, f(x, y0));
-            for (double y = y0 + step ; y <= y1; y += step)
+            for (double y = y0; y <= y1; y += step)
             {
-                PointPol p2 = new PointPol(x, y, f(x, y));
-                l.Add(new Edge(p1, p2));
-                p1 = p2;
+                PointPol p = new PointPol(x, y, f(x, y));
+                l.Add(p);
             }
         }
 
@@ -149,37 +143,45 @@ namespace Task_3
             double y1 = Double.Parse(textBox4.Text.ToString());
             double step = Double.Parse(textBox5.Text.ToString());
 
-            List<Edge> l1 = new List<Edge>(), l2 = new List<Edge>();
+            List<PointPol> l1 = new List<PointPol>(), l2 = new List<PointPol>(), l = new List<PointPol>();
             List<Polygon> polygons = new List<Polygon>();
 
             make_curve(ref l1, x0, y0, y1, step);
+            int num = 0;
 
             for (double x = x0 + step; x <= x1; x += step)
             {
                 make_curve(ref l2, x, y0, y1, step);
 
-				foreach (var e1 in l1)
-				    foreach (var e2 in l2)
-					{
-						List<Edge> gList = new List<Edge>();
-						gList.Add(e1);
-						gList.Add(e2);
-						gList.Add(new Edge(e1.P1, e2.P1));
-						gList.Add(new Edge(e1.P2, e2.P2));
+				for(int i = 0; i < l1.Count() - 1; ++i)
+                {
+					List<Edge> gList = new List<Edge>();
+                    int n1 = num + i;
+					gList.Add(new Edge(n1, n1 + 1));
 
-						polygons.Add(new Polygon(gList));
-					}
-                l1 = l2;
+					gList.Add(new Edge(n1 + l1.Count(), n1 + 1 + l1.Count));
+					gList.Add(new Edge(n1, n1 + l1.Count()));
+					gList.Add(new Edge(n1 + 1, n1 + 1 + l1.Count));
+
+					polygons.Add(new Polygon(gList));
+                }
+
+                num += l1.Count();
+
+                foreach (var p in l1)
+                    l.Add(p);
+
+                l1.Clear();
+                foreach (var e in l2)
+                    l1.Add(e);
+
+                l2.Clear();
             }
 
-            if (Math.Abs(x0 - x1) < 0.001)
-            {
-                l1.Add(new Edge(l1.Last().P2, l1.First().P1));
-                polygons.Add(new Polygon(l1));
+            foreach (var p in l1)
+                l.Add(p);
 
-            }
-
-            figure = new Polyhedron(polygons);
+            figure = new Polyhedron(polygons, l);
         }
 
         private void print_figure()
@@ -189,7 +191,7 @@ namespace Task_3
 			foreach (var pl in figure.pol)
 				foreach (var e in pl.edges)
 				{
-					Point p1 = e.P1.To2D(), p2 = e.P2.To2D();
+					Point p1 = figure.points[e.nP1].To2D(), p2 = figure.points[e.nP2].To2D();
 					g.DrawLine(my_pen, p1, p2);
 				}
 
@@ -274,20 +276,31 @@ namespace Task_3
 		private string save()
 		{
 			string result = "";
-		/*	foreach (var p in figure.pol)
+			foreach (var p in figure.pol)
 			{
-				foreach (var t in p.points)
+				foreach (var e in p.edges)
 				{
-					//t.X -= pictureBox1.Width / 2;
-					if (p.points.Last() == t)
-						result += t.X.ToString() + ";" + t.Y.ToString() + ";" + t.Z.ToString();
-					else
-						result += t.X.ToString() + ";" + t.Y.ToString() + ";" + t.Z.ToString() + " ";
-				}
+                    //t.X -= pictureBox1.Width / 2;
+                    if (p.edges.Last() == e)
+                    {
+                        var t = figure.points[e.nP1];
+                        result += t.X.ToString() + ";" + t.Y.ToString() + ";" + t.Z.ToString() + " ";
+                        t = figure.points[e.nP2];
+                        result += t.X.ToString() + ";" + t.Y.ToString() + ";" + t.Z.ToString();
+                    }
+                    else
+                    {
+                        var t = figure.points[e.nP1];
+                        result += t.X.ToString() + ";" + t.Y.ToString() + ";" + t.Z.ToString() + " ";
+                        t = figure.points[e.nP2];
+                        result += t.X.ToString() + ";" + t.Y.ToString() + ";" + t.Z.ToString() + " ";
+                    }
+                }
+
 				if (p != figure.pol.Last())
 					result += Environment.NewLine;
 			}
-			//textBox1.Text = result;*/
+			//textBox1.Text = result;
 			return result;
 		}
 
@@ -308,7 +321,7 @@ namespace Task_3
             PointPol p1 = new PointPol(x1, y1, z1);
             PointPol p2 = new PointPol(x2, y2, z2);
 
-            figure.rotate(new Edge(p1, p2), angle);
+            figure.rotate(Tuple.Create(p1,p2), angle);
             print_figure();
         }
 
@@ -373,18 +386,18 @@ namespace Task_3
             return translatePol(t1);
         }
 
-        public PointPol rotate(Edge direction, double angle, double a, double b, double c)
+        public PointPol rotate(Tuple<PointPol, PointPol> direction, double angle, double a, double b, double c)
         {
-            double phi = Math.PI / 180 * angle;
+            double phi = Math.PI / 360 * angle;
             PointPol p = shift(-a, -b, -c);
 
-            double x1 = direction.P1.X;
-            double y1 = direction.P1.Y;
-            double z1 = direction.P1.Z;
+            double x1 = direction.Item1.X;
+            double y1 = direction.Item1.Y;
+            double z1 = direction.Item1.Z;
 
-            double x2 = direction.P2.X;
-            double y2 = direction.P2.Y;
-            double z2 = direction.P2.Z;
+            double x2 = direction.Item2.X;
+            double y2 = direction.Item2.Y;
+            double z2 = direction.Item2.Z;
 
             double vecx = x2 - x1;
             double vecy = y2 - y1;
@@ -439,52 +452,17 @@ namespace Task_3
 
     public class Edge
     {
-        public PointPol P1;
-        public PointPol P2;
+        public int  nP1;
+        public int  nP2;
 
-        public Edge(PointPol p1, PointPol p2) { P1 = p1; P2 = p2; }
 
-        public void scale(double ind_scale, double a, double b, double c)
-        {
-            P1 = P1.scale(ind_scale, a, b, c);
-            P2 = P2.scale(ind_scale, a, b, c);
-        }
-
-        public void shift(double a, double b, double c)
-        {
-            P1 = P1.shift(a, b, c);
-            P2 = P2.shift(a, b, c);
-        }
-
-        public void rotate(Edge e, double angle, double a, double b, double c)
-        {
-            P1 = P1.rotate(e, angle, a, b, c);
-            P2 = P2.rotate(e, angle, a, b, c);
-        }
-
-		public void reflection(string axis)
-		{
-
-			if (axis == "X")
-			{
-				P1.X = -P1.X;
-			}
-			if (axis == "Y")
-			{
-				P1.Y = -P1.Y;
-			}
-			if (axis == "Z")
-			{
-				P1.Z = -P1.Z;
-			}
-		}
-
+        public Edge(int p1, int p2) { nP1 = p1; nP2 = p2; }
 	}
 
     public class Polygon
     {
         public List<Edge> edges = new List<Edge>();
-
+        
         //по граням
         public Polygon(List<Edge> edg)
         {
@@ -493,48 +471,22 @@ namespace Task_3
                 edges.Add(el);
             }
         }
-
-
-
-        public void scale(double ind_scale, double a, double b, double c)
-        {
-            foreach (var e in edges)
-            {
-                e.scale(ind_scale, a, b, c);
-            }
-        }
-
-        public void shift(double a, double b, double c)
-        {
-            foreach (var e in edges)
-            {
-                e.shift(a, b, c);
-            }
-        }
-
-        public void rotate(Edge edge, double angle, double a, double b, double c)
-        {
-            foreach (var e in edges)
-            {
-                e.rotate(edge, angle, a, b, c);
-            }
-        }
-
     }
 
     public class Polyhedron
     {
-       Form1 _form = new Form1();
-
+        Form1 _form = new Form1();
+        public List<PointPol> points = new List<PointPol>();
         public List<Polygon> pol = new List<Polygon>();
 
-        public Polyhedron(List<Polygon> pl)
+        public Polyhedron(List<Polygon> pl, List<PointPol> p)
         {
             foreach (var el in pl)
             {
                 pol.Add(el);
 			}
 
+            points = p;
         }
 
         public void AddPolygon(Polygon p)
@@ -547,36 +499,51 @@ namespace Task_3
             double a = 0;
             double b = 0;
             double c = 0;
+            List<PointPol> ch_points = new List<PointPol>();
 
-            _form.find_center(pol, ref a, ref b, ref c);
-            foreach (var e in pol)
-                e.scale(ind_scale, a, b, c);
+            _form.find_center(points, ref a, ref b, ref c);
+            foreach (var p in points)
+                ch_points.Add(p.scale(ind_scale, a, b, c));
+
+            points = ch_points;
         }
 
         public void shift(double a, double b, double c)
-        { 
-            foreach (var e in pol)
-                e.shift(a, b, c);
+        {
+            List<PointPol> ch_points = new List<PointPol>();
+
+            foreach (var e in points)
+                ch_points.Add(e.shift(a, b, c));
+
+            points = ch_points;
         }
 
-        public void rotate(Edge edge, double angle)
+        public void rotate(Tuple<PointPol, PointPol> dir, double angle)
         {
             double a = 0;
             double b = 0;
             double c = 0;
 
-            _form.find_center(pol, ref a, ref b, ref c);
-            foreach (var e in pol)
-                e.rotate(edge, angle, a, b, c);
+            _form.find_center(points, ref a, ref b, ref c);
+            List<PointPol> ch_points = new List<PointPol>();
+
+            foreach (var e in points)
+                ch_points.Add(e.rotate(dir, angle, a, b, c));
+
+            points = ch_points;
         }
 
         public void reflection(string axis)
         {
-			foreach (var p in pol)
-				foreach (var el in p.edges)
-				{
-					el.reflection(axis);
-				}
+            foreach (var p in points)
+            {
+                if (axis == "X")
+                    p.X = -p.X;
+                if (axis == "Y")
+                    p.Y = -p.Y;
+                if (axis == "Z")
+                    p.Z = -p.Z;
+            }
         }
     }
 
