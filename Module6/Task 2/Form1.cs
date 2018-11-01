@@ -141,32 +141,42 @@ namespace Task_3
             
         }
 
-        private void buildPolsRotate(string axis, int cnt)
+        private void buildPolsRotate(string axis, int cnt, ref PointPol rotate_around)
         {
             pols_rotate.Clear();
             List<PointPol> l1 = new List<PointPol>(points);
-
+            double a = 0, b = 0, c = 0;
+        
+            Polygon pol = new Polygon(l1);
+            //pol.find_center(ref a, ref b, ref c);
+            pol.closest_to_zero(axis, ref a, ref b, ref c);
 
             Edge dir = new Edge(new PointPol(0, 0, 0), new PointPol(1, 0, 0));
             if (axis == "X")
             {
                 dir = new Edge(new PointPol(0, 0, 0), new PointPol(1, 0, 0));
+                for (int i = 0; i < l1.Count(); ++i)
+                    l1[i] = l1[i].shift(0, -b, 0);
+                rotate_around.X = a; rotate_around.Y = 0; rotate_around.Z = c;
             }
             if (axis == "Y")
             {
                 dir = new Edge(new PointPol(0, 0, 0), new PointPol(0, 1, 0));
+                for (int i = 0; i < l1.Count(); ++i)
+                    l1[i] = l1[i].shift(-a, 0, 0);
+                rotate_around.X = 0; rotate_around.Y = b; rotate_around.Z = c;
             }
             if (axis == "Z")
             {
                 dir = new Edge(new PointPol(0, 0, 0), new PointPol(0, 0, 1));
+                for (int i = 0; i < l1.Count(); ++i)
+                    l1[i] = l1[i].shift(0, -b, 0);
+                rotate_around.X = a; rotate_around.Y = 0; rotate_around.Z = c;
             }
 
             double angle = 360.0 / cnt;
 
-            Polygon pol = new Polygon(l1);
-            double a = 0, b = 0, c = 0;
-            //pol.find_center(ref a, ref b, ref c);
-            //pol.closest_to_zero(ref a, ref b, ref c);
+
 
             for (int i = 0; i < cnt; ++i)
             {
@@ -174,7 +184,7 @@ namespace Task_3
 
                 for (int j = 0; j < l2.Count(); ++j)
                 {
-                    l2[j] = l2[j].rotate(dir, angle, a, b, c);
+                    l2[j] = l2[j].rotate(dir, angle, 0, 0, 0);
                 }
 
                 List<PointPol> lsum = new List<PointPol>(l1);
@@ -226,6 +236,19 @@ namespace Task_3
 			*/
         }
 
+        private bool pointsEqual(PointPol p1, PointPol p2)
+        {
+            return (p1.X == p2.X) && (p1.Y == p2.Y) && (p1.Z == p2.Z);
+        }
+
+        private void buildFig(PointPol rotate_around)
+        {
+            if (pols_rotate.Count() > 2)
+            {
+
+            }
+        }
+
         private void drawPolsRotate()
         {
 			Clear();
@@ -263,7 +286,9 @@ namespace Task_3
             string ax = comboBoxBuildAxis.SelectedItem.ToString();
             int cnt = Int32.Parse(textBoxBuildCount.Text);
 
-            buildPolsRotate(ax, cnt);
+            PointPol rotate_around = new PointPol(0, 0, 0);
+            buildPolsRotate(ax, cnt, ref rotate_around);
+            buildFig(rotate_around);
             drawPolsRotate();
         }
 
@@ -623,7 +648,7 @@ namespace Task_3
             z /= l.Count();
         }
 
-        public void closest_to_zero(ref double x, ref double y, ref double z)
+        public void closest_to_zero(string axis, ref double x, ref double y, ref double z)
         {
             List<PointPol> l = new List<PointPol>();
             for (int i = 0; i < edges.Count(); i += 2)
@@ -635,18 +660,51 @@ namespace Task_3
                 l.RemoveAt(l.Count() - 1);
 
             x = l.First().X; y = l.First().Y; z = l.First().Z;
-            double min_dist = x * x + y * y + z * z;
 
-            foreach (var p in l)
+            double min_dist;
+            if (axis == "X")
             {
-                double dist = p.X * p.X;// + p.Y * p.Y + p.Z * p.Z;
-                if (dist < min_dist)
+                min_dist = Math.Abs(y);
+
+                foreach (var p in l)
                 {
-                    min_dist = dist;
-                    x = p.X; y = p.Y; z = p.Z;
+                    double dist = Math.Abs(p.Y);
+                    if (dist < min_dist)
+                    {
+                        min_dist = dist;
+                        x = p.X; y = p.Y; z = p.Z;
+                    }
                 }
             }
-            
+            if (axis == "Y")
+            {
+                min_dist = Math.Abs(x);
+
+                foreach (var p in l)
+                {
+                    double dist = Math.Abs(p.X);
+                    if (dist < min_dist)
+                    {
+                        min_dist = dist;
+                        x = p.X; y = p.Y; z = p.Z;
+                    }
+                }
+            }
+            if (axis == "Z")
+            {
+                min_dist = Math.Abs(y);
+
+                foreach (var p in l)
+                {
+                    double dist = Math.Abs(p.Y);
+                    if (dist < min_dist)
+                    {
+                        min_dist = dist;
+                        x = p.X; y = p.Y; z = p.Z;
+                    }
+                }
+            }
+
         }
 
         public void scale(double ind_scale, double a, double b, double c)
