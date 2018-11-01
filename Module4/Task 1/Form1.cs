@@ -135,8 +135,8 @@ namespace Task_1{
             nolinepoint = new List<int>();
             Random rand = new Random();
             _memory = new Stack<Tuple<Color, Tuple<int, int>>>();
-            
-            double ang = 0;
+
+            double ang = Convert.ToDouble(toolStripTextBox1.Text);
             //Здесь идет разветвление по режиму
             for (int i = 0; i < str.Length; ++i)
             {
@@ -282,6 +282,18 @@ namespace Task_1{
         private void очиститьToolStripMenuItem_Click(object sender, EventArgs e){
             g.Clear(pictureBox1.BackColor);
             pictureBox1.Image = pictureBox1.Image;
+        }
+
+        private void saveToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            SaveFileDialog saveFileDialog1 = new SaveFileDialog();
+            saveFileDialog1.RestoreDirectory = true;
+            saveFileDialog1.Filter = "Image Files(*.JPG)|*.JPG|All files (*.*)|*.*";
+            pictureBox1.Image = pictureBox1.Image;
+            if (saveFileDialog1.ShowDialog() == DialogResult.OK)
+            {
+                pictureBox1.Image.Save(saveFileDialog1.FileName);
+            }
         }
     }
 }
