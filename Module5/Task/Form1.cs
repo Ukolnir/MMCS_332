@@ -304,11 +304,7 @@ namespace Task
         public List<Tuple<Point, Point>> edges;
         public List<Polygon> polygons = new List<Polygon>();
 
-        
-
-        public double[,] displayMatrix = new double[4, 4] { { Math.Sqrt(0.5), 0, -Math.Sqrt(0.5), 0 }, { 1 / Math.Sqrt(6), Math.Sqrt(2) / 3, 1 / Math.Sqrt(6), 0 }, { 1 / Math.Sqrt(3), -1 / Math.Sqrt(3), 1 / Math.Sqrt(3), 0 }, { 0, 0, 0, 1 } };
-        //public double[,] displayMatrix = new double[4, 4] { { 0.707, -0.408, 0, 0 }, { 0, 0.816, 0, 0 }, { -0.707, -0.408, 0, 0 }, { 0, 0, 0, 1 } };
-        //public double[,] cabine = new double[4, 4] { { 1, 0, 0, 0 }, { 0, 1, 0, 0 }, { -0.707, -0.408, 0, 0 }, { 0, 0, 0, 1 } };
+        public double[,] displayMatrix = new double[4, 4] { { Math.Sqrt(0.5), 0, -Math.Sqrt(0.5), 0 }, { 1 / Math.Sqrt(6), 2/Math.Sqrt(6), 1 / Math.Sqrt(6), 0 }, { 1 / Math.Sqrt(3), -1 / Math.Sqrt(3), 1 / Math.Sqrt(3), 0 }, { 0, 0, 0, 1 } };
         public double[,] ortoX = new double[4, 4] { { 0, 0, 0, 0 }, { 0, 1, 0, 0 }, { 0, 0, 1, 0 }, { 0, 0, 0, 1 } };
         public double[,] ortoY = new double[4, 4] { { 1, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 1, 0 }, { 0, 0, 0, 1 } };
         public double[,] ortoZ = new double[4, 4] { { 1, 0, 0, 0 }, { 0, 1, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 1 } };
@@ -473,20 +469,16 @@ namespace Task
             }
             edges = new List<Tuple<Point, Point>>();
             vertices2D = new List<Point>();
-            double l = 1 / 2.0;
-            double phi = 64.3 * Math.PI / 180;
             
             foreach (var p in vertices)
             {
                 var temp = _form.matrix_multiplication(dM, p.getPol());
                 var temp2d = new Point((int)Math.Round(temp[0, 0]), (int)Math.Round(temp[1, 0]));
-                //var temp2d = new Point((int)Math.Round(p.X + p.Z * (l * Math.Cos(phi))), (int)Math.Round(p.Y + p.Z * (l * Math.Sin(phi))));
                 vertices2D.Add(temp2d);
                 foreach (var t in neighbors[p])
                 {
                     var t1 = _form.matrix_multiplication(dM, t.getPol());
                     vertices2D.Add(new Point((int)Math.Round(t1[0, 0]), (int)Math.Round(t1[1, 0])));
-                    //vertices2D.Add(new Point((int)Math.Round(p.X + p.Z * (l * Math.Cos(phi))), (int)Math.Round(p.Y + p.Z * (l * Math.Sin(phi)))));
                     edges.Add(Tuple.Create(temp2d, vertices2D.Last()));
                 }
             }
