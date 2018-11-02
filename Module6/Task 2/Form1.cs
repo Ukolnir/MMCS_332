@@ -174,9 +174,7 @@ namespace Task_3
             }
 
             double angle = 360.0 / cnt;
-
-
-
+                    
             for (int i = 0; i < cnt; ++i)
             {
                 List<PointPol> l2 = new List<PointPol>(l1);
@@ -272,10 +270,10 @@ namespace Task_3
             for (int i = 1; i < points.Count(); ++i)
             {
                 g2.DrawLine(new Pen(c), (float)points[i - 1].X, (float)points[i - 1].Y, (float)points[i].X, (float)points[i].Y);
-                g2.DrawEllipse(new Pen(Color.Black), (float)points[i - 1].X - 1, (float)points[i - 1].X - 1, 2, 2);
+                //g2.DrawEllipse(new Pen(Color.Black), (float)points[i - 1].X - 1, (float)points[i - 1].X - 1, 2, 2);
             }
             g2.DrawLine(new Pen(c), (float)points.Last().X, (float)points.Last().Y, (float)points.First().X, (float)points.First().Y);
-            g2.DrawEllipse(new Pen(Color.Black), (float)points.Last().X - 1, (float)points.Last().Y - 1, 2, 2);
+            g2.DrawEllipse(new Pen(Color.Black), (float)points.First().X - 1, (float)points.First().Y - 1, 2, 2);
         }
 
 		private void button1_Click(object sender, EventArgs e)
