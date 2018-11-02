@@ -90,7 +90,7 @@ namespace Task_3
 			pictureBox2.Image = pictureBox2.Image;
 		}
 
-		public void Clear()
+		public void ClearPic1()
         {
             g.Clear(pictureBox1.BackColor);
             pictureBox1.Image = pictureBox1.Image;
@@ -100,7 +100,7 @@ namespace Task_3
             //comboBox1.SelectedItem = "...";
         }
 
-		public void Clear2()
+		public void ClearPic2()
 		{
 			g2.Clear(pictureBox2.BackColor);
 			pictureBox2.Image = pictureBox2.Image;
@@ -112,8 +112,8 @@ namespace Task_3
 
 		private void button2_Click(object sender, EventArgs e)
         {
-            Clear();
-			Clear2();
+            ClearPic1();
+            ClearPic2();
             points.Clear();
 
         }
@@ -138,6 +138,12 @@ namespace Task_3
             //g.DrawLine(new Pen(c), l.Last().Item2, l.First().Item1);
             //g.DrawLine(new Pen(c), l.First().Item1, l.First().Item2);
             
+        }
+
+        private bool edgesEqual(Edge e1, Edge e2)
+        {
+            return (pointsEqual(e1.P1, e2.P1) && pointsEqual(e1.P2, e2.P2)) ||
+                (pointsEqual(e1.P1, e2.P2) && pointsEqual(e1.P2, e2.P1));
         }
 
         private void buildPolsRotate(string axis, int cnt, ref PointPol rotate_around)
@@ -184,9 +190,6 @@ namespace Task_3
                     l2[j] = l2[j].rotate(dir, angle, 0, 0, 0);
                 }
 
-                List<PointPol> lsum = new List<PointPol>(l1);
-                lsum.AddRange(l2);
-                //fig.Add(new Polygon(lsum));
                 pols_rotate.Add(new Polygon(l1));
 
                 l1 = l2;
@@ -200,18 +203,23 @@ namespace Task_3
 
         private Polygon littlePartOfFig(Edge e1, Edge e2)
         {
+            
             List<PointPol> l1 = new List<PointPol>();
 
             l1.Add(e1.P1);
             l1.Add(e1.P2);
 
-            if (!pointsEqual(e1.P2, e2.P2))
-                l1.Add(e2.P2);
-            if (!pointsEqual(e1.P1, e2.P1))
-                l1.Add(e2.P1);
+            if (!edgesEqual(e1, e2))
+            {
+                if (!pointsEqual(e1.P2, e2.P2))
+                    l1.Add(e2.P2);
+                if (!pointsEqual(e1.P1, e2.P1))
+                    l1.Add(e2.P1);
+            }
 
             Polygon pol = new Polygon(l1);
             return pol;
+
         }
 
         private void buildPartOfFig(Polygon p1, Polygon p2)
@@ -226,7 +234,7 @@ namespace Task_3
         private void buildFig(PointPol rotate_around)
         {
             fig.Clear();
-            if (pols_rotate.Count() > 2)
+            if (pols_rotate.Count() > 1)
             {
                 for (int i = 1; i < pols_rotate.Count(); ++i)
                 {
@@ -280,7 +288,7 @@ namespace Task_3
         {
             //Polygon pol = new Polygon(points);
             //drawPolygon(pol, Color.Black);
-            Clear();
+            ClearPic1();
 
             string ax = comboBoxBuildAxis.SelectedItem.ToString();
             int cnt = Int32.Parse(textBoxBuildCount.Text);
@@ -292,6 +300,7 @@ namespace Task_3
             buildFig(rotate_around);
             buildFig(rotate_around);
             //drawPols(fig);
+            fig_drawed = false;
         }
 
         private void pictureBox1_MouseClick(object sender, MouseEventArgs e)
@@ -304,7 +313,7 @@ namespace Task_3
 
             if (points.Count() > 1)
             {
-                Clear();
+                ClearPic1();
                 Polygon pol = new Polygon(points);
                 drawPolygon(pol, Color.Black);
                 pictureBox1.Image = pictureBox1.Image;
@@ -321,17 +330,46 @@ namespace Task_3
             labelDebug2.Text = "x = " + x.ToString() + " | y = " + y.ToString();
         }
 
-        private void buttonScale_Click(object sender, EventArgs e)
+        private void reDrawPols()
         {
-            double ind = Double.Parse(textBoxScale.Text);
-			double a = 0, b = 0, c = 0;
-			find_center(pols_rotate, ref a, ref b, ref c);
-            foreach (var item in pols_rotate)
+            if (fig_drawed)
+            {
+                ClearPic1();
+                drawPols(fig);
+            }
+            else
+            {
+                ClearPic1();
+                drawPols(pols_rotate);
+            }
+        }
+
+        private void scalePols(List<Polygon> pols, double ind)
+        {
+            double a = 0, b = 0, c = 0;
+            find_center(pols, ref a, ref b, ref c);
+            foreach (var item in pols)
             {
                 item.scale(ind, a, b, c);
             }
-            Clear();
-            drawPols(pols_rotate);
+        }
+
+        private void buttonScale_Click(object sender, EventArgs e)
+        {
+            double ind = Double.Parse(textBoxScale.Text);
+
+            scalePols(pols_rotate, ind);
+            scalePols(fig, ind);
+
+            reDrawPols();
+        }
+
+        private void shiftPols(List<Polygon> pols, int x, int y, int z)
+        {
+            foreach (var item in pols)
+            {
+                item.shift(x, y, z);
+            }
         }
 
         private void buttonShift_Click(object sender, EventArgs e)
@@ -339,23 +377,42 @@ namespace Task_3
             int x = Int32.Parse(textBoxShiftX.Text);
             int y = Int32.Parse(textBoxShiftY.Text);
             int z = Int32.Parse(textBoxShiftZ.Text);
-            foreach (var item in pols_rotate)
+
+            shiftPols(pols_rotate, x, y, z);
+            shiftPols(fig, x, y, z);
+
+            reDrawPols();
+        }
+
+        private void reflectionPols(List<Polygon> pols, string axis)
+        {
+            foreach (var item in pols)
             {
-                item.shift(x, y, z);
+                item.reflection(axis);
             }
-            Clear();
-            drawPols(pols_rotate);
         }
 
         private void buttonReflection_Click(object sender, EventArgs e)
         {
             string axis = comboBoxReflection.SelectedItem.ToString();
-            foreach (var item in pols_rotate)
+
+            reflectionPols(pols_rotate, axis);
+            reflectionPols(fig, axis);
+
+            reDrawPols();
+        }
+
+        private void rotatePols(List<Polygon> pols, int x1, int y1, int z1,
+            int x2, int y2, int z2, double angle)
+        {
+            PointPol p1 = new PointPol(x1, y1, z1);
+            PointPol p2 = new PointPol(x2, y2, z2);
+            Edge ed = new Edge(p1, p2);
+
+            foreach (var item in pols)
             {
-                item.reflection(axis);
+                item.rotate(ed, angle);
             }
-            Clear();
-            drawPols(pols_rotate);
         }
 
         private void buttonRotate_Click(object sender, EventArgs e)
@@ -368,21 +425,15 @@ namespace Task_3
             int z2 = Int32.Parse(textBoxZ2.Text);
             double angle = Double.Parse(textBoxAngle.Text);
 
-            PointPol p1 = new PointPol(x1, y1, z1);
-            PointPol p2 = new PointPol(x2, y2, z2);
-            Edge ed = new Edge(p1, p2);
+            rotatePols(pols_rotate, x1, y1, z1, x2, y2, z2, angle);
+            rotatePols(fig, x1, y1, z1, x2, y2, z2, angle);
 
-            foreach (var item in pols_rotate)
-            {
-                item.rotate(ed, angle);
-            }
-            Clear();
-            drawPols(pols_rotate);
+            reDrawPols();
         }
 
         private void buttonBuild2_Click(object sender, EventArgs e)
         {
-            Clear();
+            ClearPic1();
 
             string ax = comboBoxBuildAxis.SelectedItem.ToString();
             int cnt = Int32.Parse(textBoxBuildCount.Text);
@@ -394,6 +445,7 @@ namespace Task_3
             buildFig(rotate_around);
             buildFig(rotate_around);
             drawPols(fig);
+            fig_drawed = true;
         }
 
         private void pictureBox2_MouseMove(object sender, MouseEventArgs e)
@@ -410,13 +462,13 @@ namespace Task_3
             int z = 0;
 
             points.Add(new PointPol(x, y, z));
-            Clear2();
+            ClearPic2();
             drawPointsOnPic2();
             pictureBox2.Image = pictureBox2.Image;
 
             if (points.Count() > 1)
             {
-                Clear();
+                ClearPic1();
                 Polygon pol = new Polygon(points);
                 drawPolygon(pol, Color.Black);
                 pictureBox1.Image = pictureBox1.Image;
@@ -617,11 +669,32 @@ namespace Task_3
             for (int i = 1; i < ps.Count(); ++i)
             {
                 //points.Add(ps[i]);
-                edges.Add(new Edge(p1, ps[i]));
+                Edge e = new Edge(p1, ps[i]);
+                int ind = edges.FindIndex(ed => edgesEqual(ed, e));
+                if (ind == -1)
+                    edges.Add(e);
                 p1 = ps[i];
             }
 
-            edges.Add(new Edge(p1, ps.First()));
+            Edge e2 = new Edge(p1, ps.First());
+            int ind2 = edges.FindIndex(ed => edgesEqual(ed, e2));
+            if (ind2 == -1)
+                edges.Add(e2);
+        }
+
+        private void deleteDuplicates()
+        {
+            edges = edges.Distinct().ToList();
+        }
+
+        private bool pointsEqual(PointPol p1, PointPol p2)
+        {
+            return (p1.X == p2.X) && (p1.Y == p2.Y) && (p1.Z == p2.Z);
+        }
+        private bool edgesEqual(Edge e1, Edge e2)
+        {
+            return (pointsEqual(e1.P1, e2.P1) && pointsEqual(e1.P2, e2.P2)) ||
+                (pointsEqual(e1.P1, e2.P2) && pointsEqual(e1.P2, e2.P1));
         }
         /*
         public void find_center(ref double x, ref double y, ref double z)
@@ -729,12 +802,14 @@ namespace Task_3
         {
             foreach (var e in edges)
                 e.scale(ind_scale, a, b, c);
+            deleteDuplicates();
         }
 
         public void shift(double a, double b, double c)
         {
             foreach (var e in edges)
                 e.shift(a, b, c);
+            deleteDuplicates();
         }
 
         public void rotate(Edge edge, double angle)
@@ -743,6 +818,7 @@ namespace Task_3
             find_center(ref a, ref b, ref c);
             foreach (var e in edges)
                 e.rotate(edge, angle, a, b, c);
+            deleteDuplicates();
         }
 
         public void reflection(string axis)
