@@ -15,10 +15,9 @@ namespace Task_3
         Graphics g, g2;
 
         List<PointPol> points = new List<PointPol>();
-
         List<Polygon> pols_rotate = new List<Polygon>();
-
 		List<Polygon> fig = new List<Polygon>();
+        bool fig_drawed = false;
 
 		public Form1()
         {
@@ -146,7 +145,7 @@ namespace Task_3
             pols_rotate.Clear();
             List<PointPol> l1 = new List<PointPol>(points);
             double a = 0, b = 0, c = 0;
-        
+
             Polygon pol = new Polygon(l1);
             //pol.find_center(ref a, ref b, ref c);
             pol.closest_to_zero(axis, ref a, ref b, ref c);
@@ -194,46 +193,6 @@ namespace Task_3
 
                 l1 = l2;
             }
-			/*
-            int cnt_e = fig[0].edges.Count();
-            for (int i =1; i < fig.Count(); ++i)
-            {
-                for (int j =0; j < cnt_e; ++j)
-                {
-                    //fig[i - 1].edges.Add(new Edge(fig[i - 1].edges[j].P1, fig[i].edges[j].P2));
-                    //fig[i - 1].edges.Add(new Edge(fig[i - 1].edges[j].P2, fig[i].edges[j].P1));
-                    fig[i - 1].edges.Add(new Edge(fig[i - 1].edges[j].P1, fig[i].edges[j].P1));
-                    fig[i - 1].edges.Add(new Edge(fig[i - 1].edges[j].P2, fig[i].edges[j].P2));
-                    //fig[i].edges.Add(new Edge(fig[i - 1].edges[j].P1, fig[i].edges[j].P2));
-                    //fig[i].edges.Add(new Edge(fig[i - 1].edges[j].P2, fig[i].edges[j].P1));
-                    fig[i].edges.Add(new Edge(fig[i - 1].edges[j].P1, fig[i].edges[j].P1));
-                    fig[i].edges.Add(new Edge(fig[i - 1].edges[j].P2, fig[i].edges[j].P2));
-                }
-            }
-
-            for (int j = 0; j < cnt_e; ++j)
-            {
-                //fig.First().edges.Add(new Edge(fig.First().edges[j].P1, fig.Last().edges[j].P2));
-                //fig.First().edges.Add(new Edge(fig.First().edges[j].P2, fig.Last().edges[j].P1));
-                fig.First().edges.Add(new Edge(fig.First().edges[j].P1, fig.Last().edges[j].P1));
-                fig.First().edges.Add(new Edge(fig.First().edges[j].P2, fig.Last().edges[j].P2));
-                //fig.Last().edges.Add(new Edge(fig.First().edges[j].P1, fig.Last().edges[j].P2));
-                //fig.Last().edges.Add(new Edge(fig.First().edges[j].P2, fig.Last().edges[j].P1));
-                fig.Last().edges.Add(new Edge(fig.First().edges[j].P1, fig.Last().edges[j].P1));
-                fig.Last().edges.Add(new Edge(fig.First().edges[j].P2, fig.Last().edges[j].P2));
-            }
-
-            for (int i = 0; i < fig.Count(); ++i)
-            {
-                for (int j = 0; j < cnt_e; ++j)
-                {
-                    //fig[i].edges.Add(new Edge(fig[i - 1].edges[j].P1, fig[i].edges[j].P1));
-                    //fig[i].edges.Add(new Edge(fig[i - 1].edges[j].P2, fig[i].edges[j].P2));
-                    
-                }
-                //fig[i].edges.RemoveRange(0, cnt_e/2);
-            }
-			*/
         }
 
         private bool pointsEqual(PointPol p1, PointPol p2)
@@ -241,18 +200,47 @@ namespace Task_3
             return (p1.X == p2.X) && (p1.Y == p2.Y) && (p1.Z == p2.Z);
         }
 
-        private void buildFig(PointPol rotate_around)
+        private Polygon littlePartOfFig(Edge e1, Edge e2)
         {
-            if (pols_rotate.Count() > 2)
-            {
+            List<PointPol> l1 = new List<PointPol>();
 
+            l1.Add(e1.P1);
+            l1.Add(e1.P2);
+
+            if (!pointsEqual(e1.P2, e2.P2))
+                l1.Add(e2.P2);
+            if (!pointsEqual(e1.P1, e2.P1))
+                l1.Add(e2.P1);
+
+            Polygon pol = new Polygon(l1);
+            return pol;
+        }
+
+        private void buildPartOfFig(Polygon p1, Polygon p2)
+        {
+            for (int i = 0; i < p1.edges.Count(); ++i)
+            {
+                Polygon pol = littlePartOfFig(p1.edges[i], p2.edges[i]);
+                fig.Add(pol);
             }
         }
 
-        private void drawPolsRotate()
+        private void buildFig(PointPol rotate_around)
         {
-			Clear();
-            foreach (var item in pols_rotate)
+            fig.Clear();
+            if (pols_rotate.Count() > 2)
+            {
+                for (int i = 1; i < pols_rotate.Count(); ++i)
+                {
+                    buildPartOfFig(pols_rotate[i-1], pols_rotate[i]);
+                }
+                buildPartOfFig(pols_rotate.Last(), pols_rotate.First());
+            }
+        }
+
+        private void drawPols(List<Polygon> pols)
+        {
+            foreach (var item in pols)
             {
                 drawPolygon(item, Color.Black);
             }
@@ -278,18 +266,34 @@ namespace Task_3
 			z /= pols.Count();
 		}
 
+        private void drawPointsOnPic2()
+        {
+            Color c = Color.Green;
+            for (int i = 1; i < points.Count(); ++i)
+            {
+                g2.DrawLine(new Pen(c), (float)points[i - 1].X, (float)points[i - 1].Y, (float)points[i].X, (float)points[i].Y);
+                g2.DrawEllipse(new Pen(Color.Black), (float)points[i - 1].X - 1, (float)points[i - 1].X - 1, 2, 2);
+            }
+            g2.DrawLine(new Pen(c), (float)points.Last().X, (float)points.Last().Y, (float)points.First().X, (float)points.First().Y);
+            g2.DrawEllipse(new Pen(Color.Black), (float)points.Last().X - 1, (float)points.Last().Y - 1, 2, 2);
+        }
+
 		private void button1_Click(object sender, EventArgs e)
         {
             //Polygon pol = new Polygon(points);
             //drawPolygon(pol, Color.Black);
+            Clear();
 
             string ax = comboBoxBuildAxis.SelectedItem.ToString();
             int cnt = Int32.Parse(textBoxBuildCount.Text);
 
             PointPol rotate_around = new PointPol(0, 0, 0);
             buildPolsRotate(ax, cnt, ref rotate_around);
+            drawPols(pols_rotate);
+
             buildFig(rotate_around);
-            drawPolsRotate();
+            buildFig(rotate_around);
+            //drawPols(fig);
         }
 
         private void pictureBox1_MouseClick(object sender, MouseEventArgs e)
@@ -329,10 +333,8 @@ namespace Task_3
                 item.scale(ind, a, b, c);
             }
             Clear();
-            drawPolsRotate();
+            drawPols(pols_rotate);
         }
-
-
 
         private void buttonShift_Click(object sender, EventArgs e)
         {
@@ -344,7 +346,7 @@ namespace Task_3
                 item.shift(x, y, z);
             }
             Clear();
-			drawPolsRotate();
+            drawPols(pols_rotate);
         }
 
         private void buttonReflection_Click(object sender, EventArgs e)
@@ -355,7 +357,7 @@ namespace Task_3
                 item.reflection(axis);
             }
             Clear();
-			drawPolsRotate();
+            drawPols(pols_rotate);
         }
 
         private void buttonRotate_Click(object sender, EventArgs e)
@@ -377,12 +379,30 @@ namespace Task_3
                 item.rotate(ed, angle);
             }
             Clear();
-			drawPolsRotate();
+            drawPols(pols_rotate);
         }
 
-        private void Form1_Load(object sender, EventArgs e)
+        private void buttonBuild2_Click(object sender, EventArgs e)
         {
+            Clear();
 
+            string ax = comboBoxBuildAxis.SelectedItem.ToString();
+            int cnt = Int32.Parse(textBoxBuildCount.Text);
+
+            PointPol rotate_around = new PointPol(0, 0, 0);
+            buildPolsRotate(ax, cnt, ref rotate_around);
+            //drawPols(pols_rotate);
+
+            buildFig(rotate_around);
+            buildFig(rotate_around);
+            drawPols(fig);
+        }
+
+        private void pictureBox2_MouseMove(object sender, MouseEventArgs e)
+        {
+            int x = e.X - pictureBox2.Width / 2;
+            int y = pictureBox2.Height / 2 - e.Y;
+            labelDebug2.Text = "x = " + x.ToString() + " | y = " + y.ToString();
         }
 
         private void pictureBox2_MouseClick(object sender, MouseEventArgs e)
@@ -392,8 +412,8 @@ namespace Task_3
             int z = 0;
 
             points.Add(new PointPol(x, y, z));
-
-            g2.DrawEllipse(new Pen(Color.Green), x - 1, y - 1, 2, 2);
+            Clear2();
+            drawPointsOnPic2();
             pictureBox2.Image = pictureBox2.Image;
 
             if (points.Count() > 1)
