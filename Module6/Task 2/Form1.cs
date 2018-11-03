@@ -201,6 +201,31 @@ namespace Task_3
             return (p1.X == p2.X) && (p1.Y == p2.Y) && (p1.Z == p2.Z);
         }
 
+        private bool polygonsEqual(Polygon pol1, Polygon pol2)
+        {
+            if (pol1.points.Count() != pol2.points.Count())
+                return false;
+            if (pol1.edges.Count() != pol2.edges.Count())
+                return false;
+
+            for (int i = 0; i < pol1.points.Count(); ++i)
+            {
+                if (!pointsEqual(pol1.points[i], pol2.points[i]))
+                    return false;
+            }
+            for (int i = 0; i < pol1.edges.Count(); ++i)
+            {
+                if ((pol1.edges[i].Item1 != pol2.edges[i].Item1 &&
+                    pol1.edges[i].Item2 != pol2.edges[i].Item2) ||
+                    (pol1.edges[i].Item1 != pol2.edges[i].Item2 &&
+                    pol1.edges[i].Item2 != pol2.edges[i].Item1))
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+
         private Polygon littlePartOfFig(Edge e1, Edge e2)
         {
             
@@ -232,7 +257,9 @@ namespace Task_3
                     new Edge(p2.points[p2.edges[i].Item1],
                     p2.points[p2.edges[i].Item2])
                     );
-                fig.Add(pol);
+                int ind = fig.FindIndex(polinl => polygonsEqual(polinl, pol));
+                if (ind == -1)
+                    fig.Add(pol);
             }
         }
 
@@ -289,7 +316,29 @@ namespace Task_3
             g2.DrawEllipse(new Pen(Color.Black), (float)points.First().X - 1, (float)points.First().Y - 1, 2, 2);
         }
 
-		private void button1_Click(object sender, EventArgs e)
+        private string save()
+        {
+            string result = "";
+            foreach (var pol in fig)
+            {
+                foreach (var p in pol.points)
+                {
+                    //result += p.X.ToString() + ";" + p.Y.ToString() + ";" + p.Z.ToString() + " ";
+                    result += p.X.ToString() + ";" + p.Y.ToString() + ";" + p.Z.ToString();
+                    if (p != pol.points.Last())
+                    {
+                        result += " ";
+                    }
+                }
+
+                if (pol != fig.Last())
+                    result += Environment.NewLine;
+            }
+            //textBox1.Text = result;
+            return result;
+        }
+
+        private void button1_Click(object sender, EventArgs e)
         {
             //Polygon pol = new Polygon(points);
             //drawPolygon(pol, Color.Black);
@@ -458,6 +507,21 @@ namespace Task_3
             int x = e.X - pictureBox2.Width / 2;
             int y = pictureBox2.Height / 2 - e.Y;
             labelDebug2.Text = "x = " + x.ToString() + " | y = " + y.ToString();
+        }
+
+        private void buttonSave_Click(object sender, EventArgs e)
+        {
+            SaveFileDialog saveFileDialog1 = new SaveFileDialog();
+            saveFileDialog1.RestoreDirectory = true;
+            saveFileDialog1.Filter = "Text Files(*.txt)|*.txt|All files (*.*)|*.*";
+            if (saveFileDialog1.ShowDialog() == DialogResult.OK)
+            {
+                using (System.IO.StreamWriter sw = new System.IO.StreamWriter(saveFileDialog1.FileName, false, System.Text.Encoding.Default))
+                {
+                    string text = save();
+                    sw.WriteLine(text);
+                }
+            }
         }
 
         private void pictureBox2_MouseClick(object sender, MouseEventArgs e)
@@ -698,19 +762,23 @@ namespace Task_3
             if (points.Count() > 1)
             {
                 PointPol p2, p1 = ps.First();
-                int ind2, ind1 = points.FindIndex(pinl => pointsEqual(p1, pinl));
+                int indp, ind2, ind1 = points.FindIndex(pinl => pointsEqual(p1, pinl));
                 for (int i = 1; i < ps.Count(); ++i)
                 {
                     p2 = ps[i];
                     ind2 = points.FindIndex(pinl => pointsEqual(p2, pinl));
-                    if (ind1 != ind2)
-                    edges.Add(Tuple.Create(ind1, ind2));
+                    indp = edges.FindIndex(pair =>
+                        (pair.Item1 == ind2) && (pair.Item2 == ind1));
+                    if ((ind1 != ind2) && (indp == -1))
+                        edges.Add(Tuple.Create(ind1, ind2));
                     ind1 = ind2;
                 }
 
                 p2 = ps.First();
                 ind2 = points.FindIndex(pinl => pointsEqual(p2, pinl));
-                if (ind1 != ind2)
+                indp = edges.FindIndex(pair =>
+                    (pair.Item1 == ind2) && (pair.Item2 == ind1));
+                if ((ind1 != ind2) && (indp == -1))
                     edges.Add(Tuple.Create(ind1, ind2));
             }
 
