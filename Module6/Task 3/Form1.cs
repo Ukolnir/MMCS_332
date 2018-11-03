@@ -161,10 +161,10 @@ namespace Task_3
 					List<Edge> gList = new List<Edge>();
                     int n1 = num + i;
 					gList.Add(new Edge(n1, n1 + 1));
+                    gList.Add(new Edge(n1 + 1, n1 + 1 + l1.Count));
 
-					gList.Add(new Edge(n1 + l1.Count(), n1 + 1 + l1.Count));
-					gList.Add(new Edge(n1, n1 + l1.Count()));
-					gList.Add(new Edge(n1 + 1, n1 + 1 + l1.Count));
+                    gList.Add(new Edge(n1 + 1 + l1.Count, n1 + l1.Count()));
+					gList.Add(new Edge(n1 + l1.Count(), n1));
 
 					polygons.Add(new Polygon(gList));
                 }
@@ -295,16 +295,16 @@ namespace Task_3
                     if (p.edges.Last() == e)
                     {
                         var t = figure.points[e.nP1];
-                        result += t.X.ToString() + ";" + t.Y.ToString() + ";" + t.Z.ToString() + " ";
-                        t = figure.points[e.nP2];
                         result += t.X.ToString() + ";" + t.Y.ToString() + ";" + t.Z.ToString();
+                       // t = figure.points[e.nP2];
+                        //result += t.X.ToString() + ";" + t.Y.ToString() + ";" + t.Z.ToString();
                     }
                     else
                     {
                         var t = figure.points[e.nP1];
                         result += t.X.ToString() + ";" + t.Y.ToString() + ";" + t.Z.ToString() + " ";
-                        t = figure.points[e.nP2];
-                        result += t.X.ToString() + ";" + t.Y.ToString() + ";" + t.Z.ToString() + " ";
+                       // t = figure.points[e.nP2];
+                        //result += t.X.ToString() + ";" + t.Y.ToString() + ";" + t.Z.ToString() + " ";
                     }
                 }
 
