@@ -171,6 +171,7 @@ namespace Task_1
                         result += t.X.ToString() + ";" + t.Y.ToString() + ";" + t.Z.ToString();
                     else
                         result += t.X.ToString() + ";" + t.Y.ToString() + ";" + t.Z.ToString() + " ";
+                    t.X += pictureBox1.Width / 2;
                 }
                 if (p != pol.polygons.Last())
                     result += Environment.NewLine;
