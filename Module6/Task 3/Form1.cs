@@ -43,8 +43,8 @@ namespace Task_3
 			{
 				count ++;
                 x += p.X;
-                y += p.X;
-                z += p.X;
+                y += p.Y;
+                z += p.Z;
 			}
 
             x /= count;
