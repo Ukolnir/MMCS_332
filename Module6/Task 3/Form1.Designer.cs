@@ -392,15 +392,11 @@
             this.comboBox3.FormattingEnabled = true;
             this.comboBox3.Items.AddRange(new object[] {
             "Изометрическая",
-            "Ортогональная по Х",
-            "Ортогональная по Z",
-            "Ортогональная по Y"});
+            "Ортогональная по Z"});
             this.comboBox3.Location = new System.Drawing.Point(30, 40);
             this.comboBox3.Name = "comboBox3";
             this.comboBox3.Size = new System.Drawing.Size(192, 21);
             this.comboBox3.TabIndex = 50;
-            this.comboBox3.SelectedIndexChanged += new System.EventHandler(this.comboBox3_SelectedIndexChanged);
-            this.comboBox3.SelectedValueChanged += new System.EventHandler(this.comboBox3_SelectedValueChanged);
             // 
             // Form1
             // 
