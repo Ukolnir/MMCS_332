@@ -465,7 +465,6 @@ namespace Task_3
 
             double a = 0, b = 0, c = 0;
             find_center(pols, ref a, ref b, ref c);
-
             foreach (var item in pols)
             {
                 item.rotate(ed, angle, a, b, c);

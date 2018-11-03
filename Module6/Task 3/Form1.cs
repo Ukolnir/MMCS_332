@@ -14,7 +14,6 @@ namespace Task_3
     {
         Graphics g;
         Polyhedron figure;
-        public double[,] displayMatrix;
         delegate double lambda(double a, double b);
         lambda f;
 
@@ -32,7 +31,6 @@ namespace Task_3
 
             comboBox1.SelectedItem = "x^2 + y^2 = z";
             comboBox3.SelectedItem = "Изометрическая";
-            displayMatrix = new double[4, 4] { { Math.Sqrt(0.5), 0, -Math.Sqrt(0.5), 0 }, { 1 / Math.Sqrt(6), 2 / Math.Sqrt(6), 1 / Math.Sqrt(6), 0 }, { 1 / Math.Sqrt(3), -1 / Math.Sqrt(3), 1 / Math.Sqrt(3), 0 }, { 0, 0, 0, 1 } };
         }
 
         public void find_center(List<PointPol> pList, ref double x, ref double y, ref double z)
@@ -66,14 +64,14 @@ namespace Task_3
             PointPol p2 = new PointPol(0, pictureBox1.Width, 0);
             PointPol p3 = new PointPol(0, 0, pictureBox1.Width);
 
+            String s = comboBox3.SelectedItem.ToString();
             Pen my_pen = new Pen(Color.Blue);
-            g.DrawLine(my_pen, p0.To2D(), p1.To2D());
+            g.DrawLine(my_pen, p0.To2D(s), p1.To2D(s));
             my_pen.Color = Color.Red;
-            g.DrawLine(my_pen, p0.To2D(), p2.To2D());
+            g.DrawLine(my_pen, p0.To2D(s), p2.To2D(s));
             my_pen.Color = Color.Green;
 
-            Point p3n = p3.To2D();
-            g.DrawLine(my_pen, p0.To2D(), p3n);
+            g.DrawLine(my_pen, p0.To2D(s), p3.To2D(s));
 
             pictureBox1.Image = pictureBox1.Image;
         }
@@ -163,10 +161,10 @@ namespace Task_3
 					List<Edge> gList = new List<Edge>();
                     int n1 = num + i;
 					gList.Add(new Edge(n1, n1 + 1));
+                    gList.Add(new Edge(n1 + 1, n1 + 1 + l1.Count));
 
-					gList.Add(new Edge(n1 + l1.Count(), n1 + 1 + l1.Count));
-					gList.Add(new Edge(n1, n1 + l1.Count()));
-					gList.Add(new Edge(n1 + 1, n1 + 1 + l1.Count));
+                    gList.Add(new Edge(n1 + 1 + l1.Count, n1 + l1.Count()));
+					gList.Add(new Edge(n1 + l1.Count(), n1));
 
 					polygons.Add(new Polygon(gList));
                 }
@@ -192,10 +190,12 @@ namespace Task_3
         private void print_figure()
         {
             Pen my_pen = new Pen(Color.Black);
+
+            string s = comboBox3.SelectedItem.ToString();
             foreach (var pl in figure.pol)
 				foreach (var e in pl.edges)
 				{
-					Point p1 = figure.points[e.nP1].To2D(), p2 = figure.points[e.nP2].To2D();
+					Point p1 = figure.points[e.nP1].To2D(s), p2 = figure.points[e.nP2].To2D(s);
 					g.DrawLine(my_pen, p1, p2);
 				}
 
@@ -205,21 +205,6 @@ namespace Task_3
        
         private void button1_Click(object sender, EventArgs e)
         {
-            switch (comboBox3.SelectedItem.ToString())
-            {
-                case "Изометрическая":
-                    displayMatrix = new double[4, 4] { { Math.Sqrt(0.5), 0, -Math.Sqrt(0.5), 0 }, { 1 / Math.Sqrt(6), 2 / Math.Sqrt(6), 1 / Math.Sqrt(6), 0 }, { 1 / Math.Sqrt(3), -1 / Math.Sqrt(3), 1 / Math.Sqrt(3), 0 }, { 0, 0, 0, 1 } };
-                    break;
-                case "Ортогональная по Х":
-                    displayMatrix = new double[4, 4] { { 0, 0, 0, 0 }, { 0, 1, 0, 0 }, { 0, 0, 1, 0 }, { 0, 0, 0, 1 } };
-                    break;
-                case "Ортогональная по Y":
-                    displayMatrix = new double[4, 4] { { 1, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 1, 0 }, { 0, 0, 0, 1 } };
-                    break;
-                case "Ортогональная по Z":
-                    displayMatrix = new double[4, 4] { { 1, 0, 0, 0 }, { 0, 1, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 1 } };
-                    break;
-            }
 
             create_pol();
             ClearWithout();
@@ -310,16 +295,16 @@ namespace Task_3
                     if (p.edges.Last() == e)
                     {
                         var t = figure.points[e.nP1];
-                        result += t.X.ToString() + ";" + t.Y.ToString() + ";" + t.Z.ToString() + " ";
-                        t = figure.points[e.nP2];
                         result += t.X.ToString() + ";" + t.Y.ToString() + ";" + t.Z.ToString();
+                       // t = figure.points[e.nP2];
+                        //result += t.X.ToString() + ";" + t.Y.ToString() + ";" + t.Z.ToString();
                     }
                     else
                     {
                         var t = figure.points[e.nP1];
                         result += t.X.ToString() + ";" + t.Y.ToString() + ";" + t.Z.ToString() + " ";
-                        t = figure.points[e.nP2];
-                        result += t.X.ToString() + ";" + t.Y.ToString() + ";" + t.Z.ToString() + " ";
+                       // t = figure.points[e.nP2];
+                        //result += t.X.ToString() + ";" + t.Y.ToString() + ";" + t.Z.ToString() + " ";
                     }
                 }
 
@@ -366,30 +351,7 @@ namespace Task_3
 			}
 		}
 
-        private void comboBox3_SelectedValueChanged(object sender, EventArgs e)
-        {
-
-
-        }
-
-        private void comboBox3_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            /*switch (comboBox3.SelectedItem.ToString())
-            {
-                case "Изометрическая":
-                    displayMatrix = new double[4, 4] { { Math.Sqrt(0.5), 0, -Math.Sqrt(0.5), 0 }, { 1 / Math.Sqrt(6), 2 / Math.Sqrt(6), 1 / Math.Sqrt(6), 0 }, { 1 / Math.Sqrt(3), -1 / Math.Sqrt(3), 1 / Math.Sqrt(3), 0 }, { 0, 0, 0, 1 } };
-                    break;
-                case "Ортогональная по Х":
-                    displayMatrix = new double[4, 4] { { 0, 0, 0, 0 }, { 0, 1, 0, 0 }, { 0, 0, 1, 0 }, { 0, 0, 0, 1 } };
-                    break;
-                case "Ортогональная по Y":
-                    displayMatrix = new double[4, 4] { { 1, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 1, 0 }, { 0, 0, 0, 1 } };
-                    break;
-                case "Ортогональная по Z":
-                    displayMatrix = new double[4, 4] { { 1, 0, 0, 0 }, { 0, 1, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 1 } };
-                    break;
-            }*/
-        }
+      
     }
 
 
@@ -491,9 +453,14 @@ namespace Task_3
             return translatePol1(_form.matrix_multiplication(shiftMatrix, getPol()));
         }
         //Изометрическая проекция
-        public Point To2D()
+        public Point To2D(string display)
         {
-            var temp = _form.matrix_multiplication(_form.displayMatrix, getP1());
+            double[,] displayMatrix = new double[4, 4] { { Math.Sqrt(0.5), 0, -Math.Sqrt(0.5), 0 }, { 1 / Math.Sqrt(6), 2 / Math.Sqrt(6), 1 / Math.Sqrt(6), 0 }, { 1 / Math.Sqrt(3), -1 / Math.Sqrt(3), 1 / Math.Sqrt(3), 0 }, { 0, 0, 0, 1 } };;
+  
+            if (display == "Ортогональная по Z")
+                displayMatrix = new double[4, 4] { { 1, 0, 0, 0 }, { 0, 1, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 1 } };
+
+            var temp = _form.matrix_multiplication(displayMatrix, getP1());
             var temp2d = new Point(Convert.ToInt32(temp[0, 0]), Convert.ToInt32(temp[1, 0]));
             return temp2d;
         }
