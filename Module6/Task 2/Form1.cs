@@ -226,7 +226,12 @@ namespace Task_3
         {
             for (int i = 0; i < p1.edges.Count(); ++i)
             {
-                Polygon pol = littlePartOfFig(p1.edges[i], p2.edges[i]);
+                Polygon pol = littlePartOfFig(
+                    new Edge(p1.points[p1.edges[i].Item1],
+                    p1.points[p1.edges[i].Item2]),
+                    new Edge(p2.points[p2.edges[i].Item1],
+                    p2.points[p2.edges[i].Item2])
+                    );
                 fig.Add(pol);
             }
         }
@@ -570,6 +575,24 @@ namespace Task_3
             return p3;
         }
 
+        public PointPol reflection(string axis)
+        {
+
+            if (axis == "X")
+            {
+                return new PointPol(-X, Y, Z);
+            }
+            if (axis == "Y")
+            {
+                return new PointPol(X, -Y, Z);
+            }
+            if (axis == "Z")
+            {
+                return new PointPol(X, Y, -Z);
+            }
+            return new PointPol(X, Y, Z);
+        }
+
         private PointPol translatePol(double[,] f)
         {
             return new PointPol(f[0, 0], f[0, 1], f[0, 2], f[0, 3]);
@@ -649,10 +672,10 @@ namespace Task_3
 
     public class Polygon
     {
-        //public List<PointPol> points = new List<PointPol>();
-        public List<Edge> edges = new List<Edge>();
+        public List<PointPol> points = new List<PointPol>();
+        public List<Tuple<int, int>> edges = new List<Tuple<int, int>>();
 
-        public Polygon(List<Edge> edg)
+        /*public Polygon(List<Edge> edg)
         {
             foreach (var el in edg)
             {
@@ -660,26 +683,38 @@ namespace Task_3
                 //points.Add(el.P1);
                 //points.Add(el.P2);
             }
-        }
+        }*/
         //грани
         public Polygon(List<PointPol> ps)
-        {
-            PointPol p1 = ps.First();
-            //points.Add(p1);
-            for (int i = 1; i < ps.Count(); ++i)
+        { 
+            for (int i = 0; i < ps.Count(); ++i)
             {
-                //points.Add(ps[i]);
-                Edge e = new Edge(p1, ps[i]);
-                int ind = edges.FindIndex(ed => edgesEqual(ed, e));
+                PointPol p = ps[i];
+                int ind = points.FindIndex(pinl => pointsEqual(p, pinl));
                 if (ind == -1)
-                    edges.Add(e);
-                p1 = ps[i];
+                    points.Add(p);
             }
 
-            Edge e2 = new Edge(p1, ps.First());
-            int ind2 = edges.FindIndex(ed => edgesEqual(ed, e2));
-            if (ind2 == -1)
-                edges.Add(e2);
+            if (points.Count() > 1)
+            {
+                PointPol p2, p1 = ps.First();
+                int ind2, ind1 = points.FindIndex(pinl => pointsEqual(p1, pinl));
+                for (int i = 1; i < ps.Count(); ++i)
+                {
+                    p2 = ps[i];
+                    ind2 = points.FindIndex(pinl => pointsEqual(p2, pinl));
+                    if (ind1 != ind2)
+                    edges.Add(Tuple.Create(ind1, ind2));
+                    ind1 = ind2;
+                }
+
+                p2 = ps.First();
+                ind2 = points.FindIndex(pinl => pointsEqual(p2, pinl));
+                if (ind1 != ind2)
+                    edges.Add(Tuple.Create(ind1, ind2));
+            }
+
+            deleteDuplicates();
         }
 
         private void deleteDuplicates()
@@ -718,46 +753,28 @@ namespace Task_3
         {
             x = 0; y = 0; z = 0;
 
-            List<PointPol> l = new List<PointPol>();
-            for (int i = 0; i < edges.Count(); i += 2)
-            {
-                l.Add(edges[i].P1);
-                l.Add(edges[i].P2);
-            }
-            if (edges.Count() % 2 != 0)
-                l.RemoveAt(l.Count() - 1);
-
-            foreach (var p in l)
+            foreach (var p in points)
             {
                 x += p.X;
                 y += p.Y;
                 z += p.Z;
             }
 
-            x /= l.Count();
-            y /= l.Count();
-            z /= l.Count();
+            x /= points.Count();
+            y /= points.Count();
+            z /= points.Count();
         }
 
         public void closest_to_zero(string axis, ref double x, ref double y, ref double z)
         {
-            List<PointPol> l = new List<PointPol>();
-            for (int i = 0; i < edges.Count(); i += 2)
-            {
-                l.Add(edges[i].P1);
-                l.Add(edges[i].P2);
-            }
-            if (edges.Count() % 2 != 0)
-                l.RemoveAt(l.Count() - 1);
-
-            x = l.First().X; y = l.First().Y; z = l.First().Z;
+            x = points.First().X; y = points.First().Y; z = points.First().Z;
 
             double min_dist;
             if (axis == "X")
             {
                 min_dist = Math.Abs(y);
 
-                foreach (var p in l)
+                foreach (var p in points)
                 {
                     double dist = Math.Abs(p.Y);
                     if (dist < min_dist)
@@ -771,7 +788,7 @@ namespace Task_3
             {
                 min_dist = Math.Abs(x);
 
-                foreach (var p in l)
+                foreach (var p in points)
                 {
                     double dist = Math.Abs(p.X);
                     if (dist < min_dist)
@@ -785,7 +802,7 @@ namespace Task_3
             {
                 min_dist = Math.Abs(y);
 
-                foreach (var p in l)
+                foreach (var p in points)
                 {
                     double dist = Math.Abs(p.Y);
                     if (dist < min_dist)
@@ -800,15 +817,15 @@ namespace Task_3
 
         public void scale(double ind_scale, double a, double b, double c)
         {
-            foreach (var e in edges)
-                e.scale(ind_scale, a, b, c);
+            for (int i = 0; i < points.Count(); ++i)
+                points[i] = points[i].scale(ind_scale, a, b, c);
             deleteDuplicates();
         }
 
         public void shift(double a, double b, double c)
         {
-            foreach (var e in edges)
-                e.shift(a, b, c);
+            for (int i = 0; i < points.Count(); ++i)
+                points[i] = points[i].shift(a, b, c);
             deleteDuplicates();
         }
 
@@ -816,15 +833,15 @@ namespace Task_3
         {
             double a = 0, b = 0, c = 0;
             find_center(ref a, ref b, ref c);
-            foreach (var e in edges)
-                e.rotate(edge, angle, a, b, c);
+            for (int i = 0; i < points.Count(); ++i)
+                points[i] = points[i].rotate(edge, angle, a, b, c);
             deleteDuplicates();
         }
 
         public void reflection(string axis)
         {
-            foreach (var e in edges)
-                e.reflection(axis);
+            for (int i = 0; i < points.Count(); ++i)
+                points[i] = points[i].reflection(axis);
         }
 
         public List<Tuple<Point, Point>> to2d()
@@ -832,9 +849,9 @@ namespace Task_3
             List<Tuple<Point, Point>> l = new List<Tuple<Point, Point>>();
             foreach (var item in edges)
             {
-                l.Add(item.to2d());
+                l.Add(Tuple.Create(points[item.Item1].To2D(), points[item.Item2].To2D()));
             }
-            l.Add(Tuple.Create(edges.Last().P2.To2D(), edges.First().P1.To2D()));
+            l.Add(Tuple.Create(points[edges.Last().Item2].To2D(), points[edges.First().Item2].To2D()));
             return l;
         }
     }
