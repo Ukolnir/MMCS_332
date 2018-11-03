@@ -32,6 +32,7 @@ namespace Task_3
 
             comboBox1.SelectedItem = "x^2 + y^2 = z";
             comboBox3.SelectedItem = "Изометрическая";
+            displayMatrix = new double[4, 4] { { Math.Sqrt(0.5), 0, -Math.Sqrt(0.5), 0 }, { 1 / Math.Sqrt(6), 2 / Math.Sqrt(6), 1 / Math.Sqrt(6), 0 }, { 1 / Math.Sqrt(3), -1 / Math.Sqrt(3), 1 / Math.Sqrt(3), 0 }, { 0, 0, 0, 1 } };
         }
 
         public void find_center(List<PointPol> pList, ref double x, ref double y, ref double z)
@@ -373,7 +374,7 @@ namespace Task_3
 
         private void comboBox3_SelectedIndexChanged(object sender, EventArgs e)
         {
-            switch (comboBox3.SelectedItem.ToString())
+            /*switch (comboBox3.SelectedItem.ToString())
             {
                 case "Изометрическая":
                     displayMatrix = new double[4, 4] { { Math.Sqrt(0.5), 0, -Math.Sqrt(0.5), 0 }, { 1 / Math.Sqrt(6), 2 / Math.Sqrt(6), 1 / Math.Sqrt(6), 0 }, { 1 / Math.Sqrt(3), -1 / Math.Sqrt(3), 1 / Math.Sqrt(3), 0 }, { 0, 0, 0, 1 } };
@@ -387,7 +388,7 @@ namespace Task_3
                 case "Ортогональная по Z":
                     displayMatrix = new double[4, 4] { { 1, 0, 0, 0 }, { 0, 1, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 1 } };
                     break;
-            }
+            }*/
         }
     }
 
