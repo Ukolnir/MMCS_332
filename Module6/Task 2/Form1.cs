@@ -258,7 +258,7 @@ namespace Task_3
                     p2.points[p2.edges[i].Item2])
                     );
                 int ind = fig.FindIndex(polinl => polygonsEqual(polinl, pol));
-                if (ind == -1)
+                if (ind == -1 && pol.edges.Count() > 2)
                     fig.Add(pol);
             }
         }
@@ -675,8 +675,8 @@ namespace Task_3
             double[,] shiftMatrix = new double[4, 4] { { 1, 0, 0, x }, { 0, 1, 0, y }, { 0, 0, 1, z }, { 0, 0, 0, 1 } };
             return translatePol1(matrix_multiplication(shiftMatrix, getPol()));
         }
-            //Изометрическая проекция
-        double[,] displayMatrix = new double[3, 3] { { Math.Sqrt(0.5), 0, -Math.Sqrt(0.5) }, { 1 / Math.Sqrt(6), Math.Sqrt(2) / 3, 1 / Math.Sqrt(6) }, { 1 / Math.Sqrt(3), -1 / Math.Sqrt(3), 1 / Math.Sqrt(3) } };
+        //Изометрическая проекция
+        double[,] displayMatrix = new double[4, 4] { { Math.Sqrt(0.5), 0, -Math.Sqrt(0.5), 0 }, { 1 / Math.Sqrt(6), 2 / Math.Sqrt(6), 1 / Math.Sqrt(6), 0 }, { 1 / Math.Sqrt(3), -1 / Math.Sqrt(3), 1 / Math.Sqrt(3), 0 }, { 0, 0, 0, 1 } };
 
         public Point To2D()
         {
