@@ -210,6 +210,138 @@ namespace Task_2
             return new Polyhedron(pols, points);
         }
 
+        private List<int> findPoints4(Polygon p, List<PointPol> points, string s)
+        {
+            int p1 = p.edges[0].nP1;
+            int p2 = p.edges[0].nP2;
+            int p3 = p2;
+
+            if (points[p1].To2D(s).Y < points[p2].To2D(s).Y)
+            {
+                p2 = p1;
+                p1 = p3;
+            }
+
+            p3 = p.edges[2].nP1;
+            int p4 = p3;
+
+            if (points[p1].To2D(s).Y < points[p3].To2D(s).Y)
+            {
+                p3 = p2;
+                p2 = p1;
+                p1 = p4;
+            }
+            else
+            if (points[p2].To2D(s).Y < points[p3].To2D(s).Y)
+            {
+                p3 = p2;
+                p2 = p4;
+            }
+
+            p4 = p.edges[2].nP2;
+            int c = p4;
+
+            if (points[p1].To2D(s).Y < points[p4].To2D(s).Y)
+            {
+                p4 = p3;
+                p3 = p2;
+                p2 = p1;
+                p1 = c;
+            }
+            else
+            if (points[p2].To2D(s).Y < points[p4].To2D(s).Y)
+            {
+                p4 = p3;
+                p3 = p2;
+                p2 = c;
+            }
+            else
+            if (points[p3].To2D(s).Y < points[p4].To2D(s).Y)
+            {
+                p4 = p3;
+                p3 = c;
+            }
+
+
+            if (points[p2].To2D(s).X > points[p3].To2D(s).X)
+            {
+                c = p3;
+                p3 = p2;
+                p2 = c;
+            }
+
+
+            List<int> l = new List<int>();
+            l.Add(p1); l.Add(p2); l.Add(p3); l.Add(p4);
+            return l;
+        }
+
+        private int interpolation(int p1, int p2)
+        {
+            return 0;
+        }
+
+        private void rastr(Polygon p, List<PointPol> points, ref List<Tuple<Point,int>> pixels, string ax)
+        {
+            if (p.edges.Count() == 4)
+            {
+                List<int> sortedPoints = findPoints4(p, points, ax);
+
+                int y1 = points[sortedPoints[0]].To2D(ax).Y;
+                int y2 = points[sortedPoints[1]].To2D(ax).Y;
+                int x1 = points[sortedPoints[0]].To2D(ax).X;
+                int x2 = points[sortedPoints[1]].To2D(ax).X;
+                int k1 = y1 - y2;
+
+                int y3 = points[sortedPoints[2]].To2D(ax).Y;
+                int y4 = points[sortedPoints[3]].To2D(ax).Y;
+                int x3 = points[sortedPoints[2]].To2D(ax).X;
+                int x4 = points[sortedPoints[3]].To2D(ax).X;
+                int k2 = y3 - y4;
+               
+                for (int y = y1; y < y3; --y)
+                {
+                    int xleft = ((y - y2)/(y1 - y2)) * (x1 - x2) + x2;
+                    int xright = ((y - y4) / (y3 - y4)) * (x3 - x4) + x4;
+
+                    int zleft = 0;// interpolation();
+                    int zright = 0;// interpolation();
+                    int zOur = interpolation(zright, zleft);
+
+                    pixels.Add(Tuple.Create(new Point(xleft, y), zleft));
+                    for (int x = xleft + 1; i < xright - 1; ++x)
+                        pixels.Add(Tuple.Create(new Point(x, y), zOur));
+                    pixels.Add(Tuple.Create(new Point(xright, y), zleft));
+                }
+
+                for (int y = y3; y < y4; --y)
+                {
+                    int xleft = ((y - y2) / (y1 - y2)) * (x1 - x2) + x2;
+                    int xright = ((y - y4) / (y3 - y4)) * (x3 - x4) + x4;
+
+                    int zleft = 0;// interpolation();
+                    int zright = 0;// interpolation();
+                    int zOur = interpolation(zright, zleft);
+
+                    pixels.Add(Tuple.Create(new Point(xleft, y), zleft));
+                    for (int x = xleft + 1; i < xright - 1; ++x)
+                        pixels.Add(Tuple.Create(new Point(x, y), zOur));
+                    pixels.Add(Tuple.Create(new Point(xright, y), zleft));
+                }
+            }
+        }
+
+        private List<Tuple<Point, int>> rastrAll(string ax)
+        {
+            List<Tuple<Point,int>> pixelsPol = new List<Tuple<Point,int>>();
+
+            foreach (var f in figures)
+                foreach (var p in f.pol)
+                    rastr(p, f.points, ref pixelsPol, ax);
+
+            return pixelsPol;
+        }
+
         private void print_figure(Polyhedron figure)
         {
             Pen my_pen = new Pen(Color.Black);
