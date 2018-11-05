@@ -35,13 +35,32 @@ namespace UnionPolygons
         List<Point> newPolygon = new List<Point>();
         bool flag = false;
         bool twoPolygons = false;
-
         Graphics g;
+        bool direction = true;
         private void pictureBox1_MouseDown1(object sender, MouseEventArgs e)
         {
             if (!twoPolygons){
                 if (flag){
-                    newPolygon.Add(new Point(e.X, e.Y));
+                    int temp1 = newPolygon.Last().X;
+                    int temp2 = newPolygon.Last().Y;
+                    if (direction){
+                        if (e.X > temp1)
+                            for (int i = temp1 + 1; i <= e.X; ++i)
+                                newPolygon.Add(new Point(i, temp2));
+                        else
+                            for (int i = temp1 - 1; i >= e.X; --i)
+                                newPolygon.Add(new Point(i, temp2));
+                        direction = false;
+                    }
+                    else{
+                        if (e.Y > temp2)
+                            for (int i = temp2 + 1; i <= e.Y; ++i)
+                                newPolygon.Add(new Point(temp1, i));
+                        else
+                            for (int i = temp2 - 1; i >= e.Y; --i)
+                                newPolygon.Add(new Point(temp1, i));
+                        direction = true;
+                    }
                     g.DrawLines(new Pen(Color.Black), newPolygon.ToArray());
                 }
                 else
@@ -55,20 +74,43 @@ namespace UnionPolygons
 
         private void button1_Click(object sender, EventArgs e)
         {
+            if (newPolygon.First() != newPolygon.Last())
+            {
+               /* int xF = newPolygon.First().X;
+                int yF = newPolygon.First().Y;
+                int xL = newPolygon.Last().X;
+                int yL = newPolygon.Last().Y;
+                if (Math.Abs(xF - xL) > Math.Abs(yF - yL)) {
+                    if (xL > xF)
+                        for (int i = xL - 1; i >= xF; --i)
+                            newPolygon.Add(new Point(i, yL));
+                    else
+                        for (int i = xL + 1; i <= xF ; ++i)
+                            newPolygon.Add(new Point(i, yL));
+
+                    if (yL > yF)
+                        for (int i = temp2 + 1; i <= e.Y; ++i)
+                            newPolygon.Add(new Point(temp1, i));
+                    else
+                        for (int i = temp2 - 1; i >= e.Y; --i)
+                            newPolygon.Add(new Point(temp1, i));
+                    direction = true;
+                 }*/
+                
+                newPolygon.Add(newPolygon.First());
+                g.DrawLines(new Pen(Color.Black), newPolygon.ToArray());
+                pictureBox1.Image = bmp;
+                
+            }
+
             if (twoPolygons){
                 label1.Text = "В данной реализации объединение работает только с двумя полигонами одновременно";
                 return;
             }
 
-            if (newPolygon.First() != newPolygon.Last()){
-                newPolygon.Add(newPolygon.First());
-                g.DrawLines(new Pen(Color.Black), newPolygon.ToArray());
-                pictureBox1.Image = bmp;
-            }
-
             if (general.Count == 0){
                 general = newPolygon;
-                newPolygon.Clear();
+                newPolygon = new List<Point>();
                 flag = false;
             }
             else{
@@ -97,16 +139,26 @@ namespace UnionPolygons
         //Функция берет список, стартовую точку в нем, ближайшее пересечение
         //Действие - добавляет точки в список
 
-        //Функция возвращает следущую точку списка, если конец списка -> возвращает начало
 
+
+
+        //Функция возвращает следущую точку списка, если конец списка -> возвращает начало
+        private Point next(ref List<Point> lst, Point p) {
+            int index = lst.FindIndex(x => x == p);
+            Point result;
+            if (index + 1 == lst.Count)
+                result = lst[0];
+            else
+                result = lst[index + 1];
+            return result;
+        }
 
         private void button2_Click(object sender, EventArgs e)
         {
-            List<Point> UNION = new List<Point>();
             var general_min = general.OrderBy(x => x.X).ThenBy(x => x.Y).First();
             var newPol_min = newPolygon.OrderBy(x => x.X).ThenBy(x => x.Y).First();
             bool flag = true;
-            Point start_point;
+            /*Point start_point;
             if (general_min == newPol_min || general_min.X < newPol_min.X ||
                 (general_min.X == newPol_min.X && general_min.Y < newPol_min.Y))
                 start_point = general_min;
@@ -114,23 +166,30 @@ namespace UnionPolygons
                 start_point = newPol_min;
                 flag = false;
             }
+            */
+            //List<Point> intersect = new List<Point>();
 
-            UNION.Add(start_point);
+            //foreach (var p in general) {
+               // if (newPolygon.Any(x => x == p))
+                    //intersect.Add(p);
+           // }
 
-            /*if (flag) {
-                var index = general.FindIndex(p => p == start_point);
-                Point temp = general[index];
-                while (temp != general[index - 1]) {
-                    var ff = general.FindIndex(p => p == temp);
-                    if(newPolygon.Any(g=>g == temp)){
-                        var ind = newPolygon.FindIndex(p => p == temp);
-                        if (check_dir(newPolygon[ind + 1], Tuple.Create(temp, general[ff + 1]))) { 
-                            
-                        
-                        }
-                    }
-                }
-            }*/
+            var intersect = general.Intersect(newPolygon).ToList();
+
+            textBox1.Text = "";
+            foreach (var i in general)
+                textBox1.Text += "(" + i.X + "; " + i.Y + ")    ";
+
+            textBox2.Text = "";
+            foreach (var i in newPolygon)
+                textBox2.Text += "(" + i.X + "; " + i.Y + ")    ";
+
+            textBox3.Text = "";
+            foreach (var i in intersect)
+                textBox3.Text += "(" + i.X + "; " + i.Y + ")    ";
+
+
+            //UNION.Add(start_point);
 
         }
     }
