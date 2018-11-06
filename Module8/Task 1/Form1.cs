@@ -192,8 +192,16 @@ namespace Task_3
             List<Tuple<Point, Point>> l = pol.to2d();
             foreach (var p in l)
             {
-                g.DrawLine(new Pen(c), p.Item1, p.Item2);
+                //g.DrawLine(new Pen(c), p.Item1, p.Item2);
             }
+            Point[] ps = new Point[pol.points.Count()];
+            int i = 0;
+            foreach (var item in pol.points)
+            {
+                ps[i] = item.To2D();
+                ++i;
+            }
+            g.DrawPolygon(new Pen(c), ps);
 
             if (pol.points.Count() > 2)
             {
@@ -202,8 +210,9 @@ namespace Task_3
                     List<Tuple<Point, Point>> l2 = pol.to2d(phi_a, psi_a);
                     foreach (var p in l2)
                     {
-                        g3.DrawLine(new Pen(c), p.Item1, p.Item2);
+                        //g3.DrawLine(new Pen(c), p.Item1, p.Item2);
                     }
+                    g3.FillPolygon(new SolidBrush(c), ps);
                 }
             }
         }
@@ -315,7 +324,7 @@ namespace Task_3
 
         }
 
-        private void buildPartOfFig(Polygon p1, Polygon p2)
+        private void buildPartOfFig(Polygon p1, Polygon p2, Random r)
         {
             for (int i = 0; i < p1.edges.Count(); ++i)
             {
@@ -325,6 +334,7 @@ namespace Task_3
                     new Edge(p2.points[p2.edges[i].Item1],
                     p2.points[p2.edges[i].Item2])
                     );
+                pol.color = Color.FromArgb(r.Next(0, 255), r.Next(0, 255), r.Next(0, 255));
                 int ind = fig.FindIndex(polinl => polygonsEqual(polinl, pol));
                 if (ind == -1 && pol.edges.Count() > 2)
                     fig.Add(pol);
@@ -334,21 +344,25 @@ namespace Task_3
         private void buildFig(PointPol rotate_around)
         {
             fig.Clear();
+            Random r = new Random();
             if (pols_rotate.Count() > 1)
             {
                 for (int i = 1; i < pols_rotate.Count(); ++i)
                 {
-                    buildPartOfFig(pols_rotate[i-1], pols_rotate[i]);
+                    buildPartOfFig(pols_rotate[i-1], pols_rotate[i], r);
                 }
-                buildPartOfFig(pols_rotate.Last(), pols_rotate.First());
+                buildPartOfFig(pols_rotate.Last(), pols_rotate.First(), r);
             }
         }
 
         private void drawPols(List<Polygon> pols, double phi_a, double psi_a, PointPol view_vector)
         {
+            int i = 1; 
+            Random r = new Random();
             foreach (var item in pols)
             {
-                drawPolygon(item, Color.Black, phi_a, psi_a, view_vector);
+                drawPolygon(item, item.color, phi_a, psi_a, view_vector);
+                i += 10;
             }
             pictureBox1.Image = pictureBox1.Image;
             pictureBox3.Image = pictureBox3.Image;
@@ -962,6 +976,7 @@ namespace Task_3
     {
         public List<PointPol> points = new List<PointPol>();
         public List<Tuple<int, int>> edges = new List<Tuple<int, int>>();
+        public Color color;
 
         /*public Polygon(List<Edge> edg)
         {
