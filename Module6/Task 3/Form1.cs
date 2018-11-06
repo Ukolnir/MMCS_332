@@ -247,7 +247,7 @@ namespace Task_3
                     f = (x, y) => x * x + y * y;
                     break;
                 case "1/(1+x^2) + 1/(1+y^2) = z":
-                    f = (x, y) => 1.0 / (1 + x * x) + 1.0 / (1 + y * y);
+                    f = (x, y) => Math.Sin(x) * Math.Cos(y);
                     break;
                 case "x^2 - y^2 = z":
                     f = (x, y) => x*x - y*y;
