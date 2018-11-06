@@ -14,6 +14,7 @@ namespace Task_3
     {
         Polyhedron pol;
         Pen col;
+        Camera _camera;
 
         public double[,] matrix_multiplication(double[,] m1, double[,] m2)
         {
@@ -196,6 +197,18 @@ namespace Task_3
                     sw.WriteLine(text);
                 }
             }
+        }
+
+        private void button7_Click(object sender, EventArgs e)
+        {
+            double x1, y1, z1, x2, y2, z2;
+            x1 = Convert.ToDouble(textBox2.Text) + pictureBox1.Width / 2; 
+            y1 = Convert.ToDouble(textBox3.Text);
+            z1 = Convert.ToDouble(textBox4.Text);
+            x2 = Convert.ToDouble(textBox9.Text);
+            y2 = Convert.ToDouble(textBox10.Text);
+            z2 = Convert.ToDouble(textBox11.Text);
+            _camera = new Camera(new PointPol(x1,y1,z1), new PointPol(x2,y2,z2));
         }
     }
 
@@ -489,8 +502,15 @@ namespace Task_3
 
     public class Camera {
         PointPol coords;
-        //направление обзора
-        double[,] projection;
-    
+        PointPol view_vector;
+        double[,] projection = new double[4, 4] { { Math.Sqrt(0.5), 0, -Math.Sqrt(0.5), 0 }, { 1 / Math.Sqrt(6), 2 / Math.Sqrt(6), 1 / Math.Sqrt(6), 0 }, { 1 / Math.Sqrt(3), -1 / Math.Sqrt(3), 1 / Math.Sqrt(3), 0 }, { 0, 0, 0, 1 } };
+
+        public Camera(PointPol c, PointPol v) {
+            coords = c;
+            view_vector = v;
+        }
+
+
+
     }
 }
