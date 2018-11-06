@@ -210,161 +210,212 @@ namespace Task_2
             return new Polyhedron(pols, points);
         }
 
-        private List<int> findPoints4(Polygon p, List<PointPol> points, string s)
+		private static int[] Interpolate(int i0, int d0, int i1, int d1)
+		{
+			if (i0 == i1)
+			{
+				return new int[] { d0 };
+			}
+			int[] res;
+			double a = (double)(d1 - d0) / (i1 - i0);
+			double val = d0;
+			if (i0 > i1)
+			{
+				int c = i0;
+				i0 = i1;
+				i1 = c;
+			}
+
+			res = new int[i1 - i0 + 1];
+			d1 = 0;
+			for (int i = i0; i <= i1; i++)
+			{
+				res[d1] = d0;
+				val += a;
+				d0 = (int)val;
+				++d1;
+			}
+
+
+			return res;
+		}
+
+		private void swap(ref Point p1, ref Point p2)
+		{
+			Point c = p1;
+			p1 = p2;
+			p2 = c;
+		}
+
+		private void DrawShadedTriangle(PointPol p0, PointPol p1, PointPol p2, string s, ref List<Tuple<Point,double>> pixels )
+		{
+			Point P0 = p0.To2D(s);
+			Point P1 = p1.To2D(s);
+			Point P2 = p2.To2D(s);
+
+			// Сортировка точек так, что y0 <= y1 <= y2
+			if (P1.Y < P0.Y)
+				{ swap(ref P1, ref P0); }
+			if (P2.Y < P0.Y)
+				{ swap(ref P2, ref P0); }
+			if (P2.Y < P1.Y)
+				{ swap(ref P2, ref P1); }
+
+			int z0 = (int)p0.Z;
+			if (z0 != 0)
+				z0 = 1 / z0 * 1000000;
+
+			int z1 = (int)p1.Z;
+			if (z1 != 0)
+				z1 = 1 / z1 * 1000000;
+
+			int z2 = (int)p2.Z;
+			if (z2 != 0)
+				z2 = 1 / z2 * 1000000;
+
+			// Вычисление координат x и значений h для рёбер треугольника
+			int[] x01 = Interpolate(P0.Y, P0.X, P1.Y, P1.X);
+			int[] h01 = Interpolate(P0.Y, z0, P1.Y, z1);
+			int[] x12 = Interpolate(P1.Y, P1.X, P2.Y, P2.X);
+			int[] h12 = Interpolate(P1.Y, z1, P2.Y, z2);
+
+			int[] x02 = Interpolate(P0.Y, P0.X, P2.Y, P2.X);
+			int[] h02 = Interpolate(P0.Y, z0, P2.Y, z2);
+
+			x01 = x01.Take(x01.Count() - 1).ToArray();
+			int[] x012 = x01.Concat(x12).ToArray();
+
+
+			h01 = h01.Take(h01.Count() - 1).ToArray();
+			int[] h012 = h01.Concat(h12).ToArray();
+
+			int m = x012.Count() / 2;
+
+			int[] x_left, x_right, h_left, h_right;
+
+			if (x02[m] < x012[m])
+			{
+				 x_left = x02;
+				 x_right = x012;
+
+				 h_left = h02;
+				 h_right = h012;
+
+			}
+			else
+			{
+				x_left = x012;
+				x_right = x02;
+
+				h_left = h012;
+				h_right = h02;
+	  
+		}
+
+		// Отрисовка горизонтальных отрезков
+			for (int y = P0.Y; y <= P2.Y; ++y)
+			{
+				int x_l = x_left[y - P0.Y];
+				int x_r = x_right[y - P0.Y];
+
+				int[] h_segment = Interpolate(x_l, h_left[y - P0.Y], x_r, h_right[y - P0.Y]);
+		
+				for (int x = x_l; x <= x_r; ++x)
+				{
+					
+				    double ourZ = h_segment[x - x_l];
+					pixels.Add(Tuple.Create(new Point(x, y), ourZ));
+
+				}
+			}
+		}
+
+
+
+		private List<Tuple<Point, double>> rastr(Polygon p, List<PointPol> points, string ax)
         {
-            int p1 = p.edges[0].nP1;
-            int p2 = p.edges[0].nP2;
-            int p3 = p2;
+			List<Tuple<Point, double>> pixels = new List<Tuple<Point, double>>();
+			if (p.edges.Count() == 4)
+			{
+				int n1 = p.edges[0].nP1;
+				int n2 = p.edges[0].nP2;
+				int n3 = p.edges[2].nP1;
 
-            if (points[p1].To2D(s).Y < points[p2].To2D(s).Y)
-            {
-                p2 = p1;
-                p1 = p3;
-            }
+				DrawShadedTriangle(points[n1], points[n2], points[n3], ax, ref pixels);
 
-            p3 = p.edges[2].nP1;
-            int p4 = p3;
+				n1 = p.edges[0].nP1;
+				n2 = p.edges[2].nP1;
+				n3 = p.edges[2].nP2;
 
-            if (points[p1].To2D(s).Y < points[p3].To2D(s).Y)
-            {
-                p3 = p2;
-                p2 = p1;
-                p1 = p4;
-            }
-            else
-            if (points[p2].To2D(s).Y < points[p3].To2D(s).Y)
-            {
-                p3 = p2;
-                p2 = p4;
-            }
+				DrawShadedTriangle(points[n1], points[n2], points[n3], ax, ref pixels);
+			}
+			else
+			{
+				int n1 = p.edges[0].nP1;
+				int n2 = p.edges[0].nP2;
+				int n3 = p.edges[2].nP1;
 
-            p4 = p.edges[2].nP2;
-            int c = p4;
+				DrawShadedTriangle(points[n1], points[n2], points[n3], ax, ref pixels);
+			}
 
-            if (points[p1].To2D(s).Y < points[p4].To2D(s).Y)
-            {
-                p4 = p3;
-                p3 = p2;
-                p2 = p1;
-                p1 = c;
-            }
-            else
-            if (points[p2].To2D(s).Y < points[p4].To2D(s).Y)
-            {
-                p4 = p3;
-                p3 = p2;
-                p2 = c;
-            }
-            else
-            if (points[p3].To2D(s).Y < points[p4].To2D(s).Y)
-            {
-                p4 = p3;
-                p3 = c;
-            }
-
-
-            if (points[p2].To2D(s).X > points[p3].To2D(s).X)
-            {
-                c = p3;
-                p3 = p2;
-                p2 = c;
-            }
-
-
-            List<int> l = new List<int>();
-            l.Add(p1); l.Add(p2); l.Add(p3); l.Add(p4);
-            return l;
+			return pixels;
         }
 
-        private int interpolation(int p1, int p2)
+        private List<List<Tuple<Point, double>>> rastrAll(string ax)
         {
-            return 0;
-        }
-
-        private void rastr(Polygon p, List<PointPol> points, ref List<Tuple<Point,int>> pixels, string ax)
-        {
-            if (p.edges.Count() == 4)
-            {
-                List<int> sortedPoints = findPoints4(p, points, ax);
-
-                int y1 = points[sortedPoints[0]].To2D(ax).Y;
-                int y2 = points[sortedPoints[1]].To2D(ax).Y;
-                int x1 = points[sortedPoints[0]].To2D(ax).X;
-                int x2 = points[sortedPoints[1]].To2D(ax).X;
-                int k1 = y1 - y2;
-
-                int y3 = points[sortedPoints[2]].To2D(ax).Y;
-                int y4 = points[sortedPoints[3]].To2D(ax).Y;
-                int x3 = points[sortedPoints[2]].To2D(ax).X;
-                int x4 = points[sortedPoints[3]].To2D(ax).X;
-                int k2 = y3 - y4;
-               
-                for (int y = y1; y < y3; --y)
-                {
-                    int xleft = ((y - y2)/(y1 - y2)) * (x1 - x2) + x2;
-                    int xright = ((y - y4) / (y3 - y4)) * (x3 - x4) + x4;
-
-                    int zleft = 0;// interpolation();
-                    int zright = 0;// interpolation();
-                    int zOur = interpolation(zright, zleft);
-
-                    pixels.Add(Tuple.Create(new Point(xleft, y), zleft));
-                    for (int x = xleft + 1; i < xright - 1; ++x)
-                        pixels.Add(Tuple.Create(new Point(x, y), zOur));
-                    pixels.Add(Tuple.Create(new Point(xright, y), zleft));
-                }
-
-                for (int y = y3; y < y4; --y)
-                {
-                    int xleft = ((y - y2) / (y1 - y2)) * (x1 - x2) + x2;
-                    int xright = ((y - y4) / (y3 - y4)) * (x3 - x4) + x4;
-
-                    int zleft = 0;// interpolation();
-                    int zright = 0;// interpolation();
-                    int zOur = interpolation(zright, zleft);
-
-                    pixels.Add(Tuple.Create(new Point(xleft, y), zleft));
-                    for (int x = xleft + 1; i < xright - 1; ++x)
-                        pixels.Add(Tuple.Create(new Point(x, y), zOur));
-                    pixels.Add(Tuple.Create(new Point(xright, y), zleft));
-                }
-            }
-        }
-
-        private List<Tuple<Point, int>> rastrAll(string ax)
-        {
-            List<Tuple<Point,int>> pixelsPol = new List<Tuple<Point,int>>();
+            List<List<Tuple<Point,double>>> pixelsPol = new List<List<Tuple<Point,double>>>();
 
             foreach (var f in figures)
                 foreach (var p in f.pol)
-                    rastr(p, f.points, ref pixelsPol, ax);
+                    pixelsPol.Add(rastr(p, f.points, ax));
 
             return pixelsPol;
         }
+		struct pix
+		{
+			public int z;
+			public Color c;
 
-        private void print_figure(Polyhedron figure)
-        {
-            Pen my_pen = new Pen(Color.Black);
+			public pix(int z1, Color c1) { z = z1; c = c1; }
+		}
 
-            string s = comboBox3.SelectedItem.ToString();
-            foreach (var pl in figure.pol)
-                foreach (var e in pl.edges)
-                {
-                    Point p1 = figure.points[e.nP1].To2D(s), p2 = figure.points[e.nP2].To2D(s);
-                    g.DrawLine(my_pen, p1, p2);
-                }
+		private pix[,] Z_buffer(List<List<Tuple<Point, double>>> pixels)
+		{
+			pix[,] buff = new pix[pictureBox1.Width, pictureBox1.Height];
+			for (int i = 0; i < pictureBox1.Width; ++i)
+				for (int j = 0; j < pictureBox1.Height; ++j)
+					buff[i, j] = new pix(int.MaxValue, Color.White);
 
-            pictureBox1.Image = pictureBox1.Image;
-        }
+			int wh = 0;
+
+			for (int i = 0; i < pixels.Count(); ++i)
+				foreach (var p in pixels[i])
+					if (wh + p.Item1.X > -1 && wh + p.Item1.X < pictureBox1.Width && p.Item1.Y > -1 && p.Item1.Y < pictureBox1.Height && buff[wh + p.Item1.X, p.Item1.Y].z > p.Item2)
+					{
+						buff[wh + p.Item1.X, p.Item1.Y].z = (int)p.Item2;
+						buff[wh + p.Item1.X, p.Item1.Y].c = Color.FromArgb(((i + 1) * 20)%255, ((i + 1) * 10) % 255, ((i + 1) * 50) % 255);
+					}
+
+			return buff;
+		}
+
 
         private void print_figures()
         {
             ClearWithout();
 
-            g = Graphics.FromImage(pictureBox1.Image);
-            foreach (var p in figures)
-                print_figure(p);
-        }
+			string axis = comboBox3.SelectedItem.ToString();
+
+			Bitmap img = (Bitmap)pictureBox1.Image;
+			List<List<Tuple<Point, double>>> pixels = rastrAll(axis);
+			pix[,] b = Z_buffer(pixels);
+
+			for (int i = 0; i < pictureBox1.Width; ++i)
+				for (int j = 0; j < pictureBox1.Height; ++j)
+					img.SetPixel(i, j, b[i, j].c);
+
+			pictureBox1.Image = img;
+		}
 
         private void button1_Click(object sender, EventArgs e)
         {
