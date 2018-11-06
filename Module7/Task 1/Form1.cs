@@ -189,21 +189,31 @@ namespace Task_3
         private void drawPolygon(Polygon pol, Color c, 
             double phi_a, double psi_a, PointPol view_vector)
         {
-            List<Tuple<Point, Point>> l = pol.to2d();
+            List<Tuple<Point, Point>> l = pol.to2d(phi_a, psi_a);
             foreach (var p in l)
             {
-                g.DrawLine(new Pen(c), p.Item1, p.Item2);
+                //g.DrawLine(new Pen(c), p.Item1, p.Item2);
             }
+            Point[] ps = new Point[pol.points.Count()];
+            int i = 0;
+            foreach (var item in pol.points)
+            {
+                ps[i] = item.To2D(phi_a, psi_a);
+                ++i;
+            }
+			g.DrawPolygon(new Pen(c), ps);
+			//g.FillPolygon(new SolidBrush(c), ps);
 
-            if (pol.points.Count() > 2)
+			if (pol.points.Count() > 2)
             {
                 if (isVisible(pol, view_vector))
                 {
                     List<Tuple<Point, Point>> l2 = pol.to2d(phi_a, psi_a);
                     foreach (var p in l2)
                     {
-                        g3.DrawLine(new Pen(c), p.Item1, p.Item2);
+                        //g3.DrawLine(new Pen(c), p.Item1, p.Item2);
                     }
+                    g3.FillPolygon(new SolidBrush(c), ps);
                 }
             }
         }
@@ -315,7 +325,7 @@ namespace Task_3
 
         }
 
-        private void buildPartOfFig(Polygon p1, Polygon p2)
+        private void buildPartOfFig(Polygon p1, Polygon p2, Random r)
         {
             for (int i = 0; i < p1.edges.Count(); ++i)
             {
@@ -325,6 +335,7 @@ namespace Task_3
                     new Edge(p2.points[p2.edges[i].Item1],
                     p2.points[p2.edges[i].Item2])
                     );
+                pol.color = Color.FromArgb(r.Next(0, 255), r.Next(0, 255), r.Next(0, 255));
                 int ind = fig.FindIndex(polinl => polygonsEqual(polinl, pol));
                 if (ind == -1 && pol.edges.Count() > 2)
                     fig.Add(pol);
@@ -334,21 +345,25 @@ namespace Task_3
         private void buildFig(PointPol rotate_around)
         {
             fig.Clear();
+            Random r = new Random();
             if (pols_rotate.Count() > 1)
             {
                 for (int i = 1; i < pols_rotate.Count(); ++i)
                 {
-                    buildPartOfFig(pols_rotate[i-1], pols_rotate[i]);
+                    buildPartOfFig(pols_rotate[i-1], pols_rotate[i], r);
                 }
-                buildPartOfFig(pols_rotate.Last(), pols_rotate.First());
+                buildPartOfFig(pols_rotate.Last(), pols_rotate.First(), r);
             }
         }
 
         private void drawPols(List<Polygon> pols, double phi_a, double psi_a, PointPol view_vector)
         {
+            int i = 1; 
+            Random r = new Random();
             foreach (var item in pols)
             {
-                drawPolygon(item, Color.Black, phi_a, psi_a, view_vector);
+                drawPolygon(item, item.color, phi_a, psi_a, view_vector);
+                i += 10;
             }
             pictureBox1.Image = pictureBox1.Image;
             pictureBox3.Image = pictureBox3.Image;
@@ -437,7 +452,7 @@ namespace Task_3
         private void pictureBox1_MouseClick(object sender, MouseEventArgs e)
         {
             int x = e.X - pictureBox1.Width / 2;
-            int y = pictureBox1.Height / 2 - e.Y;
+            int y = e.Y - pictureBox1.Height / 2;
             int z = Int32.Parse(textBoxBuildZ.Text);
             double phi_a = double.Parse(textBoxPhi.Text);
             double psi_a = double.Parse(textBoxPsi.Text);
@@ -723,7 +738,7 @@ namespace Task_3
             }
         }
 
-        private PointPol normVecOfPlane(PointPol p1, PointPol p2, PointPol p3)
+		private PointPol normVecOfPlane(PointPol p1, PointPol p2, PointPol p3)
         {
             double kx, ky, kz, d;
             double xa = p1.X, ya = p1.Y, za = p1.Z;
@@ -735,10 +750,10 @@ namespace Task_3
             kz = a21 * a32 - a22 * a31;
             d = (kx * -xa) + (ky * -ya) + (kz * -za);
 
-            return new PointPol(kx, ky, kz);
-        }
-        
-        private double scalarProduct(PointPol vec1, PointPol vec2)
+			return new PointPol(kx, ky, kz);
+		}
+
+		private double scalarProduct(PointPol vec1, PointPol vec2)
         {
             return (vec1.X * vec2.X + vec1.Y * vec2.Y + vec1.Z * vec2.Z);
         }
@@ -868,9 +883,9 @@ namespace Task_3
             return translatePol1(matrix_multiplication(shiftMatrix, getPol()));
         }
 
-        //Изометрическая проекция   
+		//Изометрическая проекция   
 
-        public Point To2D()
+		/*public Point To2D()
         {
             double[,] displayMatrix = new double[4, 4] { 
                 { Math.Sqrt(0.5), 0, -Math.Sqrt(0.5), 0 }, 
@@ -883,9 +898,33 @@ namespace Task_3
    
             var temp2d = new Point(x, y);
             return temp2d;
-        }
+        }*/
 
-        public Point To2D(double phi_a, double psi_a)
+		public Point To2D()
+		{
+			double phi = Math.PI / 180 * 35;
+			double psi = Math.PI / 180 * 45;
+			double[,] displayMatrix1 = new double[4, 4] {
+				{ 1, 0, 0, 0 },
+				{ 0, Math.Cos(phi), Math.Sin(phi), 0 },
+				{ 0, -Math.Sin(phi), Math.Cos(phi), 0 },
+				{ 0, 0, 0, 1 } };
+			double[,] displayMatrix2 = new double[4, 4] {
+				{ Math.Cos(psi), 0, -Math.Sin(psi), 0 },
+				{ 0, 1, 0, 0 },
+				{ Math.Sin(psi), 0, Math.Cos(psi), 0 },
+				{ 0, 0, 0, 1 } };
+
+			var displayMatrix = matrix_multiplication(displayMatrix1, displayMatrix2);
+			var temp = matrix_multiplication(displayMatrix, getP1());
+			int x = Convert.ToInt32(temp[0, 0]);
+			int y = Convert.ToInt32(temp[1, 0]);
+
+			var temp2d = new Point(x, y);
+			return temp2d;
+		}
+
+		public Point To2D(double phi_a, double psi_a)
         {
             double phi = Math.PI / 180 * phi_a;
             double psi = Math.PI / 180 * psi_a;
@@ -962,6 +1001,7 @@ namespace Task_3
     {
         public List<PointPol> points = new List<PointPol>();
         public List<Tuple<int, int>> edges = new List<Tuple<int, int>>();
+        public Color color;
 
         /*public Polygon(List<Edge> edg)
         {

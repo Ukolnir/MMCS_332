@@ -433,12 +433,21 @@ namespace Task_3
         }
         */
 
-        private double angle(Point p0, Point p1, Point p2)
+        private double pol_angle(Point p0, Point p1)
         {
-            return (p1.X - p0.X) * (-p2.Y + p1.Y) - (p2.X - p1.X) * (-p1.Y + p0.Y);
-        }
+			int x = p1.X - p0.X;
+			int y = p1.Y - p0.Y;
 
-        private List<Point> grahamScan()
+			double cos = x / Math.Sqrt(x * x + y * y);
+			return Math.Acos(cos);
+		}
+
+		private double angle(Point p0, Point p1, Point p2)
+		{
+			return (p1.X - p0.X) * (-p2.Y + p1.Y) - (p2.X - p1.X) * (-p1.Y + p0.Y);
+		}
+
+		private List<Point> grahamScan()
         {
             int n = points.Count();
             List<int> P = new List<int>(); // список номеров точек
@@ -450,12 +459,16 @@ namespace Task_3
             {
                 if (points[P[i]].X < points[P[0]].X)
                 {
-                    int tmp = P[0];
-                    P[0] = P[i];
-                    P[i] = tmp;
+					if (points[P[i]].Y < points[P[0]].Y)
+					{
+						int tmp = P[0];
+						P[0] = P[i];
+						P[i] = tmp;
+					}
                 }
             }
 
+			/*
             //sort by pollar angle
             for (int i = 2; i < n; ++i)
             {
@@ -468,27 +481,33 @@ namespace Task_3
 
                     j -= 1;
                 }
-            }
+            }*/
+
+			int min_p = P[0];
+			P.RemoveAt(0);
+			List<int> newl = P.OrderByDescending(x => pol_angle(points[min_p], points[x])).ToList();
+			newl.Insert(0, min_p);
+
 
             List<int> stack = new List<int>();
-            stack.Add(P[0]);
-            stack.Add(P[1]);
+            stack.Add(newl[0]);
+            stack.Add(newl[1]);
 
             //Delete inner poits
             for (int i = 2; i < n; ++i)
             {
                 Point p0 = points[stack[stack.Count() - 2]];
                 Point p1 = points[stack[stack.Count() - 1]];
-                Point p2 = points[P[i]];
-                while ((stack.Count() > 1) && angle(p0, p1, p2) < 0)
+                Point p2 = points[newl[i]];
+                while ((stack.Count() > 2) && angle(p0, p1, p2) < 0)
                 {
                     stack.RemoveAt(stack.Count() - 1);
 
                     p0 = points[stack[stack.Count() - 2]];
                     p1 = points[stack[stack.Count() - 1]];
-                    p2 = points[P[i]];
+                    p2 = points[newl[i]];
                 }
-                stack.Add(P[i]);
+                stack.Add(newl[i]);
             }
 
             List<Point> outers = new List<Point>();
