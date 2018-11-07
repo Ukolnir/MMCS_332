@@ -35,7 +35,12 @@
             this.radioMove = new System.Windows.Forms.RadioButton();
             this.button2 = new System.Windows.Forms.Button();
             this.listBoxMode = new System.Windows.Forms.ListBox();
+            this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.textBoxAdd1 = new System.Windows.Forms.TextBox();
+            this.textBoxAdd2 = new System.Windows.Forms.TextBox();
+            this.buttonAdd = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
+            this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
             // pictureBox1
@@ -122,11 +127,50 @@
             this.listBoxMode.Visible = false;
             this.listBoxMode.SelectedIndexChanged += new System.EventHandler(this.listBoxMode_SelectedIndexChanged);
             // 
+            // groupBox1
+            // 
+            this.groupBox1.Controls.Add(this.buttonAdd);
+            this.groupBox1.Controls.Add(this.textBoxAdd2);
+            this.groupBox1.Controls.Add(this.textBoxAdd1);
+            this.groupBox1.Location = new System.Drawing.Point(16, 458);
+            this.groupBox1.Name = "groupBox1";
+            this.groupBox1.Size = new System.Drawing.Size(200, 100);
+            this.groupBox1.TabIndex = 7;
+            this.groupBox1.TabStop = false;
+            this.groupBox1.Text = "groupBox1";
+            // 
+            // textBoxAdd1
+            // 
+            this.textBoxAdd1.Location = new System.Drawing.Point(6, 30);
+            this.textBoxAdd1.Name = "textBoxAdd1";
+            this.textBoxAdd1.Size = new System.Drawing.Size(100, 22);
+            this.textBoxAdd1.TabIndex = 8;
+            this.textBoxAdd1.Text = "50";
+            // 
+            // textBoxAdd2
+            // 
+            this.textBoxAdd2.Location = new System.Drawing.Point(6, 58);
+            this.textBoxAdd2.Name = "textBoxAdd2";
+            this.textBoxAdd2.Size = new System.Drawing.Size(100, 22);
+            this.textBoxAdd2.TabIndex = 9;
+            this.textBoxAdd2.Text = "50";
+            // 
+            // buttonAdd
+            // 
+            this.buttonAdd.Location = new System.Drawing.Point(112, 46);
+            this.buttonAdd.Name = "buttonAdd";
+            this.buttonAdd.Size = new System.Drawing.Size(75, 23);
+            this.buttonAdd.TabIndex = 10;
+            this.buttonAdd.Text = "Add";
+            this.buttonAdd.UseVisualStyleBackColor = true;
+            this.buttonAdd.Click += new System.EventHandler(this.buttonAdd_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1076, 647);
+            this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.listBoxMode);
             this.Controls.Add(this.button2);
             this.Controls.Add(this.radioMove);
@@ -138,6 +182,8 @@
             this.Name = "Form1";
             this.Text = "Form1";
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
+            this.groupBox1.ResumeLayout(false);
+            this.groupBox1.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -152,6 +198,10 @@
 		private System.Windows.Forms.RadioButton radioMove;
         private System.Windows.Forms.Button button2;
         private System.Windows.Forms.ListBox listBoxMode;
+        private System.Windows.Forms.GroupBox groupBox1;
+        private System.Windows.Forms.Button buttonAdd;
+        private System.Windows.Forms.TextBox textBoxAdd2;
+        private System.Windows.Forms.TextBox textBoxAdd1;
     }
 }
 

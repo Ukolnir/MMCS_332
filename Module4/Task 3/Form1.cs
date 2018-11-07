@@ -76,7 +76,12 @@ namespace Task_3
 			{
                 Point p = new Point(x, y);
                 if (index == -1)
-                    points.Add(p);
+                {
+                    int f_ind = points.FindIndex(poin => (poin.X == p.X) && (poin.Y == p.Y));
+                    if (f_ind == -1)
+                        points.Add(p);
+
+                }
                 else
                     points.Insert(index, p);
 
@@ -435,6 +440,9 @@ namespace Task_3
 
         private double pol_angle(Point p0, Point p1)
         {
+            if (p0 == p1)
+                return 0;
+
 			int x = p1.X - p0.X;
 			int y = p1.Y - p0.Y;
 
@@ -442,9 +450,9 @@ namespace Task_3
 			return Math.Acos(cos);
 		}
 
-		private double angle(Point p0, Point p1, Point p2)
+		private double location(Point p0, Point p1, Point p2)
 		{
-			return (p1.X - p0.X) * (-p2.Y + p1.Y) - (p2.X - p1.X) * (-p1.Y + p0.Y);
+			return (p2.Y - p1.Y) * (p0.X - p1.X) - (p2.X - p1.X) * (p0.Y - p1.Y);
 		}
 
 		private List<Point> grahamScan()
@@ -454,64 +462,53 @@ namespace Task_3
             for (int i = 0; i < n; ++i)
                 P.Add(i);
 
-            //place index of min point in P[0]
-            for (int i = 1; i < n; ++i)
-            {
-                if (points[P[i]].X < points[P[0]].X)
-                {
-					if (points[P[i]].Y < points[P[0]].Y)
-					{
-						int tmp = P[0];
-						P[0] = P[i];
-						P[i] = tmp;
-					}
-                }
-            }
-
-			/*
-            //sort by pollar angle
-            for (int i = 2; i < n; ++i)
-            {
-                int j = i;
-                while (j > 1 && (angle(points[P[0]], points[P[j-1]], points[P[j]]) < 0))
-                {
-                    int tmp = P[j];
-                    P[j] = P[j - 1];
-                    P[j - 1] = tmp;
-
-                    j -= 1;
-                }
-            }*/
-
+            P = P.OrderByDescending(p => points[p].Y).ToList();
+            
+            /*
 			int min_p = P[0];
 			P.RemoveAt(0);
-			List<int> newl = P.OrderByDescending(x => pol_angle(points[min_p], points[x])).ToList();
-			newl.Insert(0, min_p);
-
+			P = P.OrderByDescending(x => pol_angle(points[min_p], points[x])).ToList();
 
             List<int> stack = new List<int>();
-            stack.Add(newl[0]);
-            stack.Add(newl[1]);
+            stack.Add(min_p);
+            stack.Add(P[0]);
 
             //Delete inner poits
-            for (int i = 2; i < n; ++i)
+            for (int i = 1; i < P.Count(); ++i)
             {
-                Point p0 = points[stack[stack.Count() - 2]];
-                Point p1 = points[stack[stack.Count() - 1]];
-                Point p2 = points[newl[i]];
-                while ((stack.Count() > 2) && angle(p0, p1, p2) < 0)
+                while ((stack.Count() > 1) && 
+                    location(points[P[i]], 
+                        points[stack[stack.Count() - 2]], 
+                        points[stack[stack.Count() - 1]]) 
+                    > 0)
                 {
                     stack.RemoveAt(stack.Count() - 1);
-
-                    p0 = points[stack[stack.Count() - 2]];
-                    p1 = points[stack[stack.Count() - 1]];
-                    p2 = points[newl[i]];
                 }
-                stack.Add(newl[i]);
+                stack.Add(P[i]);
             }
+            P.Insert(0, min_p);
 
             List<Point> outers = new List<Point>();
+            */
 
+            int pf = P.First();
+            List<int> stack = new List<int>();
+            stack.Add(pf);
+            P.RemoveAt(0);
+            P =P.OrderByDescending(p => pol_angle(points[pf], points[p])).ToList(); //отсортировали список по полярным углам
+            stack.Add(P[0]);
+
+            for (int i = 1; i < P.Count(); ++i)
+            {
+                while (stack.Count() > 1 && location(points[P[i]], points[stack[stack.Count() - 2]], points[stack[stack.Count() - 1]]) > 0)
+                    stack.RemoveAt(stack.Count() - 1);
+
+                stack.Add(P[i]);
+            }
+
+            P.Insert(0, pf);
+
+            List<Point> outers = new List<Point>();
             for (int i = 0; i < stack.Count(); ++i)
                 outers.Add(points[stack[i]]);
 
@@ -553,6 +550,16 @@ namespace Task_3
         private void listBoxMode_SelectedIndexChanged(object sender, EventArgs e)
         {
             label1.Text = listBoxMode.SelectedItem.ToString();
+        }
+
+        private void buttonAdd_Click(object sender, EventArgs e)
+        {
+            int x = int.Parse(textBoxAdd1.Text);
+            int y = int.Parse(textBoxAdd2.Text);
+            addPoint(x, y, Color.Black);
+
+            clearWithoutPoints();
+            drawObject();
         }
     }
 }
