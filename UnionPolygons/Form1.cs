@@ -138,10 +138,14 @@ namespace UnionPolygons
 
         //Функция берет список, стартовую точку в нем, ближайшее пересечение
         //Действие - добавляет точки в список
-
-
-
-
+        private void add_points(ref List<Point> src, Point start, Point intersection) {
+            Point temp = start;
+            while (temp != intersection) {
+                UNION.Add(temp);
+                temp = next(ref src, temp);
+            }
+        }
+        
         //Функция возвращает следущую точку списка, если конец списка -> возвращает начало
         private Point next(ref List<Point> lst, Point p) {
             int index = lst.FindIndex(x => x == p);
@@ -153,12 +157,24 @@ namespace UnionPolygons
             return result;
         }
 
+        private Point prev(ref List<Point> lst, Point p)
+        {
+            int index = lst.FindIndex(x => x == p);
+            Point result;
+            if (index - 1 < 0)
+                result = lst[lst.Count - 1];
+            else
+                result = lst[index - 1];
+            return result;
+        }
+
         private void button2_Click(object sender, EventArgs e)
         {
             var general_min = general.OrderBy(x => x.X).ThenBy(x => x.Y).First();
             var newPol_min = newPolygon.OrderBy(x => x.X).ThenBy(x => x.Y).First();
             bool flag = true;
-            /*Point start_point;
+            var intersect = general.Intersect(newPolygon).ToList();
+            Point start_point;
             if (general_min == newPol_min || general_min.X < newPol_min.X ||
                 (general_min.X == newPol_min.X && general_min.Y < newPol_min.Y))
                 start_point = general_min;
@@ -166,31 +182,49 @@ namespace UnionPolygons
                 start_point = newPol_min;
                 flag = false;
             }
-            */
-            //List<Point> intersect = new List<Point>();
 
-            //foreach (var p in general) {
-               // if (newPolygon.Any(x => x == p))
-                    //intersect.Add(p);
-           // }
-
-            var intersect = general.Intersect(newPolygon).ToList();
-
-            textBox1.Text = "";
-            foreach (var i in general)
-                textBox1.Text += "(" + i.X + "; " + i.Y + ")    ";
-
-            textBox2.Text = "";
-            foreach (var i in newPolygon)
-                textBox2.Text += "(" + i.X + "; " + i.Y + ")    ";
-
-            textBox3.Text = "";
-            foreach (var i in intersect)
-                textBox3.Text += "(" + i.X + "; " + i.Y + ")    ";
+            List<Point> work_lst;
+            if (flag)
+                work_lst = general;
+            else
+                work_lst = newPolygon;
+            Point t = start_point;
+            foreach (var i in intersect){
+                add_points(ref work_lst, t, i);
+                //От пересечения взять по текущему списку точку, относительно образованной прямой выяснить,
+                //являются ли следущая или предыдущая точка в другом списке от пересечения левее образованной прямой. 
+                //Если является - сменить work_lst. Если нет - идти дальше по текущему списку
+            
+            }
 
 
-            //UNION.Add(start_point);
+           
 
         }
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*textBox1.Text = "";
+           foreach (var i in general)
+               textBox1.Text += "(" + i.X + "; " + i.Y + ")    ";
+
+           textBox2.Text = "";
+           foreach (var i in newPolygon)
+               textBox2.Text += "(" + i.X + "; " + i.Y + ")    ";
+
+           textBox3.Text = "";
+           foreach (var i in intersect)
+               textBox3.Text += "(" + i.X + "; " + i.Y + ")    ";*/
