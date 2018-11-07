@@ -73,6 +73,8 @@
             this.pictureBox3 = new System.Windows.Forms.PictureBox();
             this.button1 = new System.Windows.Forms.Button();
             this.groupBox9 = new System.Windows.Forms.GroupBox();
+            this.groupBox13 = new System.Windows.Forms.GroupBox();
+            this.textBoxSleep = new System.Windows.Forms.TextBox();
             this.button2 = new System.Windows.Forms.Button();
             this.groupBox11 = new System.Windows.Forms.GroupBox();
             this.comboBoxRotationAxis = new System.Windows.Forms.ComboBox();
@@ -86,8 +88,6 @@
             this.textBoxViewVectorZ = new System.Windows.Forms.TextBox();
             this.textBoxViewVectorY = new System.Windows.Forms.TextBox();
             this.textBoxViewVectorX = new System.Windows.Forms.TextBox();
-            this.groupBox13 = new System.Windows.Forms.GroupBox();
-            this.textBoxSleep = new System.Windows.Forms.TextBox();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
@@ -101,10 +101,10 @@
             this.groupBox8.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox3)).BeginInit();
             this.groupBox9.SuspendLayout();
+            this.groupBox13.SuspendLayout();
             this.groupBox11.SuspendLayout();
             this.groupBox10.SuspendLayout();
             this.groupBox12.SuspendLayout();
-            this.groupBox13.SuspendLayout();
             this.SuspendLayout();
             // 
             // pictureBox1
@@ -547,7 +547,7 @@
             this.textBoxPhi.Name = "textBoxPhi";
             this.textBoxPhi.Size = new System.Drawing.Size(44, 22);
             this.textBoxPhi.TabIndex = 0;
-            this.textBoxPhi.Text = "35";
+            this.textBoxPhi.Text = "145";
             // 
             // groupBox8
             // 
@@ -606,6 +606,27 @@
             this.groupBox9.TabIndex = 81;
             this.groupBox9.TabStop = false;
             this.groupBox9.Text = "Вращение";
+            // 
+            // groupBox13
+            // 
+            this.groupBox13.Controls.Add(this.textBoxSleep);
+            this.groupBox13.Location = new System.Drawing.Point(103, 25);
+            this.groupBox13.Margin = new System.Windows.Forms.Padding(4);
+            this.groupBox13.Name = "groupBox13";
+            this.groupBox13.Padding = new System.Windows.Forms.Padding(4);
+            this.groupBox13.Size = new System.Drawing.Size(80, 59);
+            this.groupBox13.TabIndex = 80;
+            this.groupBox13.TabStop = false;
+            this.groupBox13.Text = "Sleep";
+            // 
+            // textBoxSleep
+            // 
+            this.textBoxSleep.Location = new System.Drawing.Point(8, 23);
+            this.textBoxSleep.Margin = new System.Windows.Forms.Padding(4);
+            this.textBoxSleep.Name = "textBoxSleep";
+            this.textBoxSleep.Size = new System.Drawing.Size(45, 22);
+            this.textBoxSleep.TabIndex = 1;
+            this.textBoxSleep.Text = "20";
             // 
             // button2
             // 
@@ -729,7 +750,7 @@
             this.textBoxViewVectorY.Name = "textBoxViewVectorY";
             this.textBoxViewVectorY.Size = new System.Drawing.Size(55, 22);
             this.textBoxViewVectorY.TabIndex = 1;
-            this.textBoxViewVectorY.Text = "-1";
+            this.textBoxViewVectorY.Text = "1";
             // 
             // textBoxViewVectorX
             // 
@@ -739,27 +760,6 @@
             this.textBoxViewVectorX.Size = new System.Drawing.Size(55, 22);
             this.textBoxViewVectorX.TabIndex = 0;
             this.textBoxViewVectorX.Text = "1";
-            // 
-            // groupBox13
-            // 
-            this.groupBox13.Controls.Add(this.textBoxSleep);
-            this.groupBox13.Location = new System.Drawing.Point(103, 25);
-            this.groupBox13.Margin = new System.Windows.Forms.Padding(4);
-            this.groupBox13.Name = "groupBox13";
-            this.groupBox13.Padding = new System.Windows.Forms.Padding(4);
-            this.groupBox13.Size = new System.Drawing.Size(80, 59);
-            this.groupBox13.TabIndex = 80;
-            this.groupBox13.TabStop = false;
-            this.groupBox13.Text = "Sleep";
-            // 
-            // textBoxSleep
-            // 
-            this.textBoxSleep.Location = new System.Drawing.Point(8, 23);
-            this.textBoxSleep.Margin = new System.Windows.Forms.Padding(4);
-            this.textBoxSleep.Name = "textBoxSleep";
-            this.textBoxSleep.Size = new System.Drawing.Size(45, 22);
-            this.textBoxSleep.TabIndex = 1;
-            this.textBoxSleep.Text = "20";
             // 
             // Form1
             // 
@@ -808,13 +808,13 @@
             this.groupBox8.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox3)).EndInit();
             this.groupBox9.ResumeLayout(false);
+            this.groupBox13.ResumeLayout(false);
+            this.groupBox13.PerformLayout();
             this.groupBox11.ResumeLayout(false);
             this.groupBox10.ResumeLayout(false);
             this.groupBox10.PerformLayout();
             this.groupBox12.ResumeLayout(false);
             this.groupBox12.PerformLayout();
-            this.groupBox13.ResumeLayout(false);
-            this.groupBox13.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 

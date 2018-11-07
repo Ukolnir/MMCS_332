@@ -28,18 +28,21 @@ namespace Task_3
 
             pictureBox1.Image = new Bitmap(pictureBox1.Width, pictureBox1.Height);
             g = Graphics.FromImage(pictureBox1.Image);
-            g.ScaleTransform(1, -1);
-            g.TranslateTransform(pictureBox1.Width / 2, -pictureBox1.Height / 2);
+            //g.ScaleTransform(1, -1);
+            //g.TranslateTransform(pictureBox1.Width / 2, -pictureBox1.Height / 2);
+            g.TranslateTransform(pictureBox1.Width / 2, pictureBox1.Height / 2);
 
             pictureBox2.Image = new Bitmap(pictureBox2.Width, pictureBox2.Height);
             g2 = Graphics.FromImage(pictureBox2.Image);
-            g2.ScaleTransform(1, -1);
-            g2.TranslateTransform(pictureBox2.Width / 2, -pictureBox2.Height / 2);
+            //g2.ScaleTransform(1, -1);
+            //g2.TranslateTransform(pictureBox2.Width / 2, -pictureBox2.Height / 2);
+            g2.TranslateTransform(pictureBox2.Width / 2, pictureBox2.Height / 2);
 
             pictureBox3.Image = new Bitmap(pictureBox3.Width, pictureBox3.Height);
             g3 = Graphics.FromImage(pictureBox3.Image);
-            g3.ScaleTransform(1, -1);
-            g3.TranslateTransform(pictureBox3.Width / 2, -pictureBox3.Height / 2);
+            //g3.ScaleTransform(1, -1);
+            //g3.TranslateTransform(pictureBox3.Width / 2, -pictureBox3.Height / 2);
+            g3.TranslateTransform(pictureBox3.Width / 2, pictureBox3.Height / 2);
 
             write_axes1();
 			write_axes2();
@@ -123,8 +126,10 @@ namespace Task_3
             g3.DrawLine(my_pen, o, y);
             my_pen.Color = Color.Green;
             g3.DrawLine(my_pen, o, z);
-
-            PointPol newp = new PointPol(-50, 50, -50);
+                
+            PointPol newp = new PointPol(Double.Parse(textBoxViewVectorX.Text)*50,
+                Double.Parse(textBoxViewVectorY.Text)*50, 
+                Double.Parse(textBoxViewVectorZ.Text)*50);
             Point newpp = newp.To2D(phi_a, psi_a);
             g3.DrawEllipse(new Pen(Color.Red), newpp.X - 1, newpp.Y - 1, 2, 2);
 
@@ -635,7 +640,8 @@ namespace Task_3
         private void pictureBox2_MouseMove(object sender, MouseEventArgs e)
         {
             int x = e.X - pictureBox2.Width / 2;
-            int y = pictureBox2.Height / 2 - e.Y;
+            //int y = pictureBox2.Height / 2 - e.Y;
+            int y = e.Y - pictureBox2.Height / 2;
             labelDebug2.Text = "x = " + x.ToString() + " | y = " + y.ToString();
         }
 
@@ -668,7 +674,8 @@ namespace Task_3
         private void pictureBox2_MouseClick(object sender, MouseEventArgs e)
         {
             int x = e.X - pictureBox2.Width/2;
-            int y = pictureBox2.Height/2 - e.Y;
+            //int y = pictureBox2.Height/2 - e.Y;
+            int y = e.Y - pictureBox2.Height / 2;
             int z = 0;
             x = x - (x % 7);
             y = y - (y % 7);
@@ -883,7 +890,7 @@ namespace Task_3
         }
 
         //Изометрическая проекция   
-
+        /*
         public Point To2D()
         {
             double[,] displayMatrix = new double[4, 4] { 
@@ -895,6 +902,30 @@ namespace Task_3
             int x = Convert.ToInt32(temp[0, 0]);
             int y = Convert.ToInt32(temp[1, 0]);
    
+            var temp2d = new Point(x, y);
+            return temp2d;
+        }*/
+
+        public Point To2D()
+        {
+            double phi = Math.PI / 180 * 145;
+            double psi = Math.PI / 180 * 45;
+            double[,] displayMatrix1 = new double[4, 4] {
+                { 1, 0, 0, 0 },
+                { 0, Math.Cos(phi), Math.Sin(phi), 0 },
+                { 0, -Math.Sin(phi), Math.Cos(phi), 0 },
+                { 0, 0, 0, 1 } };
+            double[,] displayMatrix2 = new double[4, 4] {
+                { Math.Cos(psi), 0, -Math.Sin(psi), 0 },
+                { 0, 1, 0, 0 },
+                { Math.Sin(psi), 0, Math.Cos(psi), 0 },
+                { 0, 0, 0, 1 } };
+
+            var displayMatrix = matrix_multiplication(displayMatrix1, displayMatrix2);
+            var temp = matrix_multiplication(displayMatrix, getP1());
+            int x = Convert.ToInt32(temp[0, 0]);
+            int y = Convert.ToInt32(temp[1, 0]);
+
             var temp2d = new Point(x, y);
             return temp2d;
         }
