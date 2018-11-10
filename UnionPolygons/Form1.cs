@@ -14,6 +14,7 @@ namespace UnionPolygons
     {
         Bitmap bmp;
         List<Point> UNION = new List<Point>();
+        Pen pen_union = new Pen(Color.Red, 2);
         public Form1()
         {
             InitializeComponent();
@@ -22,6 +23,7 @@ namespace UnionPolygons
             Clear();
             g = Graphics.FromImage(bmp);
             pictureBox1.Image = bmp;
+            g.TranslateTransform(1, -1);
         }
 
         private void Clear()
@@ -127,12 +129,6 @@ namespace UnionPolygons
             
             if (yb * xa - xb * ya > 0)
                 return true;
-           /* else
-                if (yb * xa - xb * ya < 0)
-                    label5.Text += " правее";
-                else
-                    label5.Text += " лежит на прямой";*/
-
 			return false;
 		}
 
@@ -144,6 +140,7 @@ namespace UnionPolygons
                 UNION.Add(temp);
                 temp = next(ref src, temp);
             }
+            UNION.Add(intersection);
         }
         
         //Функция возвращает следущую точку списка, если конец списка -> возвращает начало
@@ -172,7 +169,7 @@ namespace UnionPolygons
         {
             var general_min = general.OrderBy(x => x.X).ThenBy(x => x.Y).First();
             var newPol_min = newPolygon.OrderBy(x => x.X).ThenBy(x => x.Y).First();
-            bool flag = true;
+            bool flag_pol = true;
             var intersect = general.Intersect(newPolygon).ToList();
             Point start_point;
             if (general_min == newPol_min || general_min.X < newPol_min.X ||
@@ -180,26 +177,101 @@ namespace UnionPolygons
                 start_point = general_min;
             else{
                 start_point = newPol_min;
-                flag = false;
+                flag_pol = false;
             }
 
+            int cnt_op = 3;
+
             List<Point> work_lst;
-            if (flag)
+            if (flag_pol)
                 work_lst = general;
             else
                 work_lst = newPolygon;
             Point t = start_point;
             foreach (var i in intersect){
+                if (cnt_op == 0)
+                    break;
                 add_points(ref work_lst, t, i);
-                //От пересечения взять по текущему списку точку, относительно образованной прямой выяснить,
-                //являются ли следущая или предыдущая точка в другом списке от пересечения левее образованной прямой. 
-                //Если является - сменить work_lst. Если нет - идти дальше по текущему списку
-            
+                Point current_point;
+                if (flag_pol){
+                    current_point = next(ref general, i);
+                    Point check_now = next(ref newPolygon, i);
+                    if (check_dir(check_now, Tuple.Create(i, current_point)))
+                    {
+                        work_lst = newPolygon;
+                        flag_pol = false;
+                        t = check_now;
+                    }
+                    else
+                    {
+                        check_now = prev(ref newPolygon, i);
+                        if (check_dir(check_now, Tuple.Create(i, current_point)))
+                        {
+                            textBox2.Text = "Пошло сюда";
+                            work_lst = newPolygon;
+                            flag_pol = false;
+                            t = check_now;
+                        }
+                        else
+                            t = current_point;
+                    }
+                }
+                else {
+                    current_point = next(ref newPolygon, i);
+                    Point check_now = next(ref general, i);
+                    if (check_dir(check_now, Tuple.Create(i, current_point)))
+                    {
+                        work_lst = general;
+                        flag_pol = true;
+                        t = check_now;
+                    }
+                    else
+                    {
+                        check_now = prev(ref general, i);
+                        if (check_dir(check_now, Tuple.Create(i, current_point)))
+                        {
+                            work_lst = general;
+                            flag_pol = true;
+                            t = check_now;
+                        }
+                        else
+                            t = current_point;
+                    }
+                }
+                --cnt_op;
             }
 
+            if (cnt_op != 0)
+            {
 
-           
+                if (flag_pol)
+                {
+                    if (UNION.Count == 0)
+                        UNION.Add(next(ref general, general.First()));
+                    add_points(ref general, UNION.Last(), general.First());
+                }
+                else
+                {
+                    if (UNION.Count == 0)
+                        UNION.Add(newPolygon.First());
+                    add_points(ref newPolygon, UNION.Last(), newPolygon.First());
+                }
+            }
+            foreach (var i in UNION)
+                textBox1.Text += "(" + i.X + "; " + i.Y + ")   ";
 
+            g.DrawLines(pen_union, UNION.ToArray());
+            pictureBox1.Image = bmp;
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            Clear();
+            general.Clear();
+            newPolygon.Clear();
+            UNION.Clear();
+            twoPolygons = false;
+            flag = false;
         }
     }
 }
