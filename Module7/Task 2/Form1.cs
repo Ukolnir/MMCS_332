@@ -53,7 +53,8 @@ namespace Task_2
             pictureBox1.Image = pictureBox1.Image;
             figures.Clear();
 
-            comboBox4.SelectedItem = "...";
+            comboBox4.SelectedItem = "Гексаэдр";
+            comboBox3.SelectedItem = "Ортогональная по Z";
             button4.Visible = false;
             button5.Visible = false;
             button6.Visible = false;
@@ -80,16 +81,6 @@ namespace Task_2
         private void button2_Click(object sender, EventArgs e)
         {
             Clear();
-        }
-
-        public double[,] matrix_multiplication(double[,] m1, double[,] m2)
-        {
-            double[,] res = new double[m1.GetLength(0), m2.GetLength(1)];
-            for (int i = 0; i < m1.GetLength(0); ++i)
-                for (int j = 0; j < m2.GetLength(1); ++j)
-                    for (int k = 0; k < m2.GetLength(0); k++)
-                        res[i, j] += m1[i, k] * m2[k, j];
-            return res;
         }
 
         private Polygon parseString( string s, ref List<PointPol> points, ref int cnt)
@@ -132,8 +123,8 @@ namespace Task_2
             }
 
             figures.Add(new Polyhedron(pols, points));
-            pols.Clear();
-            points.Clear();
+            //pols.Clear();
+            //points.Clear();
         }
 
         private Polyhedron createCubs()
@@ -218,8 +209,8 @@ namespace Task_2
 			}
 			int[] res;
 			double a = (double)(d1 - d0) / (i1 - i0);
-			double val = d0;
-			if (i0 > i1)
+            double val = d0;
+            if (i0 > i1)
 			{
 				int c = i0;
 				i0 = i1;
@@ -227,60 +218,60 @@ namespace Task_2
 			}
 
 			res = new int[i1 - i0 + 1];
-			d1 = 0;
+		
+            int ind = 0;
 			for (int i = i0; i <= i1; i++)
 			{
-				res[d1] = d0;
+				res[ind] = (int)(val + 0.5);
 				val += a;
-				d0 = (int)val;
-				++d1;
+				++ind;
 			}
 
 
 			return res;
 		}
 
-		private void swap(ref Point p1, ref Point p2)
+		private void swap(ref PointPol p1, ref PointPol p2)
 		{
-			Point c = p1;
+			PointPol c = p1;
 			p1 = p2;
 			p2 = c;
 		}
 
-		private void DrawShadedTriangle(PointPol p0, PointPol p1, PointPol p2, string s, ref List<Tuple<Point,double>> pixels )
+		private void DrawShadedTriangle(PointPol p0, PointPol p1, PointPol p2, string s, ref List<Tuple<PointPol,double>> pixels )
 		{
-			Point P0 = p0.To2D(s);
-			Point P1 = p1.To2D(s);
-			Point P2 = p2.To2D(s);
-
-			// Сортировка точек так, что y0 <= y1 <= y2
-			if (P1.Y < P0.Y)
+            PointPol P0 = p0;
+            PointPol P1 = p1;
+            PointPol P2 = p2;
+            // Сортировка точек так, что y0 <= y1 <= y2
+            if (P1.Y < P0.Y)
 				{ swap(ref P1, ref P0); }
 			if (P2.Y < P0.Y)
 				{ swap(ref P2, ref P0); }
 			if (P2.Y < P1.Y)
 				{ swap(ref P2, ref P1); }
 
-			int z0 = (int)p0.Z;
-			if (z0 != 0)
+			int z0 = (int)P0.Z;
+			/*if (z0 != 0)
 				z0 = 1 / z0 * 1000000;
-
-			int z1 = (int)p1.Z;
-			if (z1 != 0)
+                */
+			int z1 = (int)P1.Z;
+		/*	if (z1 != 0)
 				z1 = 1 / z1 * 1000000;
 
-			int z2 = (int)p2.Z;
-			if (z2 != 0)
+    */
+			int z2 = (int)P2.Z;
+		/*	if (z2 != 0)
 				z2 = 1 / z2 * 1000000;
-
+                */
 			// Вычисление координат x и значений h для рёбер треугольника
-			int[] x01 = Interpolate(P0.Y, P0.X, P1.Y, P1.X);
-			int[] h01 = Interpolate(P0.Y, z0, P1.Y, z1);
-			int[] x12 = Interpolate(P1.Y, P1.X, P2.Y, P2.X);
-			int[] h12 = Interpolate(P1.Y, z1, P2.Y, z2);
+			int[] x01 = Interpolate((int)P0.Y, (int)P0.X, (int)P1.Y, (int)P1.X);
+			int[] h01 = Interpolate((int)P0.Y, z0, (int)P1.Y, z1);
+			int[] x12 = Interpolate((int)P1.Y, (int)P1.X, (int)P2.Y, (int)P2.X);
+			int[] h12 = Interpolate((int)P1.Y, z1, (int)P2.Y, z2);
 
-			int[] x02 = Interpolate(P0.Y, P0.X, P2.Y, P2.X);
-			int[] h02 = Interpolate(P0.Y, z0, P2.Y, z2);
+			int[] x02 = Interpolate((int)P0.Y, (int)P0.X, (int)P2.Y, (int)P2.X);
+			int[] h02 = Interpolate((int)P0.Y, z0, (int)P2.Y, z2);
 
 			x01 = x01.Take(x01.Count() - 1).ToArray();
 			int[] x012 = x01.Concat(x12).ToArray();
@@ -313,18 +304,18 @@ namespace Task_2
 		}
 
 		// Отрисовка горизонтальных отрезков
-			for (int y = P0.Y; y <= P2.Y; ++y)
+			for (int y = (int)P0.Y; y <= (int)P2.Y; ++y)
 			{
-				int x_l = x_left[y - P0.Y];
-				int x_r = x_right[y - P0.Y];
+				int x_l = x_left[y - (int)P0.Y];
+				int x_r = x_right[y - (int)P0.Y];
 
-				int[] h_segment = Interpolate(x_l, h_left[y - P0.Y], x_r, h_right[y - P0.Y]);
+				int[] h_segment = Interpolate(x_l, h_left[y - (int)P0.Y], x_r, h_right[y - (int)P0.Y]);
 		
 				for (int x = x_l; x <= x_r; ++x)
 				{
 					
 				    double ourZ = h_segment[x - x_l];
-					pixels.Add(Tuple.Create(new Point(x, y), ourZ));
+					pixels.Add(Tuple.Create(new PointPol(x, y, ourZ), ourZ));
 
 				}
 			}
@@ -332,9 +323,9 @@ namespace Task_2
 
 
 
-		private List<Tuple<Point, double>> rastr(Polygon p, List<PointPol> points, string ax)
+		private List<Tuple<PointPol, double>> rastr(Polygon p, List<PointPol> points, string ax)
         {
-			List<Tuple<Point, double>> pixels = new List<Tuple<Point, double>>();
+			List<Tuple<PointPol, double>> pixels = new List<Tuple<PointPol, double>>();
 			if (p.edges.Count() == 4)
 			{
 				int n1 = p.edges[0].nP1;
@@ -361,9 +352,9 @@ namespace Task_2
 			return pixels;
         }
 
-        private List<List<Tuple<Point, double>>> rastrAll(string ax)
+        private List<List<Tuple<PointPol, double>>> rastrAll(string ax)
         {
-            List<List<Tuple<Point,double>>> pixelsPol = new List<List<Tuple<Point,double>>>();
+            List<List<Tuple<PointPol,double>>> pixelsPol = new List<List<Tuple<PointPol,double>>>();
 
             foreach (var f in figures)
                 foreach (var p in f.pol)
@@ -379,7 +370,7 @@ namespace Task_2
 			public pix(int z1, Color c1) { z = z1; c = c1; }
 		}
 
-		private pix[,] Z_buffer(List<List<Tuple<Point, double>>> pixels)
+		private pix[,] Z_buffer(List<List<Tuple<PointPol, double>>> pixels)
 		{
 			pix[,] buff = new pix[pictureBox1.Width, pictureBox1.Height];
 			for (int i = 0; i < pictureBox1.Width; ++i)
@@ -388,14 +379,17 @@ namespace Task_2
 
 			int wh = 0;
 
-			for (int i = 0; i < pixels.Count(); ++i)
-				foreach (var p in pixels[i])
-					if (wh + p.Item1.X > -1 && wh + p.Item1.X < pictureBox1.Width && p.Item1.Y > -1 && p.Item1.Y < pictureBox1.Height && buff[wh + p.Item1.X, p.Item1.Y].z > p.Item2)
-					{
-						buff[wh + p.Item1.X, p.Item1.Y].z = (int)p.Item2;
-						buff[wh + p.Item1.X, p.Item1.Y].c = Color.FromArgb(((i + 1) * 20)%255, ((i + 1) * 10) % 255, ((i + 1) * 50) % 255);
-					}
+            for (int i = 0; i < pixels.Count(); ++i)
+                foreach (var p1 in pixels[i])
+                {
+                    Point p = p1.Item1.To2D(comboBox3.SelectedItem.ToString());
 
+                    if (wh + p.X > -1 && wh + p.X < pictureBox1.Width && p.Y > -1 && p.Y < pictureBox1.Height && buff[wh + p.X, p.Y].z > p1.Item2)
+                    {
+                        buff[wh + p.X, p.Y].z = (int)p1.Item2;
+                        buff[wh + p.X, p.Y].c = Color.FromArgb(((i + 1) * 20) % 255, ((i + 1) * 10) % 255, ((i + 1) * 50) % 255);
+                    }
+                }
 			return buff;
 		}
 
@@ -407,7 +401,7 @@ namespace Task_2
 			string axis = comboBox3.SelectedItem.ToString();
 
 			Bitmap img = (Bitmap)pictureBox1.Image;
-			List<List<Tuple<Point, double>>> pixels = rastrAll(axis);
+			List<List<Tuple<PointPol, double>>> pixels = rastrAll(axis);
 			pix[,] b = Z_buffer(pixels);
 
 			for (int i = 0; i < pictureBox1.Width; ++i)
@@ -510,8 +504,6 @@ namespace Task_2
     {
         public double X, Y, Z, W;
 
-        Form1 _form = new Form1();
-
         public PointPol(double x, double y, double z)
         {
             X = x; Y = y; Z = z; W = 1;
@@ -537,15 +529,24 @@ namespace Task_2
             return new double[4, 1] { { X }, { Y }, { Z }, { W } };
         }
 
+        public double[,] matrix_multiplication(double[,] m1, double[,] m2)
+        {
+            double[,] res = new double[m1.GetLength(0), m2.GetLength(1)];
+            for (int i = 0; i < m1.GetLength(0); ++i)
+                for (int j = 0; j < m2.GetLength(1); ++j)
+                    for (int k = 0; k < m2.GetLength(0); k++)
+                        res[i, j] += m1[i, k] * m2[k, j];
+            return res;
+        }
 
         public PointPol scale(double ind_scale, double a, double b, double c)
         {
             double[,] transfer = new double[4, 4] { { 1, 0, 0, 0 }, { 0, 1, 0, 0 }, { 0, 0, 1, 0 }, { -a, -b, -c, 1 } };
-            var t1 = _form.matrix_multiplication(getP(), transfer);
+            var t1 = matrix_multiplication(getP(), transfer);
 
-            t1 = _form.matrix_multiplication(t1, new double[4, 4] { { ind_scale, 0, 0, 0 }, { 0, ind_scale, 0, 0 }, { 0, 0, ind_scale, 0 }, { 0, 0, 0, 1 } });
+            t1 = matrix_multiplication(t1, new double[4, 4] { { ind_scale, 0, 0, 0 }, { 0, ind_scale, 0, 0 }, { 0, 0, ind_scale, 0 }, { 0, 0, 0, 1 } });
             transfer = new double[4, 4] { { 1, 0, 0, 0 }, { 0, 1, 0, 0 }, { 0, 0, 1, 0 }, { a, b, c, 1 } };
-            t1 = _form.matrix_multiplication(t1, transfer);
+            t1 = matrix_multiplication(t1, transfer);
 
             return translatePol(t1);
         }
@@ -578,9 +579,9 @@ namespace Task_2
                 { l*(1-Math.Cos(phi))*m - n*Math.Sin(phi), m*m+Math.Cos(phi)*(1 - m*m), m*(1-Math.Cos(phi))*n + l*Math.Sin(phi), 0 },
                 { l*(1-Math.Cos(phi))*n + m*Math.Sin(phi), m*(1-Math.Cos(phi))*n - l*Math.Sin(phi), n*n+Math.Cos(phi)*(1 - n*n), 0 },
                 { 0, 0, 0, 1 } };
-            var t1 = _form.matrix_multiplication(p.getP(), transfer);
+            var t1 = matrix_multiplication(p.getP(), transfer);
 
-            t1 = _form.matrix_multiplication(t1, transfer);
+            t1 = matrix_multiplication(t1, transfer);
 
             PointPol p2 = translatePol(t1);
             PointPol p3 = p2.shift(a, b, c);
@@ -601,7 +602,7 @@ namespace Task_2
         public PointPol shift(double x, double y, double z)
         {
             double[,] shiftMatrix = new double[4, 4] { { 1, 0, 0, x }, { 0, 1, 0, y }, { 0, 0, 1, z }, { 0, 0, 0, 1 } };
-            return translatePol1(_form.matrix_multiplication(shiftMatrix, getPol()));
+            return translatePol1(matrix_multiplication(shiftMatrix, getPol()));
         }
         //Изометрическая проекция
         public Point To2D(string display)
@@ -611,7 +612,7 @@ namespace Task_2
             if (display == "Ортогональная по Z")
                 displayMatrix = new double[4, 4] { { 1, 0, 0, 0 }, { 0, 1, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 1 } };
 
-            var temp = _form.matrix_multiplication(displayMatrix, getP1());
+            var temp = matrix_multiplication(displayMatrix, getP1());
             var temp2d = new Point(Convert.ToInt32(temp[0, 0]), Convert.ToInt32(temp[1, 0]));
             return temp2d;
         }
