@@ -818,6 +818,22 @@ namespace Task_3
         {
             return (vec1.X * vec2.X + vec1.Y * vec2.Y + vec1.Z * vec2.Z);
         }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            double view_x = double.Parse(textBoxViewVectorX.Text);
+            double view_y = double.Parse(textBoxViewVectorY.Text);
+            double view_z = double.Parse(textBoxViewVectorZ.Text);
+
+            double x = double.Parse(textBox1.Text);
+            double y = double.Parse(textBox2.Text);
+            double z = double.Parse(textBox3.Text);
+
+            PointPol v = new PointPol(view_x, view_y, view_z);
+
+            Camera cam = new Camera(x, y, z, v);
+            reDrawPols(cam.phi, cam.psi, v);
+        }
     }
 
 
@@ -1124,23 +1140,6 @@ namespace Task_3
             return (pointsEqual(e1.P1, e2.P1) && pointsEqual(e1.P2, e2.P2)) ||
                 (pointsEqual(e1.P1, e2.P2) && pointsEqual(e1.P2, e2.P1));
         }
-        /*
-        public void find_center(ref double x, ref double y, ref double z)
-        {
-            x = 0; y = 0; z = 0;
-
-            foreach (var p in points)
-            {
-                x += p.X;
-                y += p.Y;
-                z += p.Z;
-            }
-
-            x /= points.Count();
-            y /= points.Count();
-            z /= points.Count();
-        }
-        */
 
         public void find_center(ref double x, ref double y, ref double z)
         {

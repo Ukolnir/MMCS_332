@@ -92,6 +92,12 @@
             this.hScrollBar2 = new System.Windows.Forms.HScrollBar();
             this.buttonPlus = new System.Windows.Forms.Button();
             this.buttonMinus = new System.Windows.Forms.Button();
+            this.groupBox14 = new System.Windows.Forms.GroupBox();
+            this.textBox1 = new System.Windows.Forms.TextBox();
+            this.textBox2 = new System.Windows.Forms.TextBox();
+            this.textBox3 = new System.Windows.Forms.TextBox();
+            this.groupBox15 = new System.Windows.Forms.GroupBox();
+            this.button3 = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
@@ -109,6 +115,8 @@
             this.groupBox11.SuspendLayout();
             this.groupBox10.SuspendLayout();
             this.groupBox12.SuspendLayout();
+            this.groupBox14.SuspendLayout();
+            this.groupBox15.SuspendLayout();
             this.SuspendLayout();
             // 
             // pictureBox1
@@ -174,7 +182,7 @@
             this.label1.AutoSize = true;
             this.label1.Location = new System.Drawing.Point(12, 22);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(90, 15);
+            this.label1.Size = new System.Drawing.Size(81, 13);
             this.label1.TabIndex = 15;
             this.label1.Text = "Ось вращения";
             // 
@@ -192,7 +200,7 @@
             this.label7.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.label7.Location = new System.Drawing.Point(105, 72);
             this.label7.Name = "label7";
-            this.label7.Size = new System.Drawing.Size(113, 16);
+            this.label7.Size = new System.Drawing.Size(90, 13);
             this.label7.TabIndex = 67;
             this.label7.Text = "Введите угол:";
             // 
@@ -202,7 +210,7 @@
             this.label8.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.label8.Location = new System.Drawing.Point(92, 16);
             this.label8.Name = "label8";
-            this.label8.Size = new System.Drawing.Size(172, 16);
+            this.label8.Size = new System.Drawing.Size(139, 13);
             this.label8.TabIndex = 66;
             this.label8.Text = "Введите координаты: ";
             // 
@@ -464,7 +472,7 @@
             this.labelDebug.AutoSize = true;
             this.labelDebug.Location = new System.Drawing.Point(12, 558);
             this.labelDebug.Name = "labelDebug";
-            this.labelDebug.Size = new System.Drawing.Size(71, 15);
+            this.labelDebug.Size = new System.Drawing.Size(61, 13);
             this.labelDebug.TabIndex = 75;
             this.labelDebug.Text = "labelDebug";
             // 
@@ -473,7 +481,7 @@
             this.labelDebug2.AutoSize = true;
             this.labelDebug2.Location = new System.Drawing.Point(12, 580);
             this.labelDebug2.Name = "labelDebug2";
-            this.labelDebug2.Size = new System.Drawing.Size(41, 15);
+            this.labelDebug2.Size = new System.Drawing.Size(35, 13);
             this.labelDebug2.TabIndex = 76;
             this.labelDebug2.Text = "label2";
             // 
@@ -648,7 +656,7 @@
             this.label4.AutoSize = true;
             this.label4.Location = new System.Drawing.Point(6, 76);
             this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(14, 15);
+            this.label4.Size = new System.Drawing.Size(14, 13);
             this.label4.TabIndex = 5;
             this.label4.Text = "Z";
             // 
@@ -657,7 +665,7 @@
             this.label3.AutoSize = true;
             this.label3.Location = new System.Drawing.Point(6, 48);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(14, 15);
+            this.label3.Size = new System.Drawing.Size(14, 13);
             this.label3.TabIndex = 4;
             this.label3.Text = "Y";
             // 
@@ -666,7 +674,7 @@
             this.label2.AutoSize = true;
             this.label2.Location = new System.Drawing.Point(6, 19);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(15, 15);
+            this.label2.Size = new System.Drawing.Size(14, 13);
             this.label2.TabIndex = 3;
             this.label2.Text = "X";
             // 
@@ -696,7 +704,7 @@
             // 
             // hScrollBar1
             // 
-            this.hScrollBar1.Location = new System.Drawing.Point(737, 368);
+            this.hScrollBar1.Location = new System.Drawing.Point(148, 16);
             this.hScrollBar1.Maximum = 360;
             this.hScrollBar1.Name = "hScrollBar1";
             this.hScrollBar1.Size = new System.Drawing.Size(304, 24);
@@ -706,7 +714,7 @@
             // 
             // hScrollBar2
             // 
-            this.hScrollBar2.Location = new System.Drawing.Point(737, 407);
+            this.hScrollBar2.Location = new System.Drawing.Point(148, 42);
             this.hScrollBar2.Maximum = 360;
             this.hScrollBar2.Name = "hScrollBar2";
             this.hScrollBar2.Size = new System.Drawing.Size(304, 24);
@@ -716,7 +724,7 @@
             // 
             // buttonPlus
             // 
-            this.buttonPlus.Location = new System.Drawing.Point(737, 450);
+            this.buttonPlus.Location = new System.Drawing.Point(148, 69);
             this.buttonPlus.Name = "buttonPlus";
             this.buttonPlus.Size = new System.Drawing.Size(88, 23);
             this.buttonPlus.TabIndex = 84;
@@ -726,7 +734,7 @@
             // 
             // buttonMinus
             // 
-            this.buttonMinus.Location = new System.Drawing.Point(737, 479);
+            this.buttonMinus.Location = new System.Drawing.Point(148, 93);
             this.buttonMinus.Name = "buttonMinus";
             this.buttonMinus.Size = new System.Drawing.Size(75, 23);
             this.buttonMinus.TabIndex = 85;
@@ -734,15 +742,73 @@
             this.buttonMinus.UseVisualStyleBackColor = true;
             this.buttonMinus.Click += new System.EventHandler(this.buttonMinus_Click);
             // 
+            // groupBox14
+            // 
+            this.groupBox14.Controls.Add(this.button3);
+            this.groupBox14.Controls.Add(this.groupBox15);
+            this.groupBox14.Controls.Add(this.hScrollBar1);
+            this.groupBox14.Controls.Add(this.buttonMinus);
+            this.groupBox14.Controls.Add(this.hScrollBar2);
+            this.groupBox14.Controls.Add(this.buttonPlus);
+            this.groupBox14.Location = new System.Drawing.Point(737, 363);
+            this.groupBox14.Name = "groupBox14";
+            this.groupBox14.Size = new System.Drawing.Size(455, 256);
+            this.groupBox14.TabIndex = 86;
+            this.groupBox14.TabStop = false;
+            this.groupBox14.Text = "Камера";
+            // 
+            // textBox1
+            // 
+            this.textBox1.Location = new System.Drawing.Point(6, 33);
+            this.textBox1.Name = "textBox1";
+            this.textBox1.Size = new System.Drawing.Size(36, 20);
+            this.textBox1.TabIndex = 86;
+            this.textBox1.Text = "1";
+            // 
+            // textBox2
+            // 
+            this.textBox2.Location = new System.Drawing.Point(6, 59);
+            this.textBox2.Name = "textBox2";
+            this.textBox2.Size = new System.Drawing.Size(36, 20);
+            this.textBox2.TabIndex = 87;
+            this.textBox2.Text = "1";
+            // 
+            // textBox3
+            // 
+            this.textBox3.Location = new System.Drawing.Point(6, 90);
+            this.textBox3.Name = "textBox3";
+            this.textBox3.Size = new System.Drawing.Size(36, 20);
+            this.textBox3.TabIndex = 88;
+            this.textBox3.Text = "1";
+            // 
+            // groupBox15
+            // 
+            this.groupBox15.Controls.Add(this.textBox1);
+            this.groupBox15.Controls.Add(this.textBox3);
+            this.groupBox15.Controls.Add(this.textBox2);
+            this.groupBox15.Location = new System.Drawing.Point(6, 28);
+            this.groupBox15.Name = "groupBox15";
+            this.groupBox15.Size = new System.Drawing.Size(87, 126);
+            this.groupBox15.TabIndex = 89;
+            this.groupBox15.TabStop = false;
+            this.groupBox15.Text = "Положение камеры";
+            // 
+            // button3
+            // 
+            this.button3.Location = new System.Drawing.Point(6, 156);
+            this.button3.Name = "button3";
+            this.button3.Size = new System.Drawing.Size(87, 25);
+            this.button3.TabIndex = 90;
+            this.button3.Text = "Init";
+            this.button3.UseVisualStyleBackColor = true;
+            this.button3.Click += new System.EventHandler(this.button3_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1203, 659);
-            this.Controls.Add(this.buttonMinus);
-            this.Controls.Add(this.buttonPlus);
-            this.Controls.Add(this.hScrollBar2);
-            this.Controls.Add(this.hScrollBar1);
+            this.Controls.Add(this.groupBox14);
             this.Controls.Add(this.groupBox12);
             this.Controls.Add(this.groupBox9);
             this.Controls.Add(this.button1);
@@ -791,6 +857,9 @@
             this.groupBox10.PerformLayout();
             this.groupBox12.ResumeLayout(false);
             this.groupBox12.PerformLayout();
+            this.groupBox14.ResumeLayout(false);
+            this.groupBox15.ResumeLayout(false);
+            this.groupBox15.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -861,6 +930,12 @@
         private System.Windows.Forms.HScrollBar hScrollBar2;
         private System.Windows.Forms.Button buttonPlus;
         private System.Windows.Forms.Button buttonMinus;
+        private System.Windows.Forms.GroupBox groupBox14;
+        private System.Windows.Forms.GroupBox groupBox15;
+        private System.Windows.Forms.TextBox textBox1;
+        private System.Windows.Forms.TextBox textBox3;
+        private System.Windows.Forms.TextBox textBox2;
+        private System.Windows.Forms.Button button3;
     }
 }
 
