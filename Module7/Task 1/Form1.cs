@@ -18,6 +18,7 @@ namespace Task_3
         List<Polygon> pols_rotate = new List<Polygon>();
 		List<Polygon> fig = new List<Polygon>();
         bool fig_drawed = false;
+        double ind = 1;
 
 		public Form1()
         {
@@ -28,22 +29,25 @@ namespace Task_3
 
             pictureBox1.Image = new Bitmap(pictureBox1.Width, pictureBox1.Height);
             g = Graphics.FromImage(pictureBox1.Image);
-            g.ScaleTransform(1, -1);
-            g.TranslateTransform(pictureBox1.Width / 2, -pictureBox1.Height / 2);
+            //g.ScaleTransform(1, -1);
+            //g.TranslateTransform(pictureBox1.Width / 2, -pictureBox1.Height / 2);
+            g.TranslateTransform(pictureBox1.Width / 2, pictureBox1.Height / 2);
 
             pictureBox2.Image = new Bitmap(pictureBox2.Width, pictureBox2.Height);
             g2 = Graphics.FromImage(pictureBox2.Image);
             g2.ScaleTransform(1, -1);
             g2.TranslateTransform(pictureBox2.Width / 2, -pictureBox2.Height / 2);
+            //g2.TranslateTransform(pictureBox2.Width / 2, pictureBox2.Height / 2);
 
             pictureBox3.Image = new Bitmap(pictureBox3.Width, pictureBox3.Height);
             g3 = Graphics.FromImage(pictureBox3.Image);
-            g3.ScaleTransform(1, -1);
-            g3.TranslateTransform(pictureBox3.Width / 2, -pictureBox3.Height / 2);
+            //g3.ScaleTransform(1, -1);
+            //g3.TranslateTransform(pictureBox3.Width / 2, -pictureBox3.Height / 2);
+            g3.TranslateTransform(pictureBox3.Width / 2, pictureBox3.Height / 2);
 
             write_axes1();
 			write_axes2();
-            write_axes3(phi_a, psi_a);
+            write_axes3(phi_a, psi_a, ind);
         }
 
         public void find_center(List<PointPol> pol, ref double x, ref double y, ref double z)
@@ -98,12 +102,12 @@ namespace Task_3
 			pictureBox2.Image = pictureBox2.Image;
 		}
 
-        public void write_axes3(double phi_a, double psi_a)
+        public void write_axes3(double phi_a, double psi_a, double ind)
         {
             PointPol p0 = new PointPol(0, 0, 0);
-            PointPol p1 = new PointPol(pictureBox3.Width / 2, 0, 0);
-            PointPol p2 = new PointPol(0, pictureBox3.Width / 2, 0);
-            PointPol p3 = new PointPol(0, 0, pictureBox3.Width / 2);
+            PointPol p1 = new PointPol(pictureBox3.Width / 2*ind, 0, 0);
+            PointPol p2 = new PointPol(0, pictureBox3.Width / 2*ind, 0);
+            PointPol p3 = new PointPol(0, 0, pictureBox3.Width / 2*ind);
 
             Point o = p0.To2D(phi_a, psi_a);
             Point x = p1.To2D(phi_a, psi_a);
@@ -123,8 +127,10 @@ namespace Task_3
             g3.DrawLine(my_pen, o, y);
             my_pen.Color = Color.Green;
             g3.DrawLine(my_pen, o, z);
-
-            PointPol newp = new PointPol(-50, 50, -50);
+                
+            PointPol newp = new PointPol(Double.Parse(textBoxViewVectorX.Text)*50,
+                Double.Parse(textBoxViewVectorY.Text)*50, 
+                Double.Parse(textBoxViewVectorZ.Text)*50);
             Point newpp = newp.To2D(phi_a, psi_a);
             g3.DrawEllipse(new Pen(Color.Red), newpp.X - 1, newpp.Y - 1, 2, 2);
 
@@ -153,7 +159,7 @@ namespace Task_3
             g3.Clear(pictureBox3.BackColor);
             pictureBox3.Image = pictureBox3.Image;
 
-            write_axes3(phi_a, psi_a);
+            write_axes3(phi_a, psi_a, ind);
         }
 
         private void button2_Click(object sender, EventArgs e)
@@ -189,7 +195,7 @@ namespace Task_3
         private void drawPolygon(Polygon pol, Color c, 
             double phi_a, double psi_a, PointPol view_vector)
         {
-            List<Tuple<Point, Point>> l = pol.to2d(phi_a, psi_a);
+            List<Tuple<Point, Point>> l = pol.to2d();
             foreach (var p in l)
             {
                 //g.DrawLine(new Pen(c), p.Item1, p.Item2);
@@ -201,10 +207,9 @@ namespace Task_3
                 ps[i] = item.To2D(phi_a, psi_a);
                 ++i;
             }
-			g.DrawPolygon(new Pen(c), ps);
-			//g.FillPolygon(new SolidBrush(c), ps);
+            g.DrawPolygon(new Pen(c), ps);
 
-			if (pol.points.Count() > 2)
+            if (pol.points.Count() > 2)
             {
                 if (isVisible(pol, view_vector))
                 {
@@ -218,7 +223,7 @@ namespace Task_3
             }
         }
 
-        private bool edgesEqual(Edge e1, Edge e2)
+        private bool vectorsEqual(Vector e1, Vector e2)
         {
             return (pointsEqual(e1.P1, e2.P1) && pointsEqual(e1.P2, e2.P2)) ||
                 (pointsEqual(e1.P1, e2.P2) && pointsEqual(e1.P2, e2.P1));
@@ -234,24 +239,24 @@ namespace Task_3
             //pol.find_center(ref a, ref b, ref c);
             pol.closest_to_zero(axis, ref a, ref b, ref c);
 
-            Edge dir = new Edge(new PointPol(0, 0, 0), new PointPol(1, 0, 0));
+            Vector dir = new Vector(new PointPol(0, 0, 0), new PointPol(1, 0, 0));
             if (axis == "X")
             {
-                dir = new Edge(new PointPol(0, 0, 0), new PointPol(1, 0, 0));
+                dir = new Vector(new PointPol(0, 0, 0), new PointPol(1, 0, 0));
                 for (int i = 0; i < l1.Count(); ++i)
                     l1[i] = l1[i].shift(0, -b, 0);
                 rotate_around.X = a; rotate_around.Y = 0; rotate_around.Z = c;
             }
             if (axis == "Y")
             {
-                dir = new Edge(new PointPol(0, 0, 0), new PointPol(0, 1, 0));
+                dir = new Vector(new PointPol(0, 0, 0), new PointPol(0, 1, 0));
                 for (int i = 0; i < l1.Count(); ++i)
                     l1[i] = l1[i].shift(-a, 0, 0);
                 rotate_around.X = 0; rotate_around.Y = b; rotate_around.Z = c;
             }
             if (axis == "Z")
             {
-                dir = new Edge(new PointPol(0, 0, 0), new PointPol(0, 0, 1));
+                dir = new Vector(new PointPol(0, 0, 0), new PointPol(0, 0, 1));
                 for (int i = 0; i < l1.Count(); ++i)
                     l1[i] = l1[i].shift(0, -b, 0);
                 rotate_around.X = a; rotate_around.Y = 0; rotate_around.Z = c;
@@ -304,7 +309,7 @@ namespace Task_3
             return true;
         }
 
-        private Polygon littlePartOfFig(Edge e1, Edge e2)
+        private Polygon littlePartOfFig(Vector e1, Vector e2)
         {
             
             List<PointPol> l1 = new List<PointPol>();
@@ -312,7 +317,7 @@ namespace Task_3
             l1.Add(e1.P1);
             l1.Add(e1.P2);
 
-            if (!edgesEqual(e1, e2))
+            if (!vectorsEqual(e1, e2))
             {
                 if (!pointsEqual(e1.P2, e2.P2))
                     l1.Add(e2.P2);
@@ -330,9 +335,9 @@ namespace Task_3
             for (int i = 0; i < p1.edges.Count(); ++i)
             {
                 Polygon pol = littlePartOfFig(
-                    new Edge(p1.points[p1.edges[i].Item1],
+                    new Vector(p1.points[p1.edges[i].Item1],
                     p1.points[p1.edges[i].Item2]),
-                    new Edge(p2.points[p2.edges[i].Item1],
+                    new Vector(p2.points[p2.edges[i].Item1],
                     p2.points[p2.edges[i].Item2])
                     );
                 pol.color = Color.FromArgb(r.Next(0, 255), r.Next(0, 255), r.Next(0, 255));
@@ -452,7 +457,7 @@ namespace Task_3
         private void pictureBox1_MouseClick(object sender, MouseEventArgs e)
         {
             int x = e.X - pictureBox1.Width / 2;
-            int y = e.Y - pictureBox1.Height / 2;
+            int y = pictureBox1.Height / 2 - e.Y;
             int z = Int32.Parse(textBoxBuildZ.Text);
             double phi_a = double.Parse(textBoxPhi.Text);
             double psi_a = double.Parse(textBoxPsi.Text);
@@ -578,7 +583,7 @@ namespace Task_3
         {
             PointPol p1 = new PointPol(x1, y1, z1);
             PointPol p2 = new PointPol(x2, y2, z2);
-            Edge ed = new Edge(p1, p2);
+            Vector ed = new Vector(p1, p2);
 
             double a = 0, b = 0, c = 0;
             find_center(pols, ref a, ref b, ref c);
@@ -637,6 +642,7 @@ namespace Task_3
         {
             int x = e.X - pictureBox2.Width / 2;
             int y = pictureBox2.Height / 2 - e.Y;
+            //int y = e.Y - pictureBox2.Height / 2;
             labelDebug2.Text = "x = " + x.ToString() + " | y = " + y.ToString();
         }
 
@@ -670,6 +676,7 @@ namespace Task_3
         {
             int x = e.X - pictureBox2.Width/2;
             int y = pictureBox2.Height/2 - e.Y;
+            //int y = e.Y - pictureBox2.Height / 2;
             int z = 0;
             x = x - (x % 7);
             y = y - (y % 7);
@@ -738,7 +745,61 @@ namespace Task_3
             }
         }
 
-		private PointPol normVecOfPlane(PointPol p1, PointPol p2, PointPol p3)
+        private void hScrollBar1_ValueChanged(object sender, EventArgs e)
+        {
+            double phi_a = hScrollBar1.Value;
+            double psi_a = hScrollBar2.Value;
+            double view_x = double.Parse(textBoxViewVectorX.Text);
+            double view_y = double.Parse(textBoxViewVectorY.Text);
+            double view_z = double.Parse(textBoxViewVectorZ.Text);
+
+            reDrawPols(phi_a, psi_a, new PointPol(view_x, view_y, view_z));
+        }
+
+        private void hScrollBar2_ValueChanged(object sender, EventArgs e)
+        {
+            double phi_a = hScrollBar1.Value;
+            double psi_a = hScrollBar2.Value;
+            double view_x = double.Parse(textBoxViewVectorX.Text);
+            double view_y = double.Parse(textBoxViewVectorY.Text);
+            double view_z = double.Parse(textBoxViewVectorZ.Text);
+
+            reDrawPols(phi_a, psi_a, new PointPol(view_x, view_y, view_z));
+        }
+
+        private void buttonPlus_Click(object sender, EventArgs e)
+        {           
+            double curr_ind = 1.2;
+            ind *= curr_ind;
+            double phi_a = hScrollBar1.Value;
+            double psi_a = hScrollBar2.Value;
+            double view_x = double.Parse(textBoxViewVectorX.Text);
+            double view_y = double.Parse(textBoxViewVectorY.Text);
+            double view_z = double.Parse(textBoxViewVectorZ.Text);
+
+            scalePols(pols_rotate, curr_ind);
+            scalePols(fig, curr_ind);
+
+            reDrawPols(phi_a, psi_a, new PointPol(view_x, view_y, view_z));
+        }
+
+        private void buttonMinus_Click(object sender, EventArgs e)
+        {
+            double curr_ind = 0.83333;
+            ind *= curr_ind;
+            double phi_a = hScrollBar1.Value;
+            double psi_a = hScrollBar2.Value;
+            double view_x = double.Parse(textBoxViewVectorX.Text);
+            double view_y = double.Parse(textBoxViewVectorY.Text);
+            double view_z = double.Parse(textBoxViewVectorZ.Text);
+
+            scalePols(pols_rotate, curr_ind);
+            scalePols(fig, curr_ind);
+
+            reDrawPols(phi_a, psi_a, new PointPol(view_x, view_y, view_z));
+        }
+
+        private PointPol normVecOfPlane(PointPol p1, PointPol p2, PointPol p3)
         {
             double kx, ky, kz, d;
             double xa = p1.X, ya = p1.Y, za = p1.Z;
@@ -750,10 +811,10 @@ namespace Task_3
             kz = a21 * a32 - a22 * a31;
             d = (kx * -xa) + (ky * -ya) + (kz * -za);
 
-			return new PointPol(kx, ky, kz);
-		}
-
-		private double scalarProduct(PointPol vec1, PointPol vec2)
+            return new PointPol(kx, ky, kz);
+        }
+        
+        private double scalarProduct(PointPol vec1, PointPol vec2)
         {
             return (vec1.X * vec2.X + vec1.Y * vec2.Y + vec1.Z * vec2.Z);
         }
@@ -811,7 +872,7 @@ namespace Task_3
             return translatePol(t1);
         }
 
-        public PointPol rotate(Edge direction, double angle, double a, double b, double c)
+        public PointPol rotate(Vector direction, double angle, double a, double b, double c)
         {
             double phi = Math.PI / 360 * angle;
             PointPol p = shift(-a, -b, -c);
@@ -883,9 +944,9 @@ namespace Task_3
             return translatePol1(matrix_multiplication(shiftMatrix, getPol()));
         }
 
-		//Изометрическая проекция   
-
-		/*public Point To2D()
+        //Изометрическая проекция   
+        /*
+        public Point To2D()
         {
             double[,] displayMatrix = new double[4, 4] { 
                 { Math.Sqrt(0.5), 0, -Math.Sqrt(0.5), 0 }, 
@@ -900,31 +961,31 @@ namespace Task_3
             return temp2d;
         }*/
 
-		public Point To2D()
-		{
-			double phi = Math.PI / 180 * 35;
-			double psi = Math.PI / 180 * 45;
-			double[,] displayMatrix1 = new double[4, 4] {
-				{ 1, 0, 0, 0 },
-				{ 0, Math.Cos(phi), Math.Sin(phi), 0 },
-				{ 0, -Math.Sin(phi), Math.Cos(phi), 0 },
-				{ 0, 0, 0, 1 } };
-			double[,] displayMatrix2 = new double[4, 4] {
-				{ Math.Cos(psi), 0, -Math.Sin(psi), 0 },
-				{ 0, 1, 0, 0 },
-				{ Math.Sin(psi), 0, Math.Cos(psi), 0 },
-				{ 0, 0, 0, 1 } };
+        public Point To2D()
+        {
+            double phi = Math.PI / 180 * 145;
+            double psi = Math.PI / 180 * 45;
+            double[,] displayMatrix1 = new double[4, 4] {
+                { 1, 0, 0, 0 },
+                { 0, Math.Cos(phi), Math.Sin(phi), 0 },
+                { 0, -Math.Sin(phi), Math.Cos(phi), 0 },
+                { 0, 0, 0, 1 } };
+            double[,] displayMatrix2 = new double[4, 4] {
+                { Math.Cos(psi), 0, -Math.Sin(psi), 0 },
+                { 0, 1, 0, 0 },
+                { Math.Sin(psi), 0, Math.Cos(psi), 0 },
+                { 0, 0, 0, 1 } };
 
-			var displayMatrix = matrix_multiplication(displayMatrix1, displayMatrix2);
-			var temp = matrix_multiplication(displayMatrix, getP1());
-			int x = Convert.ToInt32(temp[0, 0]);
-			int y = Convert.ToInt32(temp[1, 0]);
+            var displayMatrix = matrix_multiplication(displayMatrix1, displayMatrix2);
+            var temp = matrix_multiplication(displayMatrix, getP1());
+            int x = Convert.ToInt32(temp[0, 0]);
+            int y = Convert.ToInt32(temp[1, 0]);
 
-			var temp2d = new Point(x, y);
-			return temp2d;
-		}
+            var temp2d = new Point(x, y);
+            return temp2d;
+        }
 
-		public Point To2D(double phi_a, double psi_a)
+        public Point To2D(double phi_a, double psi_a)
         {
             double phi = Math.PI / 180 * phi_a;
             double psi = Math.PI / 180 * psi_a;
@@ -949,12 +1010,12 @@ namespace Task_3
         }
     }
 
-    public class Edge
+    public class Vector
     {
         public PointPol P1;
         public PointPol P2;
 
-        public Edge(PointPol p1, PointPol p2) { P1 = p1; P2 = p2; }
+        public Vector(PointPol p1, PointPol p2) { P1 = p1; P2 = p2; }
 
         public void scale(double ind_scale, double a, double b, double c)
         {
@@ -968,7 +1029,7 @@ namespace Task_3
             P2 = P2.shift(a, b, c);
         }
 
-        public void rotate(Edge e, double angle, double a, double b, double c)
+        public void rotate(Vector e, double angle, double a, double b, double c)
         {
             P1 = P1.rotate(e, angle, a, b, c);
             P2 = P2.rotate(e, angle, a, b, c);
@@ -1058,7 +1119,7 @@ namespace Task_3
         {
             return (p1.X == p2.X) && (p1.Y == p2.Y) && (p1.Z == p2.Z);
         }
-        private bool edgesEqual(Edge e1, Edge e2)
+        private bool vectorsEqual(Vector e1, Vector e2)
         {
             return (pointsEqual(e1.P1, e2.P1) && pointsEqual(e1.P2, e2.P2)) ||
                 (pointsEqual(e1.P1, e2.P2) && pointsEqual(e1.P2, e2.P1));
@@ -1161,10 +1222,10 @@ namespace Task_3
             deleteDuplicates();
         }
 
-        public void rotate(Edge edge, double angle, double a, double b, double c)
+        public void rotate(Vector axis, double angle, double a, double b, double c)
         {
             for (int i = 0; i < points.Count(); ++i)
-                points[i] = points[i].rotate(edge, angle, a, b, c);
+                points[i] = points[i].rotate(axis, angle, a, b, c);
             deleteDuplicates();
         }
 
@@ -1197,5 +1258,11 @@ namespace Task_3
                 points[edges.First().Item2].To2D(phi_a, psi_a)));
             return l;
         }
+    }
+
+    public class Polyhedron
+    {
+        List<PointPol> points;
+        public List<Tuple<int, int>> edges = new List<Tuple<int, int>>();
     }
 }
