@@ -1025,6 +1025,29 @@ namespace Task_3
         }
     }
 
+    public class Edge
+    {
+        public int nP1;
+        public int nP2;
+
+
+        public Edge(int p1, int p2) { nP1 = p1; nP2 = p2; }
+    }
+
+    public class PolygonNew
+    {
+        public List<Edge> edges = new List<Edge>();
+
+        //по граням
+        public PolygonNew(List<Edge> edg)
+        {
+            foreach (var el in edg)
+            {
+                edges.Add(el);
+            }
+        }
+    }
+
     public class Polygon
     {
         public List<PointPol> points = new List<PointPol>();
@@ -1233,11 +1256,17 @@ namespace Task_3
     {
         public Dictionary<PointPol, List<int>> dict = 
             new Dictionary<PointPol, List<int>>();
+        public List<PointPol> points = new List<PointPol>();
         public List<Polygon> polygons;
 
         public Polyhedron()
         {
             polygons = new List<Polygon>();
+        }
+
+        public Polyhedron(List<Polygon> pols)
+        {
+
         }
 
         private bool pointsEqual(PointPol p1, PointPol p2)
@@ -1259,8 +1288,11 @@ namespace Task_3
                         ++indpoint1)
                     {
                         var p1 = polygons[indpol1].points[indpoint1];
-                        dict.Add(p1, new List<int>());
-                        dict[p1].Add(indpol1);
+                        int indp1 = dict.Keys.ToList().FindIndex(poin => pointsEqual(poin, p1));
+                        if (indp1 == -1)
+                            dict.Add(p1, new List<int>());
+                        else
+                            dict[dict.Keys.ToList()[indp1]].Add(indpol1);
                         for (int indpol2 = indpol1+1; indpol2 < polygons.Count(); ++indpol2)
                         {
                             for (int indpoint2 = 0;
@@ -1270,7 +1302,8 @@ namespace Task_3
                                 var p2 = polygons[indpol2].points[indpoint2];
                                 if (pointsEqual(p1, p2))
                                 {
-                                    dict[p1].Add(indpol2);
+                                    int indp2 = dict.Keys.ToList().FindIndex(poin => pointsEqual(poin, p2));
+                                    dict[dict.Keys.ToList()[indp2]].Add(indpol2);
                                     break;
                                 }
                             }
