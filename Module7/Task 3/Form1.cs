@@ -830,7 +830,15 @@ namespace Task_3
             double r = double.Parse(textBoxR.Text);
 
             Camera cam = new Camera(x, y, z, t, ya, r);
-           // reDrawPols(cam.phi, cam.psi, v);
+
+            foreach (var i in fig) {
+                for (int j = 0; j < i.points.Count; ++j) { 
+                    var t0 = matrix_multiplication(cam.translateAtPosition(), i.points[j].getPol());
+                    var t1 = matrix_multiplication(cam.translateAtAngles(), 
+                        new double[3, 1] { {t0[0,0]}, {t0[1,0] }, {t0[2,0]} });
+                    i.points[j] = new PointPol(t1[0, 0], t1[1, 0], t1[2, 0]);
+                }
+            }
         }
     }
 
