@@ -133,12 +133,15 @@ namespace UnionPolygons
 		}
 
         //Функция берет список, стартовую точку в нем, ближайшее пересечение
-        //Действие - добавляет точки в список
-        private void add_points(ref List<Point> src, Point start, Point intersection) {
+        //Действие - добавляет точки в список (true - дальше по списку идем, false - назад списка идем)
+        private void add_points(ref List<Point> src, Point start, Point intersection, bool direction) { 
             Point temp = start;
             while (temp != intersection) {
                 UNION.Add(temp);
-                temp = next(ref src, temp);
+                if (direction)
+                    temp = next(ref src, temp);
+                else
+                    temp = prev(ref src, temp);
             }
             UNION.Add(intersection);
         }
@@ -171,15 +174,15 @@ namespace UnionPolygons
             var newPol_min = newPolygon.OrderBy(x => x.X).ThenBy(x => x.Y).First();
             bool flag_pol = true;
             var intersect = general.Intersect(newPolygon).ToList();
-            Point start_point;
-            if (general_min == newPol_min || general_min.X < newPol_min.X ||
+            Point start_point = general.First();
+            /*if (general_min == newPol_min || general_min.X < newPol_min.X ||
                 (general_min.X == newPol_min.X && general_min.Y < newPol_min.Y))
                 start_point = general_min;
             else{
                 start_point = newPol_min;
                 flag_pol = false;
             }
-
+            */
             int cnt_op = 3;
 
             List<Point> work_lst;
@@ -188,10 +191,11 @@ namespace UnionPolygons
             else
                 work_lst = newPolygon;
             Point t = start_point;
+            bool direction = true;
             foreach (var i in intersect){
                 if (cnt_op == 0)
                     break;
-                add_points(ref work_lst, t, i);
+                add_points(ref work_lst, t, i, direction);
                 Point current_point;
                 if (flag_pol){
                     current_point = next(ref general, i);
@@ -201,6 +205,7 @@ namespace UnionPolygons
                         work_lst = newPolygon;
                         flag_pol = false;
                         t = check_now;
+                        direction = true;
                     }
                     else
                     {
@@ -211,6 +216,7 @@ namespace UnionPolygons
                             work_lst = newPolygon;
                             flag_pol = false;
                             t = check_now;
+                            direction = false;
                         }
                         else
                             t = current_point;
@@ -224,6 +230,7 @@ namespace UnionPolygons
                         work_lst = general;
                         flag_pol = true;
                         t = check_now;
+                        direction = true;
                     }
                     else
                     {
@@ -233,6 +240,7 @@ namespace UnionPolygons
                             work_lst = general;
                             flag_pol = true;
                             t = check_now;
+                            direction = false;
                         }
                         else
                             t = current_point;
@@ -248,13 +256,13 @@ namespace UnionPolygons
                 {
                     if (UNION.Count == 0)
                         UNION.Add(next(ref general, general.First()));
-                    add_points(ref general, UNION.Last(), general.First());
+                    add_points(ref general, UNION.Last(), general.First(), true);
                 }
                 else
                 {
                     if (UNION.Count == 0)
                         UNION.Add(newPolygon.First());
-                    add_points(ref newPolygon, UNION.Last(), newPolygon.First());
+                    add_points(ref newPolygon, UNION.Last(), newPolygon.First(), true);
                 }
             }
             foreach (var i in UNION)
