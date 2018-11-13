@@ -661,15 +661,19 @@ namespace Task_3
             }
         }
 
+		private void reD() {
+			double phi_a = double.Parse(textBoxPhi.Text);
+			double psi_a = double.Parse(textBoxPsi.Text);
+			double view_x = double.Parse(textBoxViewVectorX.Text);
+			double view_y = double.Parse(textBoxViewVectorY.Text);
+			double view_z = double.Parse(textBoxViewVectorZ.Text);
+
+			reDrawPols(phi_a, psi_a, new PointPol(view_x, view_y, view_z));
+		}
+
         private void button1_Click_1(object sender, EventArgs e)
         {
-            double phi_a = double.Parse(textBoxPhi.Text);
-            double psi_a = double.Parse(textBoxPsi.Text);
-            double view_x = double.Parse(textBoxViewVectorX.Text);
-            double view_y = double.Parse(textBoxViewVectorY.Text);
-            double view_z = double.Parse(textBoxViewVectorZ.Text);
-
-            reDrawPols(phi_a, psi_a, new PointPol(view_x, view_y, view_z));
+			reD();
         }
 
         private void pictureBox2_MouseClick(object sender, MouseEventArgs e)
@@ -747,27 +751,16 @@ namespace Task_3
 
         private void hScrollBar1_ValueChanged(object sender, EventArgs e)
         {
-            double phi_a = hScrollBar1.Value;
-            double psi_a = hScrollBar2.Value;
-            double view_x = double.Parse(textBoxViewVectorX.Text);
-            double view_y = double.Parse(textBoxViewVectorY.Text);
-            double view_z = double.Parse(textBoxViewVectorZ.Text);
+			for (int i = 0; i < hScrollBar1.Value; ++i) {
+				cam.pitch = (cam.pitch + 1) % 360;
+				pointInit();
+				reD();
+			}
+		}
 
-            reDrawPols(phi_a, psi_a, new PointPol(view_x, view_y, view_z));
-        }
+      
 
-        private void hScrollBar2_ValueChanged(object sender, EventArgs e)
-        {
-            double phi_a = hScrollBar1.Value;
-            double psi_a = hScrollBar2.Value;
-            double view_x = double.Parse(textBoxViewVectorX.Text);
-            double view_y = double.Parse(textBoxViewVectorY.Text);
-            double view_z = double.Parse(textBoxViewVectorZ.Text);
-
-            reDrawPols(phi_a, psi_a, new PointPol(view_x, view_y, view_z));
-        }
-
-        private void buttonPlus_Click(object sender, EventArgs e)
+		/*private void buttonPlus_Click(object sender, EventArgs e)
         {           
             double curr_ind = 1.2;
             ind *= curr_ind;
@@ -797,7 +790,7 @@ namespace Task_3
             scalePols(fig, curr_ind);
 
             reDrawPols(phi_a, psi_a, new PointPol(view_x, view_y, view_z));
-        }
+        }*/
 
         private PointPol normVecOfPlane(PointPol p1, PointPol p2, PointPol p3)
         {
@@ -819,28 +812,62 @@ namespace Task_3
             return (vec1.X * vec2.X + vec1.Y * vec2.Y + vec1.Z * vec2.Z);
         }
 
-        private void button3_Click(object sender, EventArgs e)
+		Camera cam;
+
+		private void button4_Click(object sender, EventArgs e)
+		{
+			double x = double.Parse(textBox1.Text);
+			double y = double.Parse(textBox2.Text);
+			double z = double.Parse(textBox3.Text);
+
+			double t = double.Parse(textBoxT.Text);
+			double ya = double.Parse(textBoxY.Text);
+			double r = double.Parse(textBoxR.Text);
+
+			cam = new Camera(x, y, z, t, ya, r);
+
+			foreach (var i in fig)
+			{
+				for (int j = 0; j < i.points.Count; ++j)
+				{
+					var t0 = matrix_multiplication(cam.translateAtPosition(), i.points[j].getPol());
+					var t1 = matrix_multiplication(cam.translateAtAngles(),
+					new double[3, 1] { { t0[0, 0] }, { t0[1, 0] }, { t0[2, 0] } });
+					i.points[j] = new PointPol(t1[0, 0], t1[1, 0], t1[2, 0]);
+				}
+			}
+
+			reD();
+		}
+
+		private void button3_Click(object sender, EventArgs e)
         {
-            double x = double.Parse(textBox1.Text);
-            double y = double.Parse(textBox2.Text);
-            double z = double.Parse(textBox3.Text);
+			double x = double.Parse(textBox1.Text);
+			double y = double.Parse(textBox2.Text);
+			double z = double.Parse(textBox3.Text);
 
-            double t = double.Parse(textBoxT.Text);
-            double ya = double.Parse(textBoxY.Text);
-            double r = double.Parse(textBoxR.Text);
+			double t = double.Parse(textBoxT.Text);
+			double ya = double.Parse(textBoxY.Text);
+			double r = double.Parse(textBoxR.Text);
 
-            Camera cam = new Camera(x, y, z, t, ya, r);
+			cam = new Camera(x, y, z, t, ya, r);
 
-            foreach (var i in fig) {
-                for (int j = 0; j < i.points.Count; ++j) { 
-                    var t0 = matrix_multiplication(cam.translateAtPosition(), i.points[j].getPol());
-                    var t1 = matrix_multiplication(cam.translateAtAngles(), 
-                        new double[3, 1] { {t0[0,0]}, {t0[1,0] }, {t0[2,0]} });
-                    i.points[j] = new PointPol(t1[0, 0], t1[1, 0], t1[2, 0]);
-                }
-            }
+			pointInit();
+
+			reD();
         }
-    }
+		private void pointInit() {
+			foreach (var i in fig)
+			{
+				for (int j = 0; j < i.points.Count; ++j)
+				{
+					var t1 = matrix_multiplication(cam.translateAtAngles(),
+						 i.points[j].getP1());
+					i.points[j] = new PointPol(t1[0, 0], t1[1, 0], t1[2, 0]);
+				}
+			}
+		}
+	}
 
     public class PointPol
     {
