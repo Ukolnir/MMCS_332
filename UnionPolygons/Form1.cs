@@ -175,16 +175,7 @@ namespace UnionPolygons
             bool flag_pol = true;
             var intersect = general.Intersect(newPolygon).ToList();
             Point start_point = general.First();
-            /*if (general_min == newPol_min || general_min.X < newPol_min.X ||
-                (general_min.X == newPol_min.X && general_min.Y < newPol_min.Y))
-                start_point = general_min;
-            else{
-                start_point = newPol_min;
-                flag_pol = false;
-            }
-            */
-            int cnt_op = 3;
-
+            
             List<Point> work_lst;
             if (flag_pol)
                 work_lst = general;
@@ -193,8 +184,6 @@ namespace UnionPolygons
             Point t = start_point;
             bool direction = true;
             foreach (var i in intersect){
-                if (cnt_op == 0)
-                    break;
                 add_points(ref work_lst, t, i, direction);
                 Point current_point;
                 if (flag_pol){
@@ -212,7 +201,6 @@ namespace UnionPolygons
                         check_now = prev(ref newPolygon, i);
                         if (check_dir(check_now, Tuple.Create(i, current_point)))
                         {
-                            textBox2.Text = "Пошло сюда";
                             work_lst = newPolygon;
                             flag_pol = false;
                             t = check_now;
@@ -246,11 +234,7 @@ namespace UnionPolygons
                             t = current_point;
                     }
                 }
-                --cnt_op;
             }
-
-            if (cnt_op != 0)
-            {
 
                 if (flag_pol)
                 {
@@ -264,20 +248,20 @@ namespace UnionPolygons
                         UNION.Add(newPolygon.First());
                     add_points(ref newPolygon, UNION.Last(), newPolygon.First(), true);
                 }
-            }
             foreach (var i in UNION)
                 textBox1.Text += "(" + i.X + "; " + i.Y + ")   ";
 
             g.DrawLines(pen_union, UNION.ToArray());
             pictureBox1.Image = bmp;
-        }
+
+		}
 
         private void button3_Click(object sender, EventArgs e)
         {
             Clear();
-            general.Clear();
-            newPolygon.Clear();
-            UNION.Clear();
+            general = new List<Point>();
+            newPolygon = new List<Point>();
+            UNION = new List<Point>();
             twoPolygons = false;
             flag = false;
         }
