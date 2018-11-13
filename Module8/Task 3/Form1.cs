@@ -12,7 +12,7 @@ namespace Task_3
 {
     public partial class Form1 : Form
     {
-        Graphics g;
+		Graphics g;
         Polyhedron figure;
         delegate double lambda(double a, double b);
         lambda f;
@@ -24,9 +24,13 @@ namespace Task_3
         {
             InitializeComponent();
             pictureBox1.Image = new Bitmap(pictureBox1.Width, pictureBox1.Height);
-            Clear();
- 
-            textBox1.Text = "0";
+			g = Graphics.FromImage(pictureBox1.Image);
+
+			g.ScaleTransform(1, -1);
+			g.TranslateTransform(pictureBox1.Width / 2, -pictureBox1.Height / 2);
+			//Clear();
+
+			textBox1.Text = "0";
             textBox2.Text = "10";
             textBox3.Text = "-10";
             textBox4.Text = "5";
@@ -57,10 +61,9 @@ namespace Task_3
 
         public void write_axes()
         {
-            g = Graphics.FromImage(pictureBox1.Image);
+            //g = Graphics.FromImage(pictureBox1.Image);
 
-            g.ScaleTransform(1, -1);
-            g.TranslateTransform(pictureBox1.Width / 2, -pictureBox1.Height / 2);
+            
 
             PointPol p0 = new PointPol(0, 0, 0);
             PointPol p1 = new PointPol(pictureBox1.Width, 0, 0);
@@ -75,20 +78,18 @@ namespace Task_3
             my_pen.Color = Color.Green;
 
             g.DrawLine(my_pen, p0.To2D(s), p3.To2D(s));
-
-            pictureBox1.Image = pictureBox1.Image;
         }
+
         public void ClearWithout()
         {
-            g = Graphics.FromImage(pictureBox1.Image);
             g.Clear(pictureBox1.BackColor);
+			write_axes();
             pictureBox1.Image = pictureBox1.Image;
-        }
+		}
 
 
         public void Clear()
         {
-            g = Graphics.FromImage(pictureBox1.Image);
             g.Clear(pictureBox1.BackColor);
             pictureBox1.Image = pictureBox1.Image;
 
@@ -194,16 +195,22 @@ namespace Task_3
         {
             Pen my_pen = new Pen(Color.Black);
 
-            string s = comboBox3.SelectedItem.ToString();
+			//g.ScaleTransform(1, -1);
+			//g.TranslateTransform(pictureBox1.Width / 2, -pictureBox1.Height / 2);
+
+			string s = comboBox3.SelectedItem.ToString();
             int step = Int32.Parse(textBox5.Text.ToString());
 
             List<Point> points2D = new List<Point>();
             foreach (var p in figure.points)
             {
                 points2D.Add(p.To2D(s));
-                YMax[p.To2D(s).X] = Int32.MaxValue;
-                YMin[p.To2D(s).X] = Int32.MaxValue;
-            }
+				if (!YMax.Keys.Contains(p.To2D(s).X))
+				{
+					YMax.Add(p.To2D(s).X, Int32.MaxValue);
+					YMin.Add(p.To2D(s).X, Int32.MaxValue);
+				}
+			}
 
 
             foreach (var pl in figure.pol)
@@ -232,8 +239,7 @@ namespace Task_3
                     YMin[p1.X] = p1.Y;
             }
 
-            int[] ourZ = Interpolation(p1.X + 1, p2.X -1, p1.Y, p2.Y);
-            for (int i = p1.X + 1; i < p2.X; ++i)
+           /* for (int i = p1.X + 1; i < p2.X; ++i)
             {
                 if (YMax[i] == Int32.MaxValue)
                 {
@@ -247,7 +253,7 @@ namespace Task_3
                     if (ourZ[i - p1.X - 1] < YMin[i])
                         YMin[i] = ourZ[i - p1.X - 1];
                 }
-            }
+            }*/
 
             if (YMax[p2.X] == Int32.MaxValue)
             {
@@ -263,14 +269,8 @@ namespace Task_3
             }
         }
 
-        private bool inOneSide(Point p1, Point p2)
-        {
-            bool f = (p1.Y < YMax[p1.X] && p1.Y > YMin[p1.X] && p2.Y < YMax[p2.X] && p2.Y > YMin[p2.X]);
-            f = f || (p1.Y == YMax[p1.X] && p2.Y == YMax[p2.X]) || (p1.Y == YMin[p1.X] && p2.Y == YMin[p2.X]);
-            return f || (p1.Y == YMax[p1.X] && p2.Y == YMin[p2.X]) || (p1.Y == YMin[p1.X] && p2.Y == YMax[p2.X]);
-        }
 
-        private void intersect(Point p1, Point p2, Color UpColor, Color DownColor)
+       /* private void intersect(Point p1, Point p2, Color UpColor, Color DownColor)
         {
             int x = p1.X;
             Color c = UpColor;
@@ -303,13 +303,13 @@ namespace Task_3
 
             pictureBox1.Image = pictureBox1.Image;
         }
+		*/
 
         private void MyDraw(List<Point> points, Color UpColor, Color DownColor)
         {
-            //Bitmap bmp = (Bitmap)pictureBox1.Image;
-            Graphics g = Graphics.FromImage(pictureBox1.Image);
+            //Graphics g = Graphics.FromImage(pictureBox1.Image);
             Pen u_pen = new Pen(UpColor);
-            Pen d_pen = new Pen(DownColor);
+			/*Pen d_pen = new Pen(DownColor);
 
             Point p1 = points.First();
 
@@ -324,17 +324,35 @@ namespace Task_3
                     intersect(p1, points[i], UpColor, DownColor);
                 p1 = points[i];
             }
+			*/
+			List<int> keys = YMax.Keys.OrderBy(x => x).ToList();
+			Point p1 = new Point(keys[0], YMax[keys[0]]); 
 
-            pictureBox1.Image = pictureBox1.Image; //bmp;
+			foreach (var k in keys)
+			{
+				if (k == keys[0])
+					continue;
+
+				Point p2 = new Point(k, YMax[k]);
+				Point p1Min = new Point(p1.X, YMin[p1.X]);
+				Point p2Min = new Point(k, YMin[k]);
+
+				g.DrawLine(u_pen, p1, p2);
+				g.DrawLine(u_pen, p1Min, p2Min);
+				g.DrawLine(u_pen, p1Min, p1);
+				g.DrawLine(u_pen, p1Min, p2);
+
+				p1 = p2;
+			}
+
+			pictureBox1.Image = pictureBox1.Image; //bmp;
         }
 
 
     private void button1_Click(object sender, EventArgs e)
         {
-
             create_pol();
             ClearWithout();
-            write_axes();
             print_figure();
 
             button4.Visible = true;
@@ -384,7 +402,6 @@ namespace Task_3
         private void button5_Click(object sender, EventArgs e)
         {
             ClearWithout();
-            write_axes();
             figure.reflection(comboBox2.SelectedItem.ToString());
             print_figure();
         }
@@ -392,7 +409,6 @@ namespace Task_3
         private void button7_Click(object sender, EventArgs e)
         {
             ClearWithout();
-            write_axes();
             double ind_scale = Double.Parse(textBox9.Text.ToString());
             figure.scale(ind_scale);
             print_figure();
@@ -401,7 +417,6 @@ namespace Task_3
         private void button4_Click(object sender, EventArgs e)
         {
             ClearWithout();
-            write_axes();
             double x = Double.Parse(textBox6.Text.ToString());
             double y = Double.Parse(textBox7.Text.ToString());
             double z = Double.Parse(textBox8.Text.ToString());
