@@ -188,8 +188,8 @@ namespace Task_3
         {
             PointPol vecNorm = normVecOfPlane(pol.points[0], pol.points[1], pol.points[2]);
             if (comboBoxBuildAxis.SelectedItem.ToString() == "X")
-                return (scalarProduct(vecNorm, view_vector) > 0);
-            return (scalarProduct(vecNorm, view_vector) < 0);
+                return (scalarProduct(vecNorm, view_vector) < 0);
+            return (scalarProduct(vecNorm, view_vector) > 0);
         }
 
         private void drawPolygon(Polygon pol, Color c, 

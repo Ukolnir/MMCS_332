@@ -600,7 +600,6 @@ namespace Task_3
             //drawPols(pols_rotate);
 
             buildFig(rotate_around);
-            buildFig(rotate_around);
             drawPols(fig.polygons, phi_a, psi_a, new PointPol(view_x, view_y, view_z));
             fig_drawed = true;
         }
@@ -1254,8 +1253,8 @@ namespace Task_3
 
     public class Polyhedron
     {
-        public Dictionary<PointPol, List<int>> dict = 
-            new Dictionary<PointPol, List<int>>();
+        public Dictionary<int, List<int>> dict = 
+            new Dictionary<int, List<int>>();
         public List<PointPol> points = new List<PointPol>();
         public List<Polygon> polygons;
 
@@ -1279,34 +1278,36 @@ namespace Task_3
         public void addPolygon(Polygon pol)
         {
             polygons.Add(pol);
-            if (polygons.Count() > 3)
+
+            for (int i = 0; i < pol.points.Count(); ++i)
             {
-                for (int indpol1 = 0; indpol1 < polygons.Count(); ++indpol1)
+                int indpol = points.FindIndex(p => pointsEqual(p, pol.points[i]));
+                if (indpol == -1)
+                    points.Add(pol.points[i]);
+            }
+            if (polygons.Count() > 5)
+                fillDict();
+        }
+
+        public void fillDict()
+        {
+            for (int indpol = 0; indpol < polygons.Count(); ++indpol)
+            {
+                for (int indppol = 0; indppol < polygons[indpol].points.Count(); ++indppol)
                 {
-                    for (int indpoint1 = 0; 
-                        indpoint1 < polygons[indpol1].points.Count();
-                        ++indpoint1)
+                    int indpoint = points.FindIndex(p => pointsEqual(p, polygons[indpol].points[indppol]));
+                    int inddkey = dict.Keys.ToList().FindIndex(ind => ind == indpoint);
+                    if (inddkey == -1)
                     {
-                        var p1 = polygons[indpol1].points[indpoint1];
-                        int indp1 = dict.Keys.ToList().FindIndex(poin => pointsEqual(poin, p1));
-                        if (indp1 == -1)
-                            dict.Add(p1, new List<int>());
-                        else
-                            dict[dict.Keys.ToList()[indp1]].Add(indpol1);
-                        for (int indpol2 = indpol1+1; indpol2 < polygons.Count(); ++indpol2)
+                        dict.Add(indpoint, new List<int>());
+                        dict[indpoint].Add(indpol);
+                    }
+                    else
+                    {
+                        int inddpol = dict[indpoint].FindIndex(numpol => numpol == indpol);
+                        if (inddpol == -1)
                         {
-                            for (int indpoint2 = 0;
-                                indpoint2 < polygons[indpol2].points.Count();
-                                ++indpoint2)
-                            {
-                                var p2 = polygons[indpol2].points[indpoint2];
-                                if (pointsEqual(p1, p2))
-                                {
-                                    int indp2 = dict.Keys.ToList().FindIndex(poin => pointsEqual(poin, p2));
-                                    dict[dict.Keys.ToList()[indp2]].Add(indpol2);
-                                    break;
-                                }
-                            }
+                            dict[indpoint].Add(indpol);
                         }
                     }
                 }
@@ -1317,6 +1318,7 @@ namespace Task_3
         {
             polygons.Clear();
             dict.Clear();
+            points.Clear();
         }
 
         public void find_center(ref double x, ref double y, ref double z)
