@@ -222,6 +222,8 @@ namespace Task_3
                 }
 
             MyDraw(points2D, Color.BlueViolet, Color.DarkBlue);
+            YMax.Clear();
+            YMin.Clear();
         }
 
         private void build_Y(Point p1, Point p2, int step, int num_edg)
