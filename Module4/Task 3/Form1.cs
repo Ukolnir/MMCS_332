@@ -321,123 +321,6 @@ namespace Task_3
             }
         }
 
-        /*
-        private double alpha(Point p, Point pMin)
-        {
-            p.X -= pMin.X;
-            p.Y = pMin.Y - p.Y;
-            double alph;
-            if (p.X == 0)
-                alph = Math.PI / 2;
-            else
-            {
-                if (p.Y == 0)
-                {
-                    alph = 0;
-                }
-                else
-                {
-                    alph = Math.Atan(Convert.ToDouble(p.Y) / Convert.ToDouble(p.X));
-                }
-                if (p.X < 0)
-                    alph += Math.PI;
-            }
-            return alph;
-        }
-
-        private int sizePointsWithoutMin;
-
-        private List<Point> sortByPolar(ref List<Point> pointsWithoutMin, Point pMin)
-        {
-            sizePointsWithoutMin = pointsWithoutMin.Count();
-            bool t = true;
-            while (t)
-            {
-                t = false;
-                for (int j = 0; j < sizePointsWithoutMin-1; ++j)
-                {
-                    if (alpha(pointsWithoutMin[j], pMin) > alpha(pointsWithoutMin[j+1], pMin))
-                    {
-                        Point tmp = new Point();
-                        tmp = pointsWithoutMin[j];
-                        pointsWithoutMin[j] = pointsWithoutMin[j + 1];
-                        pointsWithoutMin[j + 1] = tmp;
-                        t = true;
-                    }
-                    else
-                    {
-                        if (alpha(pointsWithoutMin[j], pMin) == alpha(pointsWithoutMin[j+1], pMin))
-                        {
-                            if (pointsWithoutMin[j].X > pointsWithoutMin[j+1].X)
-                            {
-                                for (int k = j+2; k < sizePointsWithoutMin; ++k)
-                                {
-                                    pointsWithoutMin[k - 1] = pointsWithoutMin[k];
-                                }
-                                --sizePointsWithoutMin;
-                                t = true;
-                            }
-                            else
-                            {
-                                if (pointsWithoutMin[j+1].X > pointsWithoutMin[j].X)
-                                {
-                                    for (int k = j + 1; k <sizePointsWithoutMin; ++k)
-                                    {
-                                        pointsWithoutMin[k - 1] = pointsWithoutMin[k];
-                                    }
-                                    --sizePointsWithoutMin;
-                                    t = true;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-            return pointsWithoutMin;
-        }
-        */
-
-        /*
-        private List<Point> buildConvex()
-        {
-            //points = points.OrderBy(p1 => p1.Y).ThenBy(p2 => p2.X).ToList();
-            Point pMin = points[0];
-            int indMin = 0;
-            for (int i = 1; i < points.Count(); ++i)
-            {
-                if ((points[i].Y < pMin.Y) || (points[i].Y == pMin.Y && points[i].X < pMin.X))
-                {
-                    pMin = points[i];
-                    indMin = i;
-                }
-            }
-
-            List<Point> pointsWithoutMin = points.ToList();
-            pointsWithoutMin.RemoveAt(indMin);
-
-            List<Point> sorted = sortByPolar(ref pointsWithoutMin, pMin);
-            List<Point> pointsToDraw = new List<Point>();
-            for (int i = 0; i < points.Count(); ++i)
-            {
-                pointsToDraw.Add(new Point());
-            }
-
-            pointsToDraw[0] = pMin;
-            pointsToDraw[1] = sorted[0];
-            pointsToDraw[2] = sorted[1];
-
-            int last = 2;
-            for (int i = 0; i < sizePointsWithoutMin; ++i)
-            {
-                while (last > 0 && angle(pointsToDraw[last - 1], pointsToDraw[last], sorted[i]) >= 0)
-                    --last;
-                ++last;
-                pointsToDraw[last] = sorted[i];
-            }
-            return pointsToDraw;
-        }
-        */
-
         private double pol_angle(Point p0, Point p1)
         {
             if (p0 == p1)
@@ -473,7 +356,7 @@ namespace Task_3
             stack.Add(min_p);
             stack.Add(P[0]);
 
-            //Delete inner poits
+           
             for (int i = 1; i < P.Count(); ++i)
             {
                 while ((stack.Count() > 1) && 
@@ -495,12 +378,13 @@ namespace Task_3
             List<int> stack = new List<int>();
             stack.Add(pf);
             P.RemoveAt(0);
-            P =P.OrderByDescending(p => pol_angle(points[pf], points[p])).ToList(); //отсортировали список по полярным углам
+            P = P.OrderByDescending(p => pol_angle(points[pf], points[p])).ToList();
             stack.Add(P[0]);
 
             for (int i = 1; i < P.Count(); ++i)
             {
-                while (stack.Count() > 1 && location(points[P[i]], points[stack[stack.Count() - 2]], points[stack[stack.Count() - 1]]) > 0)
+				//Delete inner poits
+				while (stack.Count() > 1 && location(points[P[i]], points[stack[stack.Count() - 2]], points[stack[stack.Count() - 1]]) > 0)
                     stack.RemoveAt(stack.Count() - 1);
 
                 stack.Add(P[i]);

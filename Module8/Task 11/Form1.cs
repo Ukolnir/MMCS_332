@@ -188,7 +188,7 @@ namespace Task_3
 
         private bool isVisible(Polygon pol, PointPol view_vector)
         {
-            PointPol vecNorm = normVecOfPlane(pol.points[0], pol.points[1], pol.points[2]);
+            PointPol vecNorm = pol.normVecOfPlane();
             if (comboBoxBuildAxis.SelectedItem.ToString() == "X")
                 return (scalarProduct(vecNorm, view_vector) < 0);
             return (scalarProduct(vecNorm, view_vector) > 0);
@@ -764,7 +764,7 @@ namespace Task_3
 
             reDrawPols(phi_a, psi_a, new PointPol(view_x, view_y, view_z));
         }
-
+		/*
         private PointPol normVecOfPlane(PointPol p1, PointPol p2, PointPol p3)
         {
             double kx, ky, kz, d;
@@ -778,7 +778,7 @@ namespace Task_3
             d = (kx * -xa) + (ky * -ya) + (kz * -za);
 
             return new PointPol(kx, ky, kz);
-        }
+        }*/
         
         private double scalarProduct(PointPol vec1, PointPol vec2)
         {
@@ -909,6 +909,12 @@ namespace Task_3
             double[,] shiftMatrix = new double[4, 4] { { 1, 0, 0, x }, { 0, 1, 0, y }, { 0, 0, 1, z }, { 0, 0, 0, 1 } };
             return translatePol1(matrix_multiplication(shiftMatrix, getPol()));
         }
+
+		public PointPol normalize()
+		{
+			double len = Math.Sqrt(X * X + Y * Y + Z * Z);
+			return new PointPol(X / len, Y / len, Z / len);
+		}
 
         //Изометрическая проекция   
         /*
@@ -1198,8 +1204,32 @@ namespace Task_3
             }
 
         }
+		public PointPol normVecOfPlane()
+		{
+			if (points.Count() > 2)
+			{
+				PointPol p1 = points[0];
+				PointPol p2 = points[1];
+				PointPol p3 = points[2];
 
-        public void scale(double ind_scale, double a, double b, double c)
+				double kx, ky, kz, d;
+				double xa = p1.X, ya = p1.Y, za = p1.Z;
+				double a21 = p2.X - xa, a22 = p2.Y - ya, a23 = p2.Z - za;
+				double a31 = p3.X - xa, a32 = p3.Y - ya, a33 = p3.Z - za;
+
+				kx = a22 * a33 - a23 * a32;
+				ky = -(a21 * a33 - a23 * a31);
+				kz = a21 * a32 - a22 * a31;
+				d = (kx * -xa) + (ky * -ya) + (kz * -za);
+
+				return new PointPol(kx, ky, kz);
+			}
+			else
+				return new PointPol(0, 0, 0);
+		}
+
+
+		public void scale(double ind_scale, double a, double b, double c)
         {
             for (int i = 0; i < points.Count(); ++i)
                 points[i] = points[i].scale(ind_scale, a, b, c);
@@ -1253,10 +1283,11 @@ namespace Task_3
 
     public class Polyhedron
     {
-        public Dictionary<int, List<int>> dict = 
+        public Dictionary<int, List<int>> point_to_pols = 
             new Dictionary<int, List<int>>();
         public List<PointPol> points = new List<PointPol>();
         public List<Polygon> polygons;
+		public Dictionary<int, PointPol> point_to_normal = new Dictionary<int, PointPol>();
 
         public Polyhedron()
         {
@@ -1285,42 +1316,65 @@ namespace Task_3
                 if (indpol == -1)
                     points.Add(pol.points[i]);
             }
-            if (polygons.Count() > 5)
-                fillDict();
+			if (polygons.Count() > 5)
+			{
+				fillPointToPols();
+				fillPointToNormal();
+			}
         }
 
-        public void fillDict()
+		public void clearPolygons()
+		{
+			polygons.Clear();
+			point_to_pols.Clear();
+			points.Clear();
+		}
+
+		public void fillPointToPols()
         {
             for (int indpol = 0; indpol < polygons.Count(); ++indpol)
             {
                 for (int indppol = 0; indppol < polygons[indpol].points.Count(); ++indppol)
                 {
                     int indpoint = points.FindIndex(p => pointsEqual(p, polygons[indpol].points[indppol]));
-                    int inddkey = dict.Keys.ToList().FindIndex(ind => ind == indpoint);
+                    int inddkey = point_to_pols.Keys.ToList().FindIndex(ind => ind == indpoint);
                     if (inddkey == -1)
                     {
-                        dict.Add(indpoint, new List<int>());
-                        dict[indpoint].Add(indpol);
+						point_to_pols.Add(indpoint, new List<int>());
+						point_to_pols[indpoint].Add(indpol);
                     }
                     else
                     {
-                        int inddpol = dict[indpoint].FindIndex(numpol => numpol == indpol);
+                        int inddpol = point_to_pols[indpoint].FindIndex(numpol => numpol == indpol);
                         if (inddpol == -1)
                         {
-                            dict[indpoint].Add(indpol);
+							point_to_pols[indpoint].Add(indpol);
                         }
                     }
                 }
             }
         }
 
-        public void clearPolygons()
-        {
-            polygons.Clear();
-            dict.Clear();
-            points.Clear();
-        }
+		public void fillPointToNormal()
+		{
+			foreach (var indpoint in point_to_pols.Keys)
+			{
+				PointPol sum = new PointPol(0, 0, 0);
+				foreach (var indpol in point_to_pols[indpoint])
+				{
+					PointPol curr_norm = polygons[indpol].normVecOfPlane();
+					sum.X += curr_norm.X;
+					sum.Y += curr_norm.Y;
+					sum.Z += curr_norm.Z;
+				}
+				sum.X /= point_to_pols.Count();
+				sum.Y /= point_to_pols.Count();
+				sum.Z /= point_to_pols.Count();
+				point_to_normal.Add(indpoint, sum.normalize());
+			}
+		}
 
+		
         public void find_center(ref double x, ref double y, ref double z)
         {
             x = 0; y = 0; z = 0;
