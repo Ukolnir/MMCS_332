@@ -12,7 +12,8 @@ namespace Task_3
 {
     public partial class Form1 : Form
     {
-        Graphics g, g2, g3;
+        Graphics g, g2, g3, g4;
+        Bitmap image4;
 
         List<PointPol> points = new List<PointPol>();
         //List<Polygon> pols_rotate = new List<Polygon>();
@@ -21,6 +22,8 @@ namespace Task_3
         Polyhedron fig = new Polyhedron();
         bool fig_drawed = false;
         double ind = 1;
+        Color light_color = Color.Green;
+        double light_location_x, light_location_y, light_location_z;
 
 		public Form1()
         {
@@ -28,6 +31,11 @@ namespace Task_3
 
             double phi_a = hScrollBar1.Value;
             double psi_a = hScrollBar2.Value;
+            double.TryParse(textBoxLightLocationX.Text, out light_location_x);
+            double.TryParse(textBoxLightLocationY.Text, out light_location_y);
+            double.TryParse(textBoxLightLocationZ.Text, out light_location_z);
+
+            fig.updLightLocations(light_location_x, light_location_y, light_location_z);
 
             pictureBox1.Image = new Bitmap(pictureBox1.Width, pictureBox1.Height);
             g = Graphics.FromImage(pictureBox1.Image);
@@ -47,9 +55,15 @@ namespace Task_3
             //g3.TranslateTransform(pictureBox3.Width / 2, -pictureBox3.Height / 2);
             g3.TranslateTransform(pictureBox3.Width / 2, pictureBox3.Height / 2);
 
+            pictureBox4.Image = new Bitmap(pictureBox4.Width, pictureBox4.Height);
+            g4 = Graphics.FromImage(pictureBox4.Image);
+            g4.TranslateTransform(pictureBox4.Width / 2, pictureBox4.Height / 2);
+            image4 = new Bitmap(pictureBox4.Image);
+
             write_axes1();
 			write_axes2();
             write_axes3(phi_a, psi_a, ind);
+            write_axes4(phi_a, psi_a, ind);
         }
 
         public void find_center(List<PointPol> pol, ref double x, ref double y, ref double z)
@@ -139,6 +153,40 @@ namespace Task_3
             pictureBox3.Image = pictureBox3.Image;
         }
 
+        public void write_axes4(double phi_a, double psi_a, double ind)
+        {
+            PointPol p0 = new PointPol(0, 0, 0);
+            PointPol p1 = new PointPol(pictureBox4.Width / 2 * ind, 0, 0);
+            PointPol p2 = new PointPol(0, pictureBox4.Width / 2 * ind, 0);
+            PointPol p3 = new PointPol(0, 0, pictureBox4.Width / 2 * ind);
+
+            Point o = p0.To2D(phi_a, psi_a);
+            Point x = p1.To2D(phi_a, psi_a);
+            Point y = p2.To2D(phi_a, psi_a);
+            Point z = p3.To2D(phi_a, psi_a);
+
+            Font font = new Font("Arial", 8);
+            SolidBrush brush = new SolidBrush(Color.Black);
+
+            g4.DrawString("X", font, brush, x);
+            g4.DrawString("Y", font, brush, y);
+            g4.DrawString("Z", font, brush, z);
+
+            Pen my_pen = new Pen(Color.Blue);
+            g4.DrawLine(my_pen, o, x);
+            my_pen.Color = Color.Red;
+            g4.DrawLine(my_pen, o, y);
+            my_pen.Color = Color.Green;
+            g4.DrawLine(my_pen, o, z);
+
+            PointPol newp = new PointPol(Double.Parse(textBoxViewVectorX.Text) * 50,
+                Double.Parse(textBoxViewVectorY.Text) * 50,
+                Double.Parse(textBoxViewVectorZ.Text) * 50);
+            Point newpp = newp.To2D(phi_a, psi_a);
+            g4.DrawEllipse(new Pen(Color.Red), newpp.X - 1, newpp.Y - 1, 2, 2);
+
+            pictureBox4.Image = pictureBox4.Image;
+        }
 
         public void ClearPic1()
         {
@@ -164,6 +212,15 @@ namespace Task_3
             write_axes3(phi_a, psi_a, ind);
         }
 
+        public void ClearPic4(double phi_a, double psi_a)
+        {
+            g4.Clear(pictureBox4.BackColor);
+            image4 = new Bitmap(pictureBox4.Width, pictureBox4.Height);
+            pictureBox4.Image = image4;
+
+            write_axes4(phi_a, psi_a, ind);
+        }
+
         private void button2_Click(object sender, EventArgs e)
         {
             double phi_a = hScrollBar1.Value;
@@ -172,6 +229,7 @@ namespace Task_3
             ClearPic1();
             ClearPic2();
             ClearPic3(phi_a, psi_a);
+            ClearPic4(phi_a, psi_a);
             points.Clear();
 
         }
@@ -380,7 +438,118 @@ namespace Task_3
             pictureBox3.Image = pictureBox3.Image;
         }
 
-		public void find_center(List<Polygon> pols, ref double x, ref double y, ref double z)
+        public Color colorByDiffuse(Color c, double diffuse)
+        {
+            double r = c.R;
+            double g = c.G;
+            double b = c.B;
+            if (diffuse == 1)
+                return c;
+            if (diffuse > 1)
+            {
+                r += (255 - r) * (diffuse - 1);
+                g += (255 - g) * (diffuse - 1);
+                b += (255 - b) * (diffuse - 1);
+                return Color.FromArgb((int)r, (int)g, (int)b);
+            }
+            else
+            {
+                r = r * diffuse;
+                g = g * diffuse;
+                b = b * diffuse;
+                return Color.FromArgb((int)r, (int)g, (int)b);
+            }
+        }
+
+        public void drawLineBetweenPoints(Point p1, Point p2, Color c1, Color c2, 
+            int wdiv2, int hdiv2, ref List<Tuple<Point, Color>> pol_borders)
+        {
+            int x1 = p1.X;
+            int y1 = p1.Y;
+            int x2 = p2.X;
+            int y2 = p2.Y;
+            int diffx = Math.Abs(x2 - x1);
+            int diffy = Math.Abs(y2 - y1);
+            int diff = Math.Max(diffx, diffy);
+            int currx = x1;
+            int curry = y1;
+            double stepx = (double)(x2 - x1) / diff;
+            double stepy = (double)(y2 - y1) / diff;
+            double stepr = (double)(c2.R - c1.R) / diff;
+            double stepg = (double)(c2.G - c1.G) / diff;
+            double stepb = (double)(c2.B - c1.B) / diff;
+
+            for (int i = 0; i < diff; ++i)
+            {
+                currx = (int)Math.Round(x1 + stepx * i);
+                curry = (int)Math.Round(y1 + stepy * i);
+                int currr = (int)Math.Round(c1.R + stepr * i);
+                int currg = (int)Math.Round(c1.G + stepg * i);
+                int currb = (int)Math.Round(c1.B + stepb * i);
+
+                //int indinborders = pol_borders.FindIndex(p => (p.Item1.X == currx) && (p.Item1.Y == curry));
+                //if (indinborders == -1)
+                    pol_borders.Add(Tuple.Create(new Point(currx, curry), Color.FromArgb(currr, currg, currb)));
+
+                image4.SetPixel(currx + wdiv2, curry + hdiv2, Color.FromArgb(currr, currg, currb));
+            }
+        }
+
+        public void drawPolyhedron(Polyhedron polyhed, Color c, double phi_a, double psi_a, PointPol view_vector)
+        {
+            int wdiv2 = pictureBox4.Width / 2;
+            int hdiv2 = pictureBox4.Height / 2;
+            image4 = new Bitmap(pictureBox4.Image);
+            if (polyhed.polygons.Count() > 3)
+            {
+                List<Point> points2d = new List<Point>();
+                foreach (var p in polyhed.points)
+                {
+                    points2d.Add(p.To2D(phi_a, psi_a));
+                }
+
+                List<Tuple<Point, Color>> pol_borders = new List<Tuple<Point, Color>>();
+                foreach (var pol in polyhed.polygons)
+                {
+                    if (isVisible(pol, view_vector))
+                    {
+                        List<int> indices_in_points = new List<int>();
+                        foreach (var p in pol.points)
+                        {
+                            int ind = polyhed.points.FindIndex(pinpol => pointsEqual(pinpol, p));
+                            indices_in_points.Add(ind);
+                        }
+                        foreach(var indinp in indices_in_points)
+                        {
+                            int x = points2d[indinp].X;
+                            int y = points2d[indinp].Y;
+                            Color cdiff = colorByDiffuse(c, polyhed.point_to_diffuse[indinp]);
+                            image4.SetPixel(x+wdiv2, y+hdiv2, cdiff);
+                        }
+
+                        List<Tuple<int, int>> ind_edges_in_points = new List<Tuple<int, int>>();
+                        foreach (var e in pol.edges)
+                        {
+                            int ind1 = polyhed.points.FindIndex(pinpol => pointsEqual(pinpol, pol.points[e.Item1]));
+                            int ind2 = polyhed.points.FindIndex(pinpol => pointsEqual(pinpol, pol.points[e.Item2]));
+                            ind_edges_in_points.Add(Tuple.Create(ind1, ind2));
+                        }
+                        foreach (var edge in ind_edges_in_points)
+                        {
+                            Point p1 = points2d[edge.Item1];
+                            Point p2 = points2d[edge.Item2];
+                            Color cdiff1 = colorByDiffuse(c, polyhed.point_to_diffuse[edge.Item1]);
+                            Color cdiff2 = colorByDiffuse(c, polyhed.point_to_diffuse[edge.Item2]);
+                            drawLineBetweenPoints(p1, p2, cdiff1, cdiff2, wdiv2, hdiv2, ref pol_borders);
+                        }
+                        pol_borders = pol_borders.OrderBy(t => t.Item1.Y).ThenBy(t => t.Item1.X).ToList();
+                    }
+                }
+                pictureBox4.Image = image4;
+            }
+        }
+
+        public void find_center(List<Polygon> pols, ref double x, ref double y, ref double z)
 		{
 			x = 0; y = 0; z = 0;
 
@@ -445,6 +614,7 @@ namespace Task_3
 
             ClearPic1();
             ClearPic3(phi_a, psi_a);
+            ClearPic4(phi_a, psi_a);
 
             string ax = comboBoxBuildAxis.SelectedItem.ToString();
             int cnt = Int32.Parse(textBoxBuildCount.Text);
@@ -501,12 +671,15 @@ namespace Task_3
             {
                 ClearPic1();
                 ClearPic3(phi_a, psi_a);
+                ClearPic4(phi_a, psi_a);
                 drawPols(fig.polygons, phi_a, psi_a, view_vector);
+                drawPolyhedron(fig, light_color, phi_a, psi_a, view_vector);
             }
             else
             {
                 ClearPic1();
                 ClearPic3(phi_a, psi_a);
+                ClearPic4(phi_a, psi_a);
                 drawPols(pols_rotate.polygons, phi_a, psi_a, view_vector);
             }
         }
@@ -591,6 +764,7 @@ namespace Task_3
 
             ClearPic1();
             ClearPic3(phi_a, psi_a);
+            ClearPic4(phi_a, psi_a);
 
             string ax = comboBoxBuildAxis.SelectedItem.ToString();
             int cnt = Int32.Parse(textBoxBuildCount.Text);
@@ -601,6 +775,7 @@ namespace Task_3
 
             buildFig(rotate_around);
             drawPols(fig.polygons, phi_a, psi_a, new PointPol(view_x, view_y, view_z));
+            drawPolyhedron(fig, light_color, phi_a, psi_a, new PointPol(view_x, view_y, view_z));
             fig_drawed = true;
         }
 
@@ -705,6 +880,7 @@ namespace Task_3
 
                 reDrawPols(phi_a, psi_a, new PointPol(view_x, view_y, view_z));
                 pictureBox3.Image = pictureBox3.Image;
+                pictureBox4.Image = pictureBox4.Image;
 
                 System.Threading.Thread.Sleep(sleep);
                 Application.DoEvents();
@@ -747,6 +923,41 @@ namespace Task_3
             fig.scale(curr_ind);
 
             reDrawPols(phi_a, psi_a, new PointPol(view_x, view_y, view_z));
+        }
+
+        private void buttonLightColor_Click(object sender, EventArgs e)
+        {
+            ColorDialog cd = new ColorDialog();
+            cd.ShowDialog();
+            light_color = cd.Color;
+        }
+
+        private void buttonDoLight_Click(object sender, EventArgs e)
+        {
+            double phi_a = hScrollBar1.Value;
+            double psi_a = hScrollBar2.Value;
+            double view_x = double.Parse(textBoxViewVectorX.Text);
+            double view_y = double.Parse(textBoxViewVectorY.Text);
+            double view_z = double.Parse(textBoxViewVectorZ.Text);
+
+            fig.updLightLocations(light_location_x, light_location_y, light_location_z);
+            reDrawPols(phi_a, psi_a, new PointPol(view_x, view_y, view_z));
+            pictureBox4.Image = pictureBox4.Image;
+        }
+
+        private void textBoxLightLocationX_TextChanged(object sender, EventArgs e)
+        {
+            double.TryParse(textBoxLightLocationX.Text, out light_location_x);
+        }
+
+        private void textBoxLightLocationY_TextChanged(object sender, EventArgs e)
+        {
+            double.TryParse(textBoxLightLocationY.Text, out light_location_y);
+        }
+
+        private void textBoxLightLocationZ_TextChanged(object sender, EventArgs e)
+        {
+            double.TryParse(textBoxLightLocationZ.Text, out light_location_z);
         }
 
         private void buttonMinus_Click(object sender, EventArgs e)
@@ -1283,11 +1494,13 @@ namespace Task_3
 
     public class Polyhedron
     {
+        double light_loc_x, light_loc_y, light_loc_z;
         public Dictionary<int, List<int>> point_to_pols = 
             new Dictionary<int, List<int>>();
         public List<PointPol> points = new List<PointPol>();
         public List<Polygon> polygons;
 		public Dictionary<int, PointPol> point_to_normal = new Dictionary<int, PointPol>();
+        public Dictionary<int, double> point_to_diffuse = new Dictionary<int, double>();
 
         public Polyhedron()
         {
@@ -1297,6 +1510,18 @@ namespace Task_3
         public Polyhedron(List<Polygon> pols)
         {
 
+        }
+
+        public void updLightLocations(double light_location_x, double light_location_y, double light_location_z)
+        {
+            light_loc_x = light_location_x;
+            light_loc_y = light_location_y;
+            light_loc_z = light_location_z;
+        }
+
+        private double scalarProduct(PointPol vec1, PointPol vec2)
+        {
+            return (vec1.X * vec2.X + vec1.Y * vec2.Y + vec1.Z * vec2.Z);
         }
 
         private bool pointsEqual(PointPol p1, PointPol p2)
@@ -1318,8 +1543,12 @@ namespace Task_3
             }
 			if (polygons.Count() > 5)
 			{
-				fillPointToPols();
+                point_to_pols.Clear();
+                point_to_normal.Clear();
+                point_to_diffuse.Clear();
+                fillPointToPols();
 				fillPointToNormal();
+                fillPointToDiffuse();
 			}
         }
 
@@ -1327,6 +1556,8 @@ namespace Task_3
 		{
 			polygons.Clear();
 			point_to_pols.Clear();
+            point_to_normal.Clear();
+            point_to_diffuse.Clear();
 			points.Clear();
 		}
 
@@ -1374,6 +1605,22 @@ namespace Task_3
 			}
 		}
 
+        public void fillPointToDiffuse()
+        {
+            foreach (var indpoint in point_to_normal.Keys)
+            {
+                double px = points[indpoint].X;
+                double py = points[indpoint].Y;
+                double pz = points[indpoint].Z;
+
+                //PointPol light_normal = new PointPol(px - light_loc_x, py - light_loc_y, pz - light_loc_z).normalize();
+                PointPol light_normal = new PointPol(light_loc_x - px, light_loc_y - py, light_loc_z - pz).normalize();
+                PointPol v_norm = point_to_normal[indpoint].normalize();
+
+                double diffuse = Math.Max(scalarProduct(v_norm, light_normal), 0.0)*2;
+                point_to_diffuse.Add(indpoint, diffuse);
+            }
+        }
 		
         public void find_center(ref double x, ref double y, ref double z)
         {
