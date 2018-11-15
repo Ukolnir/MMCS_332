@@ -460,10 +460,11 @@ namespace Task_3
                 b = b * diffuse;
                 return Color.FromArgb((int)r, (int)g, (int)b);
             }
+            
         }
 
-        public void drawLineBetweenPoints(Point p1, Point p2, Color c1, Color c2,
-            int wdiv2, int hdiv2, ref Dictionary<int, List<Tuple<int, Color>>> pol_borders)
+        public void drawLineBetweenPoints(Point p1, Point p2, double diffuse1, double diffuse2,
+            int wdiv2, int hdiv2, ref Dictionary<int, List<Tuple<int, double>>> pol_borders)
         {
             int x1 = p1.X;
             int y1 = p1.Y;
@@ -472,23 +473,18 @@ namespace Task_3
             int diffx = Math.Abs(x2 - x1);
             int diffy = Math.Abs(y2 - y1);
             int diff = Math.Max(diffx, diffy);
-            int currx = x1;
-            int curry = y1;
             double stepx = (double)(x2 - x1) / diff;
             double stepy = (double)(y2 - y1) / diff;
-            double stepr = (double)(c2.R - c1.R) / diff;
-            double stepg = (double)(c2.G - c1.G) / diff;
-            double stepb = (double)(c2.B - c1.B) / diff;
+            double stepdiffuse = (diffuse2 - diffuse1) / diff;
 
             List<int> xs = new List<int>();
             List<int> ys = new List<int>();
             for (int i = 0; i < diff; ++i)
             {
-                currx = (int)Math.Round(x1 + stepx * i);
-                curry = (int)Math.Round(y1 + stepy * i);
-                int currr = (int)Math.Round(c1.R + stepr * i);
-                int currg = (int)Math.Round(c1.G + stepg * i);
-                int currb = (int)Math.Round(c1.B + stepb * i);
+                int currx = (int)Math.Round(x1 + stepx * i);
+                int curry = (int)Math.Round(y1 + stepy * i);
+                double currdiffuse = diffuse1 + stepdiffuse * i;
+                //int currb = (int)Math.Round(c1.B + stepb * i);
 
                 int indxinxs = xs.FindIndex(xinl => (xinl == currx));// || (p.Item1.Y == curry));// && (p.Item1.Y == curry));
                 int indyinys = ys.FindIndex(yinl => (yinl == curry));
@@ -497,12 +493,12 @@ namespace Task_3
                     bool y_repeat = pol_borders.Keys.Contains(curry);
                     if (y_repeat)
                     {
-                        pol_borders[curry].Add(Tuple.Create(currx, Color.FromArgb(currr, currg, currb)));
+                        pol_borders[curry].Add(Tuple.Create(currx, currdiffuse));
                     }
                     else
                     {
-                        pol_borders.Add(curry, new List<Tuple<int, Color>>());
-                        pol_borders[curry].Add(Tuple.Create(currx, Color.FromArgb(currr, currg, currb)));
+                        pol_borders.Add(curry, new List<Tuple<int, double>>());
+                        pol_borders[curry].Add(Tuple.Create(currx, currdiffuse));
                     }
                 }
                 if (indxinxs == -1)
@@ -511,7 +507,7 @@ namespace Task_3
                     ys.Add(curry);
 
                 if ((currx > -wdiv2) && (currx < wdiv2) && (curry > -hdiv2) && (curry < hdiv2))
-                    image4.SetPixel(currx + wdiv2, curry + hdiv2, Color.FromArgb(currr, currg, currb));
+                    image4.SetPixel(currx + wdiv2, curry + hdiv2, colorByDiffuse(light_color, currdiffuse));
             }
         }
 
@@ -532,8 +528,8 @@ namespace Task_3
                 {
                     if (isVisible(pol, view_vector))
                     {
-                        //y, [<x, Color>]
-                        Dictionary<int, List<Tuple<int, Color>>> pol_borders = new Dictionary<int, List<Tuple<int, Color>>>();
+                        //y, [<x, diffuse>]
+                        Dictionary<int, List<Tuple<int, double>>> pol_borders = new Dictionary<int, List<Tuple<int, double>>>();
                         List<int> indices_in_points = new List<int>();
                         foreach (var p in pol.points)
                         {
@@ -561,17 +557,17 @@ namespace Task_3
                         {
                             Point p1 = points2d[edge.Item1];
                             Point p2 = points2d[edge.Item2];
-                            Color cdiff1 = colorByDiffuse(c, polyhed.point_to_diffuse[edge.Item1]);
-                            Color cdiff2 = colorByDiffuse(c, polyhed.point_to_diffuse[edge.Item2]);
-                            drawLineBetweenPoints(p1, p2, cdiff1, cdiff2, wdiv2, hdiv2, ref pol_borders);
+                            double diff1 = polyhed.point_to_diffuse[edge.Item1];
+                            double diff2 = polyhed.point_to_diffuse[edge.Item2];
+                            drawLineBetweenPoints(p1, p2, diff1, diff2, wdiv2, hdiv2, ref pol_borders);
                         }
                         //pol_borders = pol_borders.OrderBy(t => t.Item1.Y).ThenBy(t => t.Item1.X).ToList();
 
                         int a = 5;
                         foreach (var y in pol_borders.Keys)
                         {
-                            Tuple<int, Color> mint = pol_borders[y].First();
-                            Tuple<int, Color> maxt = pol_borders[y].First();
+                            Tuple<int, double> mint = pol_borders[y].First();
+                            Tuple<int, double> maxt = pol_borders[y].First();
                             foreach (var t in pol_borders[y])
                             {
                                 if (t.Item1 < mint.Item1)
@@ -579,7 +575,7 @@ namespace Task_3
                                 if (t.Item1 > maxt.Item1)
                                     maxt = t;
                             }
-                            Dictionary<int, List<Tuple<int, Color>>> to_del = new Dictionary<int, List<Tuple<int, Color>>>();
+                            Dictionary<int, List<Tuple<int, double>>> to_del = new Dictionary<int, List<Tuple<int, double>>>();
                             drawLineBetweenPoints(new Point(mint.Item1, y), new Point(maxt.Item1, y), mint.Item2, maxt.Item2, wdiv2, hdiv2, ref to_del);
                         }
 
@@ -979,6 +975,9 @@ namespace Task_3
             double view_x = double.Parse(textBoxViewVectorX.Text);
             double view_y = double.Parse(textBoxViewVectorY.Text);
             double view_z = double.Parse(textBoxViewVectorZ.Text);
+            double.TryParse(textBoxLightLocationX.Text, out light_location_x);
+            double.TryParse(textBoxLightLocationY.Text, out light_location_y);
+            double.TryParse(textBoxLightLocationZ.Text, out light_location_z);
 
             ClearPic4(phi_a, psi_a);
 
@@ -991,12 +990,13 @@ namespace Task_3
         {
             double time = double.Parse(textBoxLightTime.Text);
 
-            double angle = 0;
+            double curr_angle = 0;
             double phi_a = hScrollBar1.Value;
             double psi_a = hScrollBar2.Value;
             double view_x = double.Parse(textBoxViewVectorX.Text);
             double view_y = double.Parse(textBoxViewVectorY.Text);
             double view_z = double.Parse(textBoxViewVectorZ.Text);
+            double angle = double.Parse(textBoxLightAngle.Text);
             int sleep = int.Parse(textBoxLightSleep.Text);
 
             DateTime date1 = DateTime.Now;
@@ -1007,9 +1007,9 @@ namespace Task_3
                     break;
 
                 int radius = 300;
-                light_location_x = (int)Math.Round(radius * Math.Cos(angle));
-                light_location_z = (int)Math.Round(radius * Math.Sin(angle));
-                angle += Math.PI / 180;
+                light_location_x = (int)Math.Round(radius * Math.Cos(curr_angle));
+                light_location_z = (int)Math.Round(radius * Math.Sin(curr_angle));
+                curr_angle += Math.PI / 360 * angle;
 
                 fig.updLightLocations(light_location_x, light_location_y, light_location_z);
                 reDrawPols(phi_a, psi_a, new PointPol(view_x, view_y, view_z));
@@ -1025,15 +1025,21 @@ namespace Task_3
         private void textBoxLightLocationX_TextChanged(object sender, EventArgs e)
         {
             double.TryParse(textBoxLightLocationX.Text, out light_location_x);
+            double.TryParse(textBoxLightLocationY.Text, out light_location_y);
+            double.TryParse(textBoxLightLocationZ.Text, out light_location_z);
         }
 
         private void textBoxLightLocationY_TextChanged(object sender, EventArgs e)
         {
+            double.TryParse(textBoxLightLocationX.Text, out light_location_x);
             double.TryParse(textBoxLightLocationY.Text, out light_location_y);
+            double.TryParse(textBoxLightLocationZ.Text, out light_location_z);
         }
 
         private void textBoxLightLocationZ_TextChanged(object sender, EventArgs e)
         {
+            double.TryParse(textBoxLightLocationX.Text, out light_location_x);
+            double.TryParse(textBoxLightLocationY.Text, out light_location_y);
             double.TryParse(textBoxLightLocationZ.Text, out light_location_z);
         }
 
