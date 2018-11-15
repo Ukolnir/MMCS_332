@@ -406,7 +406,8 @@ namespace Task_3
                     new Vector(p2.points[p2.edges[i].Item1],
                     p2.points[p2.edges[i].Item2])
                     );
-                pol.color = Color.FromArgb(r.Next(0, 255), r.Next(0, 255), r.Next(0, 255));
+                //pol.color = Color.FromArgb(r.Next(0, 255), r.Next(0, 255), r.Next(0, 255));
+                pol.color = Color.FromArgb(100, 100, 100);
                 int ind = fig.polygons.FindIndex(polinl => polygonsEqual(polinl, pol));
                 if (ind == -1 && pol.edges.Count() > 2)
                     fig.addPolygon(pol);
@@ -461,8 +462,8 @@ namespace Task_3
             }
         }
 
-        public void drawLineBetweenPoints(Point p1, Point p2, Color c1, Color c2, 
-            int wdiv2, int hdiv2, ref List<Tuple<Point, Color>> pol_borders)
+        public void drawLineBetweenPoints(Point p1, Point p2, Color c1, Color c2,
+            int wdiv2, int hdiv2, ref Dictionary<int, List<Tuple<int, Color>>> pol_borders)
         {
             int x1 = p1.X;
             int y1 = p1.Y;
@@ -479,6 +480,8 @@ namespace Task_3
             double stepg = (double)(c2.G - c1.G) / diff;
             double stepb = (double)(c2.B - c1.B) / diff;
 
+            List<int> xs = new List<int>();
+            List<int> ys = new List<int>();
             for (int i = 0; i < diff; ++i)
             {
                 currx = (int)Math.Round(x1 + stepx * i);
@@ -487,11 +490,28 @@ namespace Task_3
                 int currg = (int)Math.Round(c1.G + stepg * i);
                 int currb = (int)Math.Round(c1.B + stepb * i);
 
-                //int indinborders = pol_borders.FindIndex(p => (p.Item1.X == currx) && (p.Item1.Y == curry));
-                //if (indinborders == -1)
-                    pol_borders.Add(Tuple.Create(new Point(currx, curry), Color.FromArgb(currr, currg, currb)));
+                int indxinxs = xs.FindIndex(xinl => (xinl == currx));// || (p.Item1.Y == curry));// && (p.Item1.Y == curry));
+                int indyinys = ys.FindIndex(yinl => (yinl == curry));
+                if ((indxinxs == -1) || (indyinys == -1))
+                {
+                    bool y_repeat = pol_borders.Keys.Contains(curry);
+                    if (y_repeat)
+                    {
+                        pol_borders[curry].Add(Tuple.Create(currx, Color.FromArgb(currr, currg, currb)));
+                    }
+                    else
+                    {
+                        pol_borders.Add(curry, new List<Tuple<int, Color>>());
+                        pol_borders[curry].Add(Tuple.Create(currx, Color.FromArgb(currr, currg, currb)));
+                    }
+                }
+                if (indxinxs == -1)
+                    xs.Add(currx);
+                if (indyinys == -1)
+                    ys.Add(curry);
 
-                image4.SetPixel(currx + wdiv2, curry + hdiv2, Color.FromArgb(currr, currg, currb));
+                if ((currx > -wdiv2) && (currx < wdiv2) && (curry > -hdiv2) && (curry < hdiv2))
+                    image4.SetPixel(currx + wdiv2, curry + hdiv2, Color.FromArgb(currr, currg, currb));
             }
         }
 
@@ -507,24 +527,27 @@ namespace Task_3
                 {
                     points2d.Add(p.To2D(phi_a, psi_a));
                 }
-
-                List<Tuple<Point, Color>> pol_borders = new List<Tuple<Point, Color>>();
+                
                 foreach (var pol in polyhed.polygons)
                 {
                     if (isVisible(pol, view_vector))
                     {
+                        //y, [<x, Color>]
+                        Dictionary<int, List<Tuple<int, Color>>> pol_borders = new Dictionary<int, List<Tuple<int, Color>>>();
                         List<int> indices_in_points = new List<int>();
                         foreach (var p in pol.points)
                         {
                             int ind = polyhed.points.FindIndex(pinpol => pointsEqual(pinpol, p));
-                            indices_in_points.Add(ind);
+                            //if (ind != 1)
+                                indices_in_points.Add(ind);
                         }
                         foreach(var indinp in indices_in_points)
                         {
                             int x = points2d[indinp].X;
                             int y = points2d[indinp].Y;
                             Color cdiff = colorByDiffuse(c, polyhed.point_to_diffuse[indinp]);
-                            image4.SetPixel(x+wdiv2, y+hdiv2, cdiff);
+                            if ((x > -wdiv2) && (x < wdiv2) && (y > -hdiv2) && (y < hdiv2))
+                                image4.SetPixel(x+wdiv2, y+hdiv2, cdiff);
                         }
 
                         List<Tuple<int, int>> ind_edges_in_points = new List<Tuple<int, int>>();
@@ -542,8 +565,25 @@ namespace Task_3
                             Color cdiff2 = colorByDiffuse(c, polyhed.point_to_diffuse[edge.Item2]);
                             drawLineBetweenPoints(p1, p2, cdiff1, cdiff2, wdiv2, hdiv2, ref pol_borders);
                         }
-                        pol_borders = pol_borders.OrderBy(t => t.Item1.Y).ThenBy(t => t.Item1.X).ToList();
-                    }
+                        //pol_borders = pol_borders.OrderBy(t => t.Item1.Y).ThenBy(t => t.Item1.X).ToList();
+
+                        int a = 5;
+                        foreach (var y in pol_borders.Keys)
+                        {
+                            Tuple<int, Color> mint = pol_borders[y].First();
+                            Tuple<int, Color> maxt = pol_borders[y].First();
+                            foreach (var t in pol_borders[y])
+                            {
+                                if (t.Item1 < mint.Item1)
+                                    mint = t;
+                                if (t.Item1 > maxt.Item1)
+                                    maxt = t;
+                            }
+                            Dictionary<int, List<Tuple<int, Color>>> to_del = new Dictionary<int, List<Tuple<int, Color>>>();
+                            drawLineBetweenPoints(new Point(mint.Item1, y), new Point(maxt.Item1, y), mint.Item2, maxt.Item2, wdiv2, hdiv2, ref to_del);
+                        }
+
+                    } 
                 }
                 pictureBox4.Image = image4;
             }
@@ -880,7 +920,7 @@ namespace Task_3
 
                 reDrawPols(phi_a, psi_a, new PointPol(view_x, view_y, view_z));
                 pictureBox3.Image = pictureBox3.Image;
-                pictureBox4.Image = pictureBox4.Image;
+                //pictureBox4.Image = pictureBox4.Image;
 
                 System.Threading.Thread.Sleep(sleep);
                 Application.DoEvents();
@@ -940,9 +980,46 @@ namespace Task_3
             double view_y = double.Parse(textBoxViewVectorY.Text);
             double view_z = double.Parse(textBoxViewVectorZ.Text);
 
+            ClearPic4(phi_a, psi_a);
+
             fig.updLightLocations(light_location_x, light_location_y, light_location_z);
-            reDrawPols(phi_a, psi_a, new PointPol(view_x, view_y, view_z));
-            pictureBox4.Image = pictureBox4.Image;
+            drawPolyhedron(fig, light_color, phi_a, psi_a, new PointPol(view_x, view_y, view_z));
+            //pictureBox4.Image = pictureBox4.Image;
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            double time = double.Parse(textBoxLightTime.Text);
+
+            double angle = 0;
+            double phi_a = hScrollBar1.Value;
+            double psi_a = hScrollBar2.Value;
+            double view_x = double.Parse(textBoxViewVectorX.Text);
+            double view_y = double.Parse(textBoxViewVectorY.Text);
+            double view_z = double.Parse(textBoxViewVectorZ.Text);
+            int sleep = int.Parse(textBoxLightSleep.Text);
+
+            DateTime date1 = DateTime.Now;
+            while (true)
+            {
+                DateTime date2 = DateTime.Now;
+                if (date2.Subtract(date1).TotalSeconds >= time)
+                    break;
+
+                int radius = 300;
+                light_location_x = (int)Math.Round(radius * Math.Cos(angle));
+                light_location_z = (int)Math.Round(radius * Math.Sin(angle));
+                angle += Math.PI / 180;
+
+                fig.updLightLocations(light_location_x, light_location_y, light_location_z);
+                reDrawPols(phi_a, psi_a, new PointPol(view_x, view_y, view_z));
+
+                pictureBox3.Image = pictureBox3.Image;
+                //pictureBox4.Image = pictureBox4.Image;
+
+                System.Threading.Thread.Sleep(sleep);
+                Application.DoEvents();
+            }
         }
 
         private void textBoxLightLocationX_TextChanged(object sender, EventArgs e)
@@ -1517,6 +1594,7 @@ namespace Task_3
             light_loc_x = light_location_x;
             light_loc_y = light_location_y;
             light_loc_z = light_location_z;
+            updPoints();
         }
 
         private double scalarProduct(PointPol vec1, PointPol vec2)
@@ -1531,6 +1609,31 @@ namespace Task_3
                 (Math.Abs(p1.Z - p2.Z) < 0.01);
         }
 
+        public void updPoints()
+        {
+            points.Clear();
+            foreach (var pol in polygons)
+            {
+                for (int i = 0; i < pol.points.Count(); ++i)
+                {
+                    int indpol = points.FindIndex(p => pointsEqual(p, pol.points[i]));
+                    if (indpol == -1)
+                        points.Add(pol.points[i]);
+                }
+            }
+            updPointDicts();
+        }
+
+        public void updPointDicts()
+        {
+            point_to_pols.Clear();
+            point_to_normal.Clear();
+            point_to_diffuse.Clear();
+            fillPointToPols();
+            fillPointToNormal();
+            fillPointToDiffuse();
+        }
+
         public void addPolygon(Polygon pol)
         {
             polygons.Add(pol);
@@ -1543,12 +1646,7 @@ namespace Task_3
             }
 			if (polygons.Count() > 5)
 			{
-                point_to_pols.Clear();
-                point_to_normal.Clear();
-                point_to_diffuse.Clear();
-                fillPointToPols();
-				fillPointToNormal();
-                fillPointToDiffuse();
+                updPointDicts();
 			}
         }
 
@@ -1649,6 +1747,7 @@ namespace Task_3
             {
                 item.scale(ind, a, b, c);
             }
+            updPoints();
         }
 
         public void shift(int x, int y, int z)
@@ -1657,6 +1756,7 @@ namespace Task_3
             {
                 item.shift(x, y, z);
             }
+            updPoints();
         }
 
         public void reflection(string axis)
@@ -1665,6 +1765,7 @@ namespace Task_3
             {
                 item.reflection(axis);
             }
+            updPoints();
         }
 
         public void rotate(int x1, int y1, int z1,
@@ -1680,6 +1781,7 @@ namespace Task_3
             {
                 item.rotate(ed, angle, a, b, c);
             }
+            updPoints();
         }
     }
 }
