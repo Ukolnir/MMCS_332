@@ -387,7 +387,7 @@ namespace Task_2
                     if (wh + p.X > -1 && wh + p.X < pictureBox1.Width && p.Y > -1 && p.Y < pictureBox1.Height && buff[wh + p.X, p.Y].z > p1.Item2)
                     {
                         buff[wh + p.X, p.Y].z = (int)p1.Item2;
-                        buff[wh + p.X, p.Y].c = Color.FromArgb(((i + 1) * 20) % 255, ((i + 1) * 10) % 255, ((i + 1) * 50) % 255);
+                        buff[wh + p.X, p.Y].c = Color.FromArgb(((i + 1) * 2) % 255, ((i + 1) * 5) % 255, ((i + 1) * 5) % 255);
                     }
                 }
 			return buff;

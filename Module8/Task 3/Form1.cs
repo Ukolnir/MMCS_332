@@ -12,8 +12,9 @@ namespace Task_3
 {
     public partial class Form1 : Form
     {
-		Graphics g;
+		Graphics g, g2;
         Polyhedron figure;
+        double x0;
         delegate double lambda(double a, double b);
         lambda f;
 
@@ -24,13 +25,17 @@ namespace Task_3
         {
             InitializeComponent();
             pictureBox1.Image = new Bitmap(pictureBox1.Width, pictureBox1.Height);
-			g = Graphics.FromImage(pictureBox1.Image);
+            pictureBox2.Image = new Bitmap(pictureBox2.Width, pictureBox2.Height);
+            g = Graphics.FromImage(pictureBox1.Image);
+            g2 = Graphics.FromImage(pictureBox2.Image);
 
-			g.ScaleTransform(1, -1);
+            g.ScaleTransform(1, -1);
 			g.TranslateTransform(pictureBox1.Width / 2, -pictureBox1.Height / 2);
-			//Clear();
+            g2.ScaleTransform(1, -1);
+            g2.TranslateTransform(pictureBox2.Width / 2, -pictureBox2.Height / 2);
+            //Clear();
 
-			textBox1.Text = "0";
+            textBox1.Text = "0";
             textBox2.Text = "10";
             textBox3.Text = "-10";
             textBox4.Text = "5";
@@ -73,25 +78,32 @@ namespace Task_3
             String s = comboBox3.SelectedItem.ToString();
             Pen my_pen = new Pen(Color.Blue);
             g.DrawLine(my_pen, p0.To2D(s), p1.To2D(s));
+            g2.DrawLine(my_pen, p0.To2D(s), p1.To2D(s));
             my_pen.Color = Color.Red;
             g.DrawLine(my_pen, p0.To2D(s), p2.To2D(s));
+            g2.DrawLine(my_pen, p0.To2D(s), p2.To2D(s));
             my_pen.Color = Color.Green;
 
             g.DrawLine(my_pen, p0.To2D(s), p3.To2D(s));
+            g2.DrawLine(my_pen, p0.To2D(s), p3.To2D(s));
         }
 
         public void ClearWithout()
         {
             g.Clear(pictureBox1.BackColor);
-			write_axes();
+            g2.Clear(pictureBox2.BackColor);
+            write_axes();
             pictureBox1.Image = pictureBox1.Image;
-		}
+            pictureBox2.Image = pictureBox2.Image;
+        }
 
 
         public void Clear()
         {
             g.Clear(pictureBox1.BackColor);
+            g2.Clear(pictureBox2.BackColor);
             pictureBox1.Image = pictureBox1.Image;
+            pictureBox2.Image = pictureBox2.Image;
 
             comboBox1.SelectedItem = "...";
             button4.Visible = false;
@@ -144,7 +156,7 @@ namespace Task_3
 
         private void create_pol()
         {
-            double x0 = Double.Parse(textBox1.Text.ToString());
+            x0 = Double.Parse(textBox1.Text.ToString());
             double x1 = Double.Parse(textBox2.Text.ToString());
             double y0 = Double.Parse(textBox3.Text.ToString());
             double y1 = Double.Parse(textBox4.Text.ToString());
@@ -191,171 +203,229 @@ namespace Task_3
             figure = new Polyhedron(polygons, l);
         }
 
+
         private void print_figure()
         {
-            Pen my_pen = new Pen(Color.Black);
-
-			//g.ScaleTransform(1, -1);
-			//g.TranslateTransform(pictureBox1.Width / 2, -pictureBox1.Height / 2);
-
 			string s = comboBox3.SelectedItem.ToString();
             int step = Int32.Parse(textBox5.Text.ToString());
 
-            List<Point> points2D = new List<Point>();
             foreach (var p in figure.points)
             {
-                points2D.Add(p.To2D(s));
-				if (!YMax.Keys.Contains(p.To2D(s).X))
-				{
-					YMax.Add(p.To2D(s).X, Int32.MaxValue);
-					YMin.Add(p.To2D(s).X, Int32.MaxValue);
-				}
-			}
-
-
-            foreach (var pl in figure.pol)
-                for (int i = 0; i < pl.edges.Count(); i += 2)
+                if (!YMax.Keys.Contains(p.To2D(s).X))
                 {
-                    var e = pl.edges[i];
-                    Point p1 = figure.points[e.nP1].To2D(s), p2 = figure.points[e.nP2].To2D(s);
-                    build_Y(p1, p2, step, i/2);
+                    YMax.Add(p.To2D(s).X, Int32.MaxValue);
+                    YMin.Add(p.To2D(s).X, Int32.MaxValue);
+                }
+                else
+                {
+                    if (p.To2D(s).Y > YMax[p.To2D(s).X])
+                        YMax[p.To2D(s).X] = p.To2D(s).Y;
+                    if (p.To2D(s).Y < YMin[p.To2D(s).X])
+                        YMin[p.To2D(s).X] = p.To2D(s).Y;
                 }
 
-            MyDraw(points2D, Color.BlueViolet, Color.DarkBlue);
+            }
+
+            FindRightPoints(figure.points, step, s);
+           // DrawPoint(d);
+        }
+
+        private void fillingYArray(List<PointPol> points, string s)
+        {
+            foreach (var p in figure.points)
+            {
+                if (!YMax.Keys.Contains(p.To2D(s).X))
+                {
+                    YMax.Add(p.To2D(s).X, Int32.MaxValue);
+                    YMin.Add(p.To2D(s).X, Int32.MaxValue);
+                }
+                else
+                {
+                    if (p.To2D(s).Y > YMax[p.To2D(s).X])
+                        YMax[p.To2D(s).X] = p.To2D(s).Y;
+                    if (p.To2D(s).Y < YMin[p.To2D(s).X])
+                        YMin[p.To2D(s).X] = p.To2D(s).Y;
+                }
+            }
+        }
+
+        private void DrawPoint( Dictionary<double, List<Point>> d)
+        {
+            Bitmap bmp = (Bitmap)pictureBox2.Image;
+            foreach (var k in d.Keys)
+                foreach (var p in d[k])
+                    bmp.SetPixel(p.X, p.Y, Color.BlueViolet);
+
+            pictureBox2.Image = bmp;
+        }
+
+        private Point pointOnLine(Point p1, Point p2, int x)
+        {
+            double y = ((x - p1.X) * (p2.Y- p1.Y) * 1.0) / (p2.X - p1.X) + p1.Y;
+            return new Point(x, (int)Math.Round(y));
+        }
+
+        private void FindRightPoints(List<PointPol> points, int step, string s)
+        {
+            Dictionary<double, List<Point>> res = new Dictionary<double, List<Point>>();
+
+            Bitmap bmp = (Bitmap)pictureBox2.Image;
+
+            //заполняем YMin, YMax
+            fillingYArray(points, s);
+
+            //сортируем точки по плоскости z
+            Dictionary<double, List<Point>> zList = new Dictionary<double, List<Point>>();
+            foreach (var p in points)
+            {
+                if (zList.Keys.Contains(p.Z))
+                    zList[p.Z].Add(p.To2D(s));
+                else
+                {
+                    List<Point> pList = new List<Point>();
+                    pList.Add(p.To2D(s));
+                    zList.Add(p.Z, pList);
+                }
+            }
+
+            List<double> keys = zList.Keys.OrderByDescending(z => z).ToList();
+            List<Point> newPoints = new List<Point>();      //массив видимых точек по заданной z
+            List<Point> pointsNow = zList[keys[0]].OrderBy(p1 => p1.X).ToList(); //все точки по z, которые были ранее
+
+            //Обрабатываем все точки для ZMax
+            newPoints.Add(pointsNow[0]);
+            YMax[pointsNow[0].X] = pointsNow[0].Y;
+            YMin[pointsNow[0].X] = pointsNow[0].Y;
+
+            for (int i = 1; i < pointsNow.Count(); ++i)
+            {
+                for (int x = pointsNow[i - 1].X; x < pointsNow[i].X; ++x)
+                {
+                    Point pN = pointOnLine(pointsNow[i - 1], pointsNow[i], x);
+                    newPoints.Add(pN);
+
+                    if (pN.X >= 0 && pN.X < pictureBox2.Width && pN.Y >= 0 && pN.Y < pictureBox2.Height)
+                       bmp.SetPixel(pN.X, pN.Y, Color.BlueViolet);
+
+                    YMax[pN.X] = pN.Y;
+                    YMin[pN.X] = pN.Y;
+                }
+
+                newPoints.Add(pointsNow[i]);
+                YMax[pointsNow[i].X] = pointsNow[i].Y;
+                YMin[pointsNow[i].X] = pointsNow[i].Y;
+            }
+
+            res.Add(keys[0], newPoints);
+
+            for (int i = 1; i < keys.Count(); ++i) //проходимся по остальным проекциям
+            {
+                newPoints = new List<Point>();
+                pointsNow = zList[keys[i]].OrderBy(p1 => p1.X).ToList(); //отсортировали по х
+                pointsNow.Add(res[keys[i - 1]][res[keys[i - 1]].Count() - 1]); //добавляем в конец предыдущую правую вершину
+                Point pLast = res[keys[i - 1]][0]; //находим пред. лев. границу
+
+                for (int j = 0; j < pointsNow.Count(); ++j) //проходим по ребру, пока точки видимы
+                {
+                    var p = pointsNow[j];
+                    while (pLast != p) 
+                    {
+                        int x;
+                        Point pN;
+                        //если предыдущая точка видима, добавляем все видимые точки в отрезке от нее до точки пересечения или следующей
+
+                        if ( !YMax.Keys.Contains(pLast.X) || YMax[pLast.X] == Int32.MaxValue || pLast.Y > YMax[pLast.X] || pLast.Y < YMin[pLast.X])
+                        {
+                            if (!YMax.Keys.Contains(pLast.X))
+                            {
+                                YMax.Add(pLast.X, Int32.MaxValue);
+                                YMin.Add(pLast.X, Int32.MaxValue);
+                            }
+
+                            if (pLast != res[keys[i - 1]][0])
+                            {
+                                newPoints.Add(pLast);
+
+                                if (pLast.X >= 0 && pLast.X < pictureBox2.Width && pLast.Y >= 0 && pLast.Y < pictureBox2.Height)
+                                    bmp.SetPixel(pLast.X, pLast.Y, Color.BlueViolet);
+
+                                if (YMax[pLast.X] == Int32.MaxValue)
+                                {
+                                    YMax[pLast.X] = pLast.Y;
+                                    YMin[pLast.X] = pLast.Y;
+                                }
+                                else
+                                    if (YMax[pLast.X] < pLast.Y)
+                                    YMax[pLast.X] = pLast.Y;
+                                else
+                                    YMin[pLast.X] = pLast.Y;
+                            }
+
+                        }
+
+                        x = pLast.X < p.X ? pLast.X + 1 : pLast.X - 1;
+                        if (j > 0)
+                        {
+                            pN = pointOnLine(pointsNow[j - 1], pointsNow[j], x);
+                            pLast = pN;
+                        }
+                        else
+                        {
+                            pN = pointOnLine(pointsNow[j], pointsNow[j + 1], x);
+                            pLast = pN;
+                        }
+
+                    }
+
+                    if (pLast != res[keys[i - 1]][res[keys[i - 1]].Count() - 1] && (YMax[pLast.X] == Int32.MaxValue || pLast.Y > YMax[pLast.X] || pLast.Y < YMin[pLast.X]))
+                    {
+                        if (pLast.X >= 0 && pLast.X < pictureBox2.Width && pLast.Y >= 0 && pLast.Y < pictureBox2.Height)
+                            bmp.SetPixel(pLast.X, pLast.Y, Color.BlueViolet);
+                        newPoints.Add(pLast);
+                        if (YMax[pLast.X] == Int32.MaxValue)
+                        {
+                            YMax[pLast.X] = pLast.Y;
+                            YMin[pLast.X] = pLast.Y;
+                        }
+                        else
+                            if (YMax[pLast.X] < pLast.Y)
+                            YMax[pLast.X] = pLast.Y;
+                        else
+                            YMin[pLast.X] = pLast.Y;
+                    }
+                }
+                res.Add(keys[i], newPoints);
+
+                pictureBox2.Image = bmp;
+            }
+            //сохраняем видимые точки для остальных z
+
             YMax.Clear();
             YMin.Clear();
+            //return res;
         }
-
-        private void build_Y(Point p1, Point p2, int step, int num_edg)
+    
+        private void old_print_figure()
         {
-            if (YMax[p1.X] == Int32.MaxValue)
-            {
-                YMax[p1.X] = p1.Y;
-                YMin[p1.X] = p1.Y;
-            }
-            else
-            {
-                if (p1.Y > YMax[p1.X])
-                    YMax[p1.X] = p1.Y;
-                if (p1.Y < YMin[p1.X])
-                    YMin[p1.X] = p1.Y;
-            }
+            Pen my_pen = new Pen(Color.BlueViolet);
+            string s = comboBox3.SelectedItem.ToString();
 
-           /* for (int i = p1.X + 1; i < p2.X; ++i)
-            {
-                if (YMax[i] == Int32.MaxValue)
+            foreach (var pl in figure.pol)
+                foreach (var e in pl.edges)
                 {
-                    YMax[i] = ourZ[i - p1.X - 1];
-                    YMin[i] = ourZ[i-p1.X - 1];
+                    Point p1 = figure.points[e.nP1].To2D(s), p2 = figure.points[e.nP2].To2D(s);
+                    g.DrawLine(my_pen, p1, p2);
                 }
-                else
-                {
-                    if (ourZ[i - p1.X - 1] > YMax[i])
-                        YMax[i] = ourZ[i - p1.X - 1];
-                    if (ourZ[i - p1.X - 1] < YMin[i])
-                        YMin[i] = ourZ[i - p1.X - 1];
-                }
-            }*/
-
-            if (YMax[p2.X] == Int32.MaxValue)
-            {
-                YMax[p2.X] = p2.Y;
-                YMin[p2.X] = p2.Y;
-            }
-            else
-            {
-                if (p2.Y > YMax[p2.X])
-                    YMax[p2.X] = p2.Y;
-                if (p2.Y < YMin[p2.X])
-                    YMin[p2.X] = p2.Y;
-            }
-        }
-
-
-       /* private void intersect(Point p1, Point p2, Color UpColor, Color DownColor)
-        {
-            int x = p1.X;
-            Color c = UpColor;
-            if ((p1.Y < YMax[p1.X] && p1.Y > YMin[p1.X]))
-                c = DownColor;
-            Color c1 = c;
-            while (c1 == c)
-            {
-                x++;
-                if ((p1.Y < YMax[p1.X] && p1.Y > YMin[p1.X]))
-                    c1 = DownColor;
-                else
-                    c1 = UpColor;
-            }
-
-            x--;
-
-            Graphics g = Graphics.FromImage(pictureBox1.Image);
-            Pen c_pen = new Pen(c);
-            Pen c1_pen = new Pen(c1);
-
-            int y = p1.Y < YMin[x] ? YMin[x] : YMax[x];
-            Point pM = new Point(x, y);
-            g.DrawLine(c_pen, p1, pM);
-
-            x++;
-            y = y < YMin[x] ? YMin[x] : YMax[x];
-            pM = new Point(x, y);
-            g.DrawLine(c1_pen, pM, p2);
 
             pictureBox1.Image = pictureBox1.Image;
         }
-		*/
-
-        private void MyDraw(List<Point> points, Color UpColor, Color DownColor)
-        {
-            //Graphics g = Graphics.FromImage(pictureBox1.Image);
-            Pen u_pen = new Pen(UpColor);
-			/*Pen d_pen = new Pen(DownColor);
-
-            Point p1 = points.First();
-
-            for (int i = 1; i < points.Count(); ++i)
-            {
-                if (inOneSide(p1, points[i]))
-                    if ((p1.Y < YMax[p1.X] && p1.Y > YMin[p1.X]))
-                        g.DrawLine(u_pen, p1, points[i]);
-                    else
-                        g.DrawLine(d_pen, p1, points[i]);
-                else
-                    intersect(p1, points[i], UpColor, DownColor);
-                p1 = points[i];
-            }
-			*/
-			List<int> keys = YMax.Keys.OrderBy(x => x).ToList();
-			Point p1 = new Point(keys[0], YMax[keys[0]]); 
-
-			foreach (var k in keys)
-			{
-				if (k == keys[0])
-					continue;
-
-				Point p2 = new Point(k, YMax[k]);
-				Point p1Min = new Point(p1.X, YMin[p1.X]);
-				Point p2Min = new Point(k, YMin[k]);
-
-				g.DrawLine(u_pen, p1, p2);
-				g.DrawLine(u_pen, p1Min, p2Min);
-				g.DrawLine(u_pen, p1Min, p1);
-				g.DrawLine(u_pen, p1Min, p2);
-
-				p1 = p2;
-			}
-
-			pictureBox1.Image = pictureBox1.Image; //bmp;
-        }
-
 
     private void button1_Click(object sender, EventArgs e)
         {
             create_pol();
             ClearWithout();
             print_figure();
+            old_print_figure();
 
             button4.Visible = true;
             button5.Visible = true;
@@ -406,6 +476,7 @@ namespace Task_3
             ClearWithout();
             figure.reflection(comboBox2.SelectedItem.ToString());
             print_figure();
+            old_print_figure();
         }
 
         private void button7_Click(object sender, EventArgs e)
@@ -414,6 +485,7 @@ namespace Task_3
             double ind_scale = Double.Parse(textBox9.Text.ToString());
             figure.scale(ind_scale);
             print_figure();
+            old_print_figure();
         }
 
         private void button4_Click(object sender, EventArgs e)
@@ -425,6 +497,7 @@ namespace Task_3
 
             figure.shift(x, y, z);
             print_figure();
+            old_print_figure();
         }
 
 		private string save()
@@ -477,6 +550,7 @@ namespace Task_3
 
             figure.rotate(Tuple.Create(p1,p2), angle);
             print_figure();
+            old_print_figure();
         }
 
 		private void button3_Click(object sender, EventArgs e)
