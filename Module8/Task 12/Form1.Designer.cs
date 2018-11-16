@@ -107,6 +107,7 @@
             this.button3 = new System.Windows.Forms.Button();
             this.groupBox17 = new System.Windows.Forms.GroupBox();
             this.textBoxLightTime = new System.Windows.Forms.TextBox();
+            this.buttonLoadTexture = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
@@ -996,11 +997,22 @@
             this.textBoxLightTime.TabIndex = 0;
             this.textBoxLightTime.Text = "10";
             // 
+            // buttonLoadTexture
+            // 
+            this.buttonLoadTexture.Location = new System.Drawing.Point(1397, 54);
+            this.buttonLoadTexture.Name = "buttonLoadTexture";
+            this.buttonLoadTexture.Size = new System.Drawing.Size(110, 44);
+            this.buttonLoadTexture.TabIndex = 88;
+            this.buttonLoadTexture.Text = "LoadTexture";
+            this.buttonLoadTexture.UseVisualStyleBackColor = true;
+            this.buttonLoadTexture.Click += new System.EventHandler(this.buttonLoadTexture_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1604, 811);
+            this.Controls.Add(this.buttonLoadTexture);
             this.Controls.Add(this.groupBox14);
             this.Controls.Add(this.pictureBox4);
             this.Controls.Add(this.groupBox8);
@@ -1147,6 +1159,7 @@
         private System.Windows.Forms.TextBox textBoxLightTime;
         private System.Windows.Forms.GroupBox groupBox16;
         private System.Windows.Forms.TextBox textBoxLightAngle;
+        private System.Windows.Forms.Button buttonLoadTexture;
     }
 }
 
