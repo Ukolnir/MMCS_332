@@ -13,7 +13,7 @@ namespace Task_3
     public partial class Form1 : Form
     {
         Graphics g, g2, g3, g4;
-        Bitmap image4, texture;
+        Bitmap texture;
 
         List<PointPol> points = new List<PointPol>();
         //List<Polygon> pols_rotate = new List<Polygon>();
@@ -58,7 +58,7 @@ namespace Task_3
             pictureBox4.Image = new Bitmap(pictureBox4.Width, pictureBox4.Height);
             g4 = Graphics.FromImage(pictureBox4.Image);
             g4.TranslateTransform(pictureBox4.Width / 2, pictureBox4.Height / 2);
-            image4 = new Bitmap(pictureBox4.Image);
+            //image4 = new Bitmap(pictureBox4.Image);
 
             write_axes1();
 			write_axes2();
@@ -223,8 +223,7 @@ namespace Task_3
         public void ClearPic4(double phi_a, double psi_a)
         {
             g4.Clear(pictureBox4.BackColor);
-            image4 = new Bitmap(pictureBox4.Width, pictureBox4.Height);
-            pictureBox4.Image = image4;
+            pictureBox4.Image = pictureBox4.Image;
 
             write_axes4(phi_a, psi_a, ind);
         }
@@ -561,8 +560,8 @@ namespace Task_3
                 if (indyinys == -1)
                     ys.Add(curry);
 
-                if ((currx > -wdiv2) && (currx < wdiv2) && (curry > -hdiv2) && (curry < hdiv2))
-                    image4.SetPixel(currx + wdiv2, curry + hdiv2, colorByDiffuse(light_color, currdiffuse));
+                //if ((currx > -wdiv2) && (currx < wdiv2) && (curry > -hdiv2) && (curry < hdiv2))
+                    //image4.SetPixel(currx + wdiv2, curry + hdiv2, colorByDiffuse(light_color, currdiffuse));
             }
         }
 
@@ -602,16 +601,29 @@ namespace Task_3
                     Color currcolor = Color.Black;
                     if ((currx - xmin > 0) && ((currx - xmin) < (xmax-xmin)) && (curry - ymin > 0) && ((curry - ymin) < (ymax - ymin)))
                         currcolor = tex.GetPixel((currx - xmin), (curry - ymin));
-                    image4.SetPixel(currx + wdiv2, curry + hdiv2, colorByDiffuse(currcolor, currdiffuse));
+                    //image4.SetPixel(currx + wdiv2, curry + hdiv2, colorByDiffuse(currcolor, currdiffuse));
                 }
             }
+        }
+
+        public void drawOneLineOfTextureBetweenPoints(Point p1, Point p2, int xmin, int ymin, Bitmap tex)
+        {
+            int w1 = p2.X - p1.X;
+            if (w1 <= 1)
+                return;
+
+            Rectangle r = new Rectangle(p1.X- xmin, p1.Y-ymin, p2.X - p1.X, 1);
+            Bitmap line = texture.Clone(r, texture.PixelFormat);
+            r = new Rectangle(p1.X, p1.Y, p2.X - p1.X, 1);
+            g4.DrawImage(line, r);
+            line.Dispose();
         }
 
         public void drawPolyhedron(Polyhedron polyhed, Color c, double phi_a, double psi_a, PointPol view_vector)
         {
             int wdiv2 = pictureBox4.Width / 2;
             int hdiv2 = pictureBox4.Height / 2;
-            image4 = new Bitmap(pictureBox4.Image);
+            //image4 = new Bitmap(pictureBox4.Image);
             //g4 = Graphics.FromImage(pictureBox4.Image);
             if (polyhed.polygons.Count() > 3)
             {
@@ -643,8 +655,8 @@ namespace Task_3
                             int x = points2d[indinp].X;
                             int y = points2d[indinp].Y;
                             Color cdiff = colorByDiffuse(c, polyhed.point_to_diffuse[indinp]);
-                            if ((x > -wdiv2) && (x < wdiv2) && (y > -hdiv2) && (y < hdiv2))
-                                image4.SetPixel(x+wdiv2, y+hdiv2, cdiff);
+                            //if ((x > -wdiv2) && (x < wdiv2) && (y > -hdiv2) && (y < hdiv2))
+                                //image4.SetPixel(x+wdiv2, y+hdiv2, cdiff);
                         }
 
                         //find indices of points in edges
@@ -677,30 +689,21 @@ namespace Task_3
                         if ((ymax - ymin > 0) && (xmax - xmin > 0))
                         {
                             
-                            double angle = angleByVectors(new Point(-100, 0),
-                                new Point(sorted_points[1].X - sorted_points[0].X,
-                                    sorted_points[1].Y - sorted_points[0].Y));
-                            labelDebug.Text = angle.ToString();
-
+                            //double angle = angleByVectors(new Point(-100, 0),
+                              //  new Point(sorted_points[1].X - sorted_points[0].X,
+                                //    sorted_points[1].Y - sorted_points[0].Y));
+                            //labelDebug.Text = angle.ToString();
                             //curr_tex = ResizeBitmap(texture, (xmax - xmin), (ymax - ymin));
-                            /*curr_tex = RotateImage(texture,
+                            //curr_tex = RotateImage(curr_tex,
                                 //new PointF((xmax - xmin)/2, (ymax - ymin)/2), (float)angle);
-                                new PointF(0, 0), (float)angle);
-
-                            GraphicsUnit units = GraphicsUnit.Point;
-                            RectangleF bmpRectangleF = curr_tex.GetBounds(ref units);
-                            Rectangle bmpRectangle = Rectangle.Round(bmpRectangleF);
-                            curr_tex = curr_tex.Clone(bmpRectangle, curr_tex.PixelFormat);
-                            curr_tex = ResizeBitmap(curr_tex, (xmax - xmin), (ymax - ymin));*/
-
                             foreach (var y in pol_borders.Keys)
                             {
-                                //int xmin = pol_borders[y].Min(t => t.Item1);
-                                //int xmax = pol_borders[y].Max(t => t.Item1);
+                                xmin = pol_borders[y].Min(t => t.Item1);
+                                xmax = pol_borders[y].Max(t => t.Item1);
                                 //if (xmax - xmin > 0)
                                 {
                                     //curr_tex = ResizeBitmap(texture, (xmax - xmin), (ymax - ymin));
-                                    Tuple<int, double> tmin = pol_borders[y].First();
+                                    /*Tuple<int, double> tmin = pol_borders[y].First();
                                     Tuple<int, double> tmax = pol_borders[y].First();
                                     foreach (var t in pol_borders[y])
                                     {
@@ -708,17 +711,18 @@ namespace Task_3
                                             tmin = t;
                                         if (t.Item1 > tmax.Item1)
                                             tmax = t;
-                                    }
+                                    }*/
                                     
                                     Dictionary<int, List<Tuple<int, double>>> to_del = new Dictionary<int, List<Tuple<int, double>>>();
-                                    drawTextureBetweenPoints(new Point(tmin.Item1, y), new Point(tmax.Item1, y),
-                                        tmin.Item2, tmax.Item2, wdiv2, hdiv2, xmin, xmax, ymin, ymax, curr_tex);
+                                    drawOneLineOfTextureBetweenPoints(new Point(xmin, y), new Point(xmax, y),
+                                        xmin, ymin, curr_tex);
                                 }
                             }
+                            curr_tex.Dispose();
                         }
                     } 
                 }
-                pictureBox4.Image = image4;
+                pictureBox4.Image = pictureBox4.Image;
                 //pictureBox4.Image = pictureBox4.Image;
                 //image4 = (Bitmap)pictureBox4.Image;
             }
@@ -1173,17 +1177,9 @@ namespace Task_3
                     c.Visible = true;
             }
  
-            //Bitmap bmp = RotateImage(texture, 
-                //new PointF(pictureBox1.Width/2, pictureBox1.Height/2), 30);
-            //pictureBox1.SizeMode = PictureBoxSizeMode.StretchImage;
-            GraphicsUnit units = GraphicsUnit.Point;
-            RectangleF bmpRectangleF = texture.GetBounds(ref units);
-            Rectangle bmpRectangle = Rectangle.Round(bmpRectangleF);
-            Bitmap bmp = RotateImage(texture,
-                new PointF(bmpRectangle.Width / 2, bmpRectangle.Height / 2), 30);
-            bmp = bmp.Clone(bmpRectangle, bmp.PixelFormat);
-            bmp = ResizeBitmap(bmp, pictureBox1.Width, pictureBox1.Height);
-            pictureBox1.Image = bmp;
+            pictureBox1.Image = RotateImage(texture, 
+                new PointF(pictureBox1.Width/2, pictureBox1.Height/2), 30);
+            pictureBox1.SizeMode = PictureBoxSizeMode.StretchImage;
         }
 
         private void textBoxLightLocationX_TextChanged(object sender, EventArgs e)
