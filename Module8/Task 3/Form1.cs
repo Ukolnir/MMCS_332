@@ -28,11 +28,14 @@ namespace Task_3
             pictureBox2.Image = new Bitmap(pictureBox2.Width, pictureBox2.Height);
             g = Graphics.FromImage(pictureBox1.Image);
             g2 = Graphics.FromImage(pictureBox2.Image);
-
+            
             g.ScaleTransform(1, -1);
 			g.TranslateTransform(pictureBox1.Width / 2, -pictureBox1.Height / 2);
             g2.ScaleTransform(1, -1);
             g2.TranslateTransform(pictureBox2.Width / 2, -pictureBox2.Height / 2);
+            pictureBox2.Image = pictureBox2.Image;
+            pictureBox1.Image = pictureBox1.Image;
+
             //Clear();
 
             textBox1.Text = "0";
@@ -261,7 +264,7 @@ namespace Task_3
 
         private Point pointOnLine(Point p1, Point p2, int x)
         {
-            double y = ((x - p1.X) * (p2.Y- p1.Y) * 1.0) / (p2.X - p1.X) + p1.Y;
+            double y = p1.X != p2.X ? ((x - p1.X) * (p2.Y- p1.Y) * 1.0) / (p2.X - p1.X) + p1.Y : (p2.Y + p1.Y) / 2;
             return new Point(x, (int)Math.Round(y));
         }
 
@@ -322,27 +325,37 @@ namespace Task_3
             {
                 newPoints = new List<Point>();
                 pointsNow = zList[keys[i]].OrderBy(p1 => p1.X).ToList(); //отсортировали по х
-                pointsNow.Add(res[keys[i - 1]][res[keys[i - 1]].Count() - 1]); //добавляем в конец предыдущую правую вершину
-                Point pLast = res[keys[i - 1]][0]; //находим пред. лев. границу
+
+                double ind = keys[i - 1];
+                int k = i - 1;
+                while (!res.Keys.Contains(ind) || res[ind].Count() == 0)
+                {
+                    k--;
+                    ind = keys[k];
+                }
+
+                pointsNow.Add(res[ind][res[ind].Count() - 1]); //добавляем в конец предыдущую правую вершину
+                Point pLast = res[ind][0]; //находим пред. лев. границу
 
                 for (int j = 0; j < pointsNow.Count(); ++j) //проходим по ребру, пока точки видимы
                 {
                     var p = pointsNow[j];
-                    while (pLast != p) 
+                    while (pLast.X != p.X) 
                     {
                         int x;
                         Point pN;
                         //если предыдущая точка видима, добавляем все видимые точки в отрезке от нее до точки пересечения или следующей
 
+                        if (!YMax.Keys.Contains(pLast.X))
+                        {
+                            YMax.Add(pLast.X, Int32.MaxValue);
+                            YMin.Add(pLast.X, Int32.MaxValue);
+                        }
+
+
                         if ( !YMax.Keys.Contains(pLast.X) || YMax[pLast.X] == Int32.MaxValue || pLast.Y > YMax[pLast.X] || pLast.Y < YMin[pLast.X])
                         {
-                            if (!YMax.Keys.Contains(pLast.X))
-                            {
-                                YMax.Add(pLast.X, Int32.MaxValue);
-                                YMin.Add(pLast.X, Int32.MaxValue);
-                            }
-
-                            if (pLast != res[keys[i - 1]][0])
+                            if (pLast != res[ind][0])
                             {
                                 newPoints.Add(pLast);
 
@@ -377,7 +390,7 @@ namespace Task_3
 
                     }
 
-                    if (pLast != res[keys[i - 1]][res[keys[i - 1]].Count() - 1] && (YMax[pLast.X] == Int32.MaxValue || pLast.Y > YMax[pLast.X] || pLast.Y < YMin[pLast.X]))
+                    if (pLast != res[ind][res[ind].Count() - 1] && (YMax[pLast.X] == Int32.MaxValue || pLast.Y > YMax[pLast.X] || pLast.Y < YMin[pLast.X]))
                     {
                         if (pLast.X >= 0 && pLast.X < pictureBox2.Width && pLast.Y >= 0 && pLast.Y < pictureBox2.Height)
                             bmp.SetPixel(pLast.X, pLast.Y, Color.BlueViolet);
