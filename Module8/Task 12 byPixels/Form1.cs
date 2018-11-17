@@ -298,6 +298,14 @@ namespace Task_3
             return rotatedBmp;
         }
 
+        private Rectangle BoundsOfBitmap(Bitmap bmp)
+        {
+            GraphicsUnit units = GraphicsUnit.Point;
+            RectangleF bmpRectangleF = bmp.GetBounds(ref units);
+            Rectangle bmpRectangle = Rectangle.Round(bmpRectangleF);
+            return bmpRectangle;
+        }
+
         private void drawPolygon(Polygon pol, Color c, 
             double phi_a, double psi_a, PointPol view_vector)
         {
@@ -607,10 +615,14 @@ namespace Task_3
             }
         }
 
-        public void drawPolyhedron(Polyhedron polyhed, Color c, double phi_a, double psi_a, PointPol view_vector)
+        public void drawPolyhedron(Polyhedron polyhed, Color c, double phi_a, double psi_a, 
+            PointPol view_vector)
         {
             int wdiv2 = pictureBox4.Width / 2;
             int hdiv2 = pictureBox4.Height / 2;
+
+            string mode = comboBoxMode.Text;
+
             image4 = new Bitmap(pictureBox4.Image);
             //g4 = Graphics.FromImage(pictureBox4.Image);
             if (polyhed.polygons.Count() > 3)
@@ -676,23 +688,26 @@ namespace Task_3
                         //draw inner part
                         if ((ymax - ymin > 0) && (xmax - xmin > 0))
                         {
-                            
-                            double angle = angleByVectors(new Point(-100, 0),
-                                new Point(sorted_points[1].X - sorted_points[0].X,
-                                    sorted_points[1].Y - sorted_points[0].Y));
-                            labelDebug.Text = angle.ToString();
+                            if (mode == "RotateMode")
+                            {
+                                double angle = angleByVectors(new Point(100, 0),
+                                    new Point(sorted_points[1].X - sorted_points[0].X,
+                                        sorted_points[1].Y - sorted_points[0].Y));
+                                labelDebug.Text = angle.ToString();
 
-                            //curr_tex = ResizeBitmap(texture, (xmax - xmin), (ymax - ymin));
-                            /*curr_tex = RotateImage(texture,
-                                //new PointF((xmax - xmin)/2, (ymax - ymin)/2), (float)angle);
-                                new PointF(0, 0), (float)angle);
+                                Bitmap tex1 = ResizeBitmap(texture, (xmax - xmin) * 4, (ymax - ymin) * 4);
+                                Rectangle bmpRect = BoundsOfBitmap(tex1);
+                                Bitmap tex2 = RotateImage(tex1,
+                                    new PointF(bmpRect.Width / 2, bmpRect.Height / 2), (float)angle);
 
-                            GraphicsUnit units = GraphicsUnit.Point;
-                            RectangleF bmpRectangleF = curr_tex.GetBounds(ref units);
-                            Rectangle bmpRectangle = Rectangle.Round(bmpRectangleF);
-                            curr_tex = curr_tex.Clone(bmpRectangle, curr_tex.PixelFormat);
-                            curr_tex = ResizeBitmap(curr_tex, (xmax - xmin), (ymax - ymin));*/
-
+                                bmpRect = BoundsOfBitmap(tex2);
+                                curr_tex = ResizeBitmap(tex2, (xmax - xmin), (ymax - ymin));
+                                tex1.Dispose(); tex2.Dispose();
+                            }
+                            else
+                            {
+                                curr_tex = ResizeBitmap(curr_tex, (xmax - xmin), (ymax - ymin));
+                            }
                             foreach (var y in pol_borders.Keys)
                             {
                                 //int xmin = pol_borders[y].Min(t => t.Item1);
@@ -1172,18 +1187,16 @@ namespace Task_3
                 if (c.Name != "buttonLoadTexture" && c.Name != "pictureBox3")
                     c.Visible = true;
             }
- 
+
             //Bitmap bmp = RotateImage(texture, 
-                //new PointF(pictureBox1.Width/2, pictureBox1.Height/2), 30);
+            //new PointF(pictureBox1.Width/2, pictureBox1.Height/2), 30);
             //pictureBox1.SizeMode = PictureBoxSizeMode.StretchImage;
-            GraphicsUnit units = GraphicsUnit.Point;
-            RectangleF bmpRectangleF = texture.GetBounds(ref units);
-            Rectangle bmpRectangle = Rectangle.Round(bmpRectangleF);
+            /*Rectangle bmpRect = BoundsOfBitmap(texture);
             Bitmap bmp = RotateImage(texture,
-                new PointF(bmpRectangle.Width / 2, bmpRectangle.Height / 2), 30);
-            bmp = bmp.Clone(bmpRectangle, bmp.PixelFormat);
+                new PointF(bmpRect.Width / 2, bmpRect.Height / 2), 30);
+            bmp = bmp.Clone(bmpRect, bmp.PixelFormat);
             bmp = ResizeBitmap(bmp, pictureBox1.Width, pictureBox1.Height);
-            pictureBox1.Image = bmp;
+            pictureBox1.Image = bmp;*/
         }
 
         private void textBoxLightLocationX_TextChanged(object sender, EventArgs e)

@@ -612,11 +612,7 @@ namespace Task_3
             if (w1 <= 1)
                 return;
 
-            Rectangle r = new Rectangle(p1.X- xmin, p1.Y-ymin, p2.X - p1.X, 1);
-            Bitmap line = texture.Clone(r, texture.PixelFormat);
-            r = new Rectangle(p1.X, p1.Y, p2.X - p1.X, 1);
-            g4.DrawImage(line, r);
-            line.Dispose();
+            g4.DrawImage(tex, new Rectangle(p1.X, p1.Y, p2.X - p1.X, 1), p1.X - xmin, p1.Y - ymin, p2.X - p1.X, 1, GraphicsUnit.Pixel);
         }
 
         public void drawPolyhedron(Polyhedron polyhed, Color c, double phi_a, double psi_a, PointPol view_vector)
@@ -683,7 +679,6 @@ namespace Task_3
                         int ymax = pol_borders.Keys.Max();
                         int xmin = pol_borders.Values.Min(t1 => t1.Min(t2 => t2.Item1));
                         int xmax = pol_borders.Values.Max(t1 => t1.Max(t2 => t2.Item1));
-                        Bitmap curr_tex = new Bitmap(texture);
 
                         //draw inner part
                         if ((ymax - ymin > 0) && (xmax - xmin > 0))
@@ -693,7 +688,8 @@ namespace Task_3
                               //  new Point(sorted_points[1].X - sorted_points[0].X,
                                 //    sorted_points[1].Y - sorted_points[0].Y));
                             //labelDebug.Text = angle.ToString();
-                            //curr_tex = ResizeBitmap(texture, (xmax - xmin), (ymax - ymin));
+
+                            Bitmap resized = ResizeBitmap(texture, (xmax - xmin), (ymax - ymin));
                             //curr_tex = RotateImage(curr_tex,
                                 //new PointF((xmax - xmin)/2, (ymax - ymin)/2), (float)angle);
                             foreach (var y in pol_borders.Keys)
@@ -715,10 +711,10 @@ namespace Task_3
                                     
                                     Dictionary<int, List<Tuple<int, double>>> to_del = new Dictionary<int, List<Tuple<int, double>>>();
                                     drawOneLineOfTextureBetweenPoints(new Point(xmin, y), new Point(xmax, y),
-                                        xmin, ymin, curr_tex);
+                                        xmin, ymin, resized);
                                 }
                             }
-                            curr_tex.Dispose();
+                            resized.Dispose();
                         }
                     } 
                 }
@@ -1177,9 +1173,6 @@ namespace Task_3
                     c.Visible = true;
             }
  
-            pictureBox1.Image = RotateImage(texture, 
-                new PointF(pictureBox1.Width/2, pictureBox1.Height/2), 30);
-            pictureBox1.SizeMode = PictureBoxSizeMode.StretchImage;
         }
 
         private void textBoxLightLocationX_TextChanged(object sender, EventArgs e)

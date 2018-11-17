@@ -108,6 +108,7 @@
             this.groupBox17 = new System.Windows.Forms.GroupBox();
             this.textBoxLightTime = new System.Windows.Forms.TextBox();
             this.buttonLoadTexture = new System.Windows.Forms.Button();
+            this.comboBoxMode = new System.Windows.Forms.ComboBox();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
@@ -301,7 +302,7 @@
             this.textBoxShiftZ.Name = "textBoxShiftZ";
             this.textBoxShiftZ.Size = new System.Drawing.Size(32, 20);
             this.textBoxShiftZ.TabIndex = 57;
-            this.textBoxShiftZ.Text = "10";
+            this.textBoxShiftZ.Text = "0";
             // 
             // textBoxShiftY
             // 
@@ -309,7 +310,7 @@
             this.textBoxShiftY.Name = "textBoxShiftY";
             this.textBoxShiftY.Size = new System.Drawing.Size(32, 20);
             this.textBoxShiftY.TabIndex = 56;
-            this.textBoxShiftY.Text = "10";
+            this.textBoxShiftY.Text = "0";
             // 
             // textBoxShiftX
             // 
@@ -501,7 +502,7 @@
             // 
             this.pictureBox2.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.pictureBox2.Location = new System.Drawing.Point(424, 364);
-            this.pictureBox2.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.pictureBox2.Margin = new System.Windows.Forms.Padding(2);
             this.pictureBox2.Name = "pictureBox2";
             this.pictureBox2.Size = new System.Drawing.Size(318, 265);
             this.pictureBox2.TabIndex = 77;
@@ -593,7 +594,7 @@
             this.comboBoxRotationAxis.Name = "comboBoxRotationAxis";
             this.comboBoxRotationAxis.Size = new System.Drawing.Size(101, 21);
             this.comboBoxRotationAxis.TabIndex = 0;
-            this.comboBoxRotationAxis.Text = "X";
+            this.comboBoxRotationAxis.Text = "Y";
             // 
             // groupBox10
             // 
@@ -794,9 +795,9 @@
             this.groupBox8.Controls.Add(this.buttonLightColor);
             this.groupBox8.Controls.Add(this.groupBox7);
             this.groupBox8.Location = new System.Drawing.Point(615, 15);
-            this.groupBox8.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.groupBox8.Margin = new System.Windows.Forms.Padding(2);
             this.groupBox8.Name = "groupBox8";
-            this.groupBox8.Padding = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.groupBox8.Padding = new System.Windows.Forms.Padding(2);
             this.groupBox8.Size = new System.Drawing.Size(185, 132);
             this.groupBox8.TabIndex = 86;
             this.groupBox8.TabStop = false;
@@ -805,7 +806,7 @@
             // buttonDoLight
             // 
             this.buttonDoLight.Location = new System.Drawing.Point(103, 72);
-            this.buttonDoLight.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.buttonDoLight.Margin = new System.Windows.Forms.Padding(2);
             this.buttonDoLight.Name = "buttonDoLight";
             this.buttonDoLight.Size = new System.Drawing.Size(78, 54);
             this.buttonDoLight.TabIndex = 82;
@@ -816,7 +817,7 @@
             // buttonLightColor
             // 
             this.buttonLightColor.Location = new System.Drawing.Point(103, 26);
-            this.buttonLightColor.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.buttonLightColor.Margin = new System.Windows.Forms.Padding(2);
             this.buttonLightColor.Name = "buttonLightColor";
             this.buttonLightColor.Size = new System.Drawing.Size(68, 36);
             this.buttonLightColor.TabIndex = 81;
@@ -851,9 +852,9 @@
             // 
             this.groupBox16.Controls.Add(this.textBoxLightAngle);
             this.groupBox16.Location = new System.Drawing.Point(143, 20);
-            this.groupBox16.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.groupBox16.Margin = new System.Windows.Forms.Padding(2);
             this.groupBox16.Name = "groupBox16";
-            this.groupBox16.Padding = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.groupBox16.Padding = new System.Windows.Forms.Padding(2);
             this.groupBox16.Size = new System.Drawing.Size(44, 48);
             this.groupBox16.TabIndex = 83;
             this.groupBox16.TabStop = false;
@@ -862,7 +863,7 @@
             // textBoxLightAngle
             // 
             this.textBoxLightAngle.Location = new System.Drawing.Point(5, 20);
-            this.textBoxLightAngle.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.textBoxLightAngle.Margin = new System.Windows.Forms.Padding(2);
             this.textBoxLightAngle.Name = "textBoxLightAngle";
             this.textBoxLightAngle.Size = new System.Drawing.Size(31, 20);
             this.textBoxLightAngle.TabIndex = 0;
@@ -918,7 +919,7 @@
             // buttonLoadTexture
             // 
             this.buttonLoadTexture.Location = new System.Drawing.Point(1017, 20);
-            this.buttonLoadTexture.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.buttonLoadTexture.Margin = new System.Windows.Forms.Padding(2);
             this.buttonLoadTexture.Name = "buttonLoadTexture";
             this.buttonLoadTexture.Size = new System.Drawing.Size(166, 111);
             this.buttonLoadTexture.TabIndex = 88;
@@ -926,11 +927,24 @@
             this.buttonLoadTexture.UseVisualStyleBackColor = true;
             this.buttonLoadTexture.Click += new System.EventHandler(this.buttonLoadTexture_Click);
             // 
+            // comboBoxMode
+            // 
+            this.comboBoxMode.FormattingEnabled = true;
+            this.comboBoxMode.Items.AddRange(new object[] {
+            "NormalMode",
+            "RotateMode"});
+            this.comboBoxMode.Location = new System.Drawing.Point(615, 181);
+            this.comboBoxMode.Name = "comboBoxMode";
+            this.comboBoxMode.Size = new System.Drawing.Size(121, 21);
+            this.comboBoxMode.TabIndex = 89;
+            this.comboBoxMode.Text = "NormalMode";
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1203, 659);
+            this.Controls.Add(this.comboBoxMode);
             this.Controls.Add(this.buttonLoadTexture);
             this.Controls.Add(this.groupBox14);
             this.Controls.Add(this.pictureBox4);
@@ -1078,6 +1092,7 @@
         private System.Windows.Forms.GroupBox groupBox16;
         private System.Windows.Forms.TextBox textBoxLightAngle;
         private System.Windows.Forms.Button buttonLoadTexture;
+        private System.Windows.Forms.ComboBox comboBoxMode;
     }
 }
 
