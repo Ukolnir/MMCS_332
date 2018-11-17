@@ -363,7 +363,7 @@ namespace Task_3
 
                         }
 
-                        x = pLast.X < p.X ? pLast.X + 1 : pLast.X - 1;
+                        x = pLast.X <= p.X ? pLast.X + 1 : pLast.X - 1;
                         if (j > 0)
                         {
                             pN = pointOnLine(pointsNow[j - 1], pointsNow[j], x);
@@ -393,10 +393,9 @@ namespace Task_3
                         else
                             YMin[pLast.X] = pLast.Y;
                     }
+                    pictureBox2.Image = bmp;
                 }
                 res.Add(keys[i], newPoints);
-
-                pictureBox2.Image = bmp;
             }
             //сохраняем видимые точки для остальных z
 
