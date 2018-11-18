@@ -223,117 +223,127 @@ namespace Task_3
             figure = new Polyhedron(polygons, l);
         }
 
-
-
-        private void Horizont_figure()
+        public struct point3
         {
-            DrawHiddenLines(points, step);
+            public int x, y, z;
+            PointPol p;
+            public point3(int x1, int y1, int z1)
+            { x = x1;  y = y1;  z = z1; p = new PointPol(0, 0, 0); }
+            public point3(int x1, int y1, int z1, PointPol p1)
+            { x = x1; y = y1; z = z1; p = p1; }
         }
 
-        private void DrawHiddenLines(PointPol[] grid, int steps)
+        public point3 ViewPortTranform(PointPol p)
         {
+            int h = pictureBox2.Image.Height;
+            int w = pictureBox2.Image.Width;
 
-            // задание минимумов и максимумов для плавающего горизонта 
-            int[] Ymin = new int[pictureBox2.Width];
-            int[] Ymax = new int[pictureBox2.Width];
-            for (int i = 0; i < pictureBox2.Width; ++i)
-            {
-                Ymin[i] = pictureBox2.Height;
-                Ymax[i] = -1;
-            }
-
-            
-            // отрисовка 
-            Bitmap bmp = (Bitmap)pictureBox2.Image;
-            
-            Pen p = new Pen(Color.BlueViolet);
-            for (int i = 0; i < steps * steps; i += steps)
-            {
-                Point first;
-                Point second = grid[i].To2D("Ортогональная по Z");
-
-                int mw = pictureBox2.Width / 2;
-                int mh = pictureBox2.Height / 2;
-                for (int j = 1; j < steps; ++j)
-                {
-                    first = second;
-                    second = grid[i + j].To2D("Ортогональная по Z");
-                    PlotHiddenLine(new Point(first.X + mw, mh-first.Y), new Point(second.X + mw, mh - second.Y), ref Ymax, ref Ymin, ref bmp, p);
-                }
-
-                if (i + steps >= steps * steps)
-                    break;
-
-                second = grid[i].To2D("Ортогональная по Z");
-                for (int j = 0; j < steps; ++j)
-                {
-                    first = second;
-                    second = grid[i + steps + j].To2D("Ортогональная по Z");
-                    PlotHiddenLine(new Point(first.X + mw, mh - first.Y), new Point(second.X + mw, mh - second.Y), ref Ymax, ref Ymin, ref bmp, p);
-
-                    if (j == steps - 1)
-                        break;
-
-                    first = second;
-                    second = grid[i + 1 + j].To2D("Ортогональная по Z");
-                    PlotHiddenLine(new Point(first.X + mw, mh - first.Y), new Point(second.X + mw, mh - second.Y), ref Ymax, ref Ymin, ref bmp, p);
-                }
-
-            }
-            pictureBox2.Image = bmp;
-            p.Dispose();
+            return new point3((int)((1 + p.X) * w / 2),
+                              (int)((1 + p.Y) * h / 2),
+                              (int)(p.Z * 100000000), p);
         }
 
-        private void PlotHiddenLine(Point first, Point second, ref int[] Ymax, ref int[] Ymin, ref Bitmap bmp, Pen p)
-        {
-            int dir_inc = second.X > first.X ? 1 : -1;
-            for (int xi = first.X; xi != second.X + dir_inc; xi += dir_inc)
-            {
-                if (xi < 0 || xi >= pictureBox2.Width)
-                    continue;
-                double ratio = 0;
-                if ((second.X - first.X) == 0)
-                {
-                    ratio = 1;
-                }
-                else
-                {
-                    ratio = (double)(xi - first.X) / (double)(second.X - first.X);
-                }
 
-                int yi = (int)Math.Round(first.Y + ratio * (second.Y - first.Y));
-                if (yi > Ymax[xi])
+        public PointPol PointToView(PointPol p)
+        {
+            return new PointPol(p.X/p.Z, p.Y/p.Z, p.Z);
+        }
+
+        private static int[] Interpolate(int i0, int d0, int i1, int d1)
+        {
+            if (i0 == i1)
+            {
+                return new int[] { d0, d1 };
+            }
+            int[] res;
+            int a = (d1 - d0) / (i1 - i0);
+            res = new int[i1 - i0 + 1];
+            d1 = 0;
+            for (int i = i0; i <= i1; i++)
+            {
+                res[d1] = d0;
+                d0 += a;
+                ++d1;
+            }
+
+
+            return res;
+
+        }
+
+        public void Horizont_figure()
+        {
+            float x0 = float.Parse(textBox1.Text.ToString());
+            float x1 = float.Parse(textBox2.Text.ToString());
+            float y0 = float.Parse(textBox3.Text.ToString());
+            float y1 = float.Parse(textBox4.Text.ToString());
+            CameraRender(new PointF(x0, x1), new PointF(y0, y1));
+        }
+
+        public void CameraRender(PointF borderx, PointF bordexy)
+        {
+
+            int h = pictureBox2.Image.Height;
+            int w = pictureBox2.Image.Width;
+
+            double xstep = double.Parse(textBox5.Text);
+            double ystep = xstep;
+            var YMax = new int[w];
+            var YMin = new int[w];
+
+            for (int i = 0; i < w; i++)
+            {
+                YMax[i] = -1;
+                YMin[i] = pictureBox2.Height;
+            }
+            for (double x = borderx.X; x <= borderx.Y; x += xstep)
+            {
+                var hor = new List<PointPol>();
+                for (double y = bordexy.X; y <= bordexy.Y; y += ystep)
+                    hor.Add(PointToView(new PointPol(x, y, f(x, y))));
+
+
+                var cur_hor = new List<Point>();
+                foreach (PointPol p in hor)
                 {
-                    if ((second.X - first.X) == 0)
-                        Graphics.FromImage(bmp).DrawLine(p, first, second);
-                    else if (xi - dir_inc >= 0 && xi - dir_inc < pictureBox2.Width && ((xi == first.X) || Ymax[xi - dir_inc] == -1))
+                     point3 vp = ViewPortTranform(p);
+                    cur_hor.Add(new Point((int)p.X, (int)p.Y));
+                }
+                cur_hor = cur_hor.OrderBy(p => p.X).ToList();
+                for (int i = 0; i < cur_hor.Count - 1; i++)
+                {
+
+                    var line = Interpolate(cur_hor[i].X, cur_hor[i].Y, cur_hor[i + 1].X, cur_hor[i + 1].Y);
+                    int index = -1;
+                    for (int linex = cur_hor[i].X; linex < cur_hor[i + 1].X; ++linex)
                     {
-                        if (xi >= 0 & xi < pictureBox2.Width && yi >= 0 && yi < pictureBox2.Height)
-                            bmp.SetPixel(xi, yi, Color.BlueViolet);
+                        index++;
+                        if (linex >= 0 && linex < w && line[index] > YMax[linex])
+                        {
+                            YMax[linex] = line[index];
+
+                        }
+
+                        if (linex >= 0 && linex < w && line[index] < YMin[linex])
+                        {
+                            YMin[linex] = line[index];
+                        }
                     }
-                    else
-                        if (xi - dir_inc >= 0 && xi - dir_inc < pictureBox2.Width)
-                        Graphics.FromImage(bmp).DrawLine(p, xi - dir_inc, Ymax[xi - dir_inc], xi, yi);
-                    if (xi >= 0 && xi < pictureBox2.Width)
-                        Ymax[xi] = yi;
+
                 }
-                if (yi < Ymin[xi])
+                for (int i = 0; i < w - 1; i++)
                 {
-                    if ((second.X - first.X) == 0)
-                        Graphics.FromImage(bmp).DrawLine(p, first, second);
-                    else if (xi - dir_inc >= 0 && xi - dir_inc < pictureBox2.Width &&( (xi == first.X) || Ymin[xi - dir_inc] == pictureBox1.Height))
-                    {
-                        if (xi >= 0 & xi < pictureBox2.Width && yi >= 0 && yi < pictureBox2.Height)
-                            bmp.SetPixel(xi, yi, Color.BlueViolet);
-                    }
-                    else
-                        if (xi - dir_inc >= 0 && xi - dir_inc < pictureBox2.Width)
-                            Graphics.FromImage(bmp).DrawLine(p, xi - dir_inc, Ymin[xi - dir_inc], xi, yi);
-                    if (xi >= 0 && xi < pictureBox2.Width)
-                    Ymin[xi] = yi;
+                    if (YMax[i] >= 0 && YMax[i] < h && YMax[i + 1] >= 0 && YMax[i + 1] < h)
+                        g2.DrawLine(new Pen(Color.Green), new Point(i, YMax[i]), new Point(i + 1, YMax[i + 1]));
+                    if (YMin[i] <= h && YMax[i] < pictureBox2.Width && YMin[i + 1] < h && YMin[i + 1] < pictureBox2.Width)
+                        g2.DrawLine(new Pen(Color.GreenYellow), new Point(i, YMin[i]), new Point(i + 1, YMin[i + 1]));
                 }
+
             }
+
+            pictureBox2.Image = pictureBox2.Image;
         }
+
 
         private void old_print_figure()
         {
@@ -429,7 +439,22 @@ namespace Task_3
         private void button5_Click(object sender, EventArgs e)
         {
             ClearWithout();
-            figure.reflection(comboBox2.SelectedItem.ToString());
+            string axis = comboBox2.SelectedItem.ToString();
+            figure.reflection(axis);
+
+            PointPol[] ps = new PointPol[(step + 1) * (step + 1)];
+            for(int i = 0; i < points.Count(); ++i)
+            {
+                var p = points[i];
+                if (axis == "X")
+                    ps[i] = new PointPol(-p.X, p.Y, p.Z);
+                if (axis == "Y")
+                    ps[i] = new PointPol(p.X, -p.Y, p.Z);
+                if (axis == "Z")
+                    ps[i] = new PointPol(p.X, p.Y, -p.Z);
+            }
+
+            points = ps; 
             Horizont_figure();
             old_print_figure();
         }
@@ -442,11 +467,11 @@ namespace Task_3
 
             double a = 0, b = 0, c = 0;
             find_center(points, ref a, ref b, ref c);
-            PointPol[] ps = new PointPol[(step + 1) * (step + 1)];
+           /* PointPol[] ps = new PointPol[(step + 1) * (step + 1)];
             for(int i = 0; i < points.Count(); ++i)
                 ps[i] = points[i].scale(ind_scale, a, b, c);
             points = ps;
-
+            */
             Horizont_figure();
             old_print_figure();
         }
