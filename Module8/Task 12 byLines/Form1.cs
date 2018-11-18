@@ -606,13 +606,13 @@ namespace Task_3
             }
         }
 
-        public void drawOneLineOfTextureBetweenPoints(Point p1, Point p2, int xmin, int ymin, Bitmap tex)
+        public void drawOneLineOfTextureBetweenPoints(Point p1, Point p2, int ymin, int xminglob, int xmaxglob, Bitmap tex)
         {
             int w1 = p2.X - p1.X;
             if (w1 <= 1)
                 return;
 
-            g4.DrawImage(tex, new Rectangle(p1.X, p1.Y, p2.X - p1.X, 1), p1.X - xmin, p1.Y - ymin, p2.X - p1.X, 1, GraphicsUnit.Pixel);
+            g4.DrawImage(tex, new Rectangle(p1.X, p1.Y, p2.X - p1.X, 1), p1.X - xminglob, p1.Y - ymin, p2.X - p1.X, 1, GraphicsUnit.Pixel);
         }
 
         public void drawPolyhedron(Polyhedron polyhed, Color c, double phi_a, double psi_a, PointPol view_vector)
@@ -677,11 +677,11 @@ namespace Task_3
                         //find 
                         int ymin = pol_borders.Keys.Min();
                         int ymax = pol_borders.Keys.Max();
-                        int xmin = pol_borders.Values.Min(t1 => t1.Min(t2 => t2.Item1));
-                        int xmax = pol_borders.Values.Max(t1 => t1.Max(t2 => t2.Item1));
+                        int xminglob = pol_borders.Values.Min(t1 => t1.Min(t2 => t2.Item1));
+                        int xmaxglob = pol_borders.Values.Max(t1 => t1.Max(t2 => t2.Item1));
 
                         //draw inner part
-                        if ((ymax - ymin > 0) && (xmax - xmin > 0))
+                        if ((ymax - ymin > 0) && (xmaxglob - xminglob > 0))
                         {
                             
                             //double angle = angleByVectors(new Point(-100, 0),
@@ -689,13 +689,13 @@ namespace Task_3
                                 //    sorted_points[1].Y - sorted_points[0].Y));
                             //labelDebug.Text = angle.ToString();
 
-                            Bitmap resized = ResizeBitmap(texture, (xmax - xmin), (ymax - ymin));
+                            Bitmap resized = ResizeBitmap(texture, (xmaxglob - xminglob), (ymax - ymin));
                             //curr_tex = RotateImage(curr_tex,
                                 //new PointF((xmax - xmin)/2, (ymax - ymin)/2), (float)angle);
                             foreach (var y in pol_borders.Keys)
                             {
-                                xmin = pol_borders[y].Min(t => t.Item1);
-                                xmax = pol_borders[y].Max(t => t.Item1);
+                                int xmin = pol_borders[y].Min(t => t.Item1);
+                                int xmax = pol_borders[y].Max(t => t.Item1);
                                 //if (xmax - xmin > 0)
                                 {
                                     //curr_tex = ResizeBitmap(texture, (xmax - xmin), (ymax - ymin));
@@ -710,8 +710,8 @@ namespace Task_3
                                     }*/
                                     
                                     Dictionary<int, List<Tuple<int, double>>> to_del = new Dictionary<int, List<Tuple<int, double>>>();
-                                    drawOneLineOfTextureBetweenPoints(new Point(xmin, y), new Point(xmax, y),
-                                        xmin, ymin, resized);
+                                    drawOneLineOfTextureBetweenPoints(new Point(xmin, y), new Point(xmax, y), 
+                                        ymin, xminglob, xmaxglob, resized);
                                 }
                             }
                             resized.Dispose();
