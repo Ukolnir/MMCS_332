@@ -12,146 +12,141 @@ namespace Task_3
 {
     public partial class Form1 : Form
     {
-		Graphics g, g2;
+        Graphics g, g2;
+
+        Camera cam;
+
+        PointPol[] points;
+        List<Polygon> pols_rotate = new List<Polygon>();
+        List<Polygon> fig = new List<Polygon>();
         Polyhedron figure;
         delegate double lambda(double a, double b);
         lambda f;
-        PointPol [] points ;
-        int step; 
+
+        int step;
 
         public Form1()
         {
             InitializeComponent();
+
+            double phi_a = double.Parse(textBox9.Text);
+            double psi_a = double.Parse(textBox10.Text);
+
             pictureBox1.Image = new Bitmap(pictureBox1.Width, pictureBox1.Height);
-            pictureBox2.Image = new Bitmap(pictureBox2.Width, pictureBox2.Height);
             g = Graphics.FromImage(pictureBox1.Image);
+            g.TranslateTransform(pictureBox1.Width / 2, pictureBox1.Height / 2);
+
+            pictureBox2.Image = new Bitmap(pictureBox2.Width, pictureBox2.Height);
             g2 = Graphics.FromImage(pictureBox2.Image);
-            
-            g.ScaleTransform(1, -1);
-			g.TranslateTransform(pictureBox1.Width / 2, -pictureBox1.Height / 2);
-            g2.ScaleTransform(1, -1);
-            g2.TranslateTransform(pictureBox2.Width / 2, -pictureBox2.Height / 2);
-            pictureBox2.Image = pictureBox2.Image;
-            pictureBox1.Image = pictureBox1.Image;
+            //g2.ScaleTransform(1, -1);
+            g2.TranslateTransform(pictureBox2.Width / 2, pictureBox2.Height / 2);
 
-            //Clear();
-
-            textBox1.Text = "0";
-            textBox2.Text = "10";
-            textBox3.Text = "-10";
-            textBox4.Text = "5";
-            textBox5.Text = "3";
-
-            comboBox1.SelectedItem = "Sin(x)*Cos(x) = z";
-            comboBox3.SelectedItem = "Ортогональная по Z";
+            write_axes1();
+            write_axes2();
         }
 
-        public void find_center(List<PointPol> pList, ref double x, ref double y, ref double z)
+        public void find_center(List<PointPol> pol, ref double x, ref double y, ref double z)
         {
             x = 0; y = 0; z = 0;
 
-			int count = 0;
-
-			foreach (var p in pList)
-			{
-				count ++;
-                x += p.X;
-                y += p.Y;
-                z += p.Z;
-			}
-
-            x /= count;
-            y /= count;
-            z /= count;
-        }
-
-        public void find_center(PointPol[] pList, ref double x, ref double y, ref double z)
-        {
-            x = 0; y = 0; z = 0;
-
-            int count = 0;
-
-            foreach (var p in pList)
+            foreach (var p in pol)
             {
-                count++;
                 x += p.X;
                 y += p.Y;
                 z += p.Z;
             }
 
-            x /= count;
-            y /= count;
-            z /= count;
+            x /= pol.Count();
+            y /= pol.Count();
+            z /= pol.Count();
         }
 
-        public void write_axes()
+        public void write_axes1()
         {
-            //g = Graphics.FromImage(pictureBox1.Image);
-
-            
-
             PointPol p0 = new PointPol(0, 0, 0);
-            PointPol p1 = new PointPol(pictureBox1.Width, 0, 0);
-            PointPol p2 = new PointPol(0, pictureBox1.Width, 0);
-            PointPol p3 = new PointPol(0, 0, pictureBox1.Width);
+            PointPol p1 = new PointPol(pictureBox1.Width / 2, 0, 0);
+            PointPol p2 = new PointPol(0, pictureBox1.Width / 2, 0);
+            PointPol p3 = new PointPol(0, 0, pictureBox1.Width / 2);
 
-            String s = comboBox3.SelectedItem.ToString();
+            Point o = p0.To2D();
+            Point x = p1.To2D();
+            Point y = p2.To2D();
+            Point z = p3.To2D();
+
+            Font font = new Font("Arial", 8);
+            SolidBrush brush = new SolidBrush(Color.Black);
+
+            g.DrawString("X", font, brush, x);
+            g.DrawString("Y", font, brush, y);
+            g.DrawString("Z", font, brush, z);
+
             Pen my_pen = new Pen(Color.Blue);
-            g.DrawLine(my_pen, p0.To2D(s), p1.To2D(s));
-            g2.DrawLine(my_pen, p0.To2D(s), p1.To2D(s));
+            g.DrawLine(my_pen, o, x);
             my_pen.Color = Color.Red;
-            g.DrawLine(my_pen, p0.To2D(s), p2.To2D(s));
-            g2.DrawLine(my_pen, p0.To2D(s), p2.To2D(s));
+            g.DrawLine(my_pen, o, y);
             my_pen.Color = Color.Green;
+            g.DrawLine(my_pen, o, z);
 
-            g.DrawLine(my_pen, p0.To2D(s), p3.To2D(s));
-            g2.DrawLine(my_pen, p0.To2D(s), p3.To2D(s));
+            pictureBox1.Image = pictureBox1.Image;
         }
 
-        public void ClearWithout()
+        public void write_axes2()
         {
-            g.Clear(pictureBox1.BackColor);
-            g2.Clear(pictureBox2.BackColor);
-            write_axes();
-            pictureBox1.Image = pictureBox1.Image;
+            PointPol p0 = new PointPol(0, 0, 0);
+            PointPol p1 = new PointPol(pictureBox1.Width / 2, 0, 0);
+            PointPol p2 = new PointPol(0, pictureBox1.Width / 2, 0);
+            PointPol p3 = new PointPol(0, 0, pictureBox1.Width / 2);
+
+            Point o = p0.To2D();
+            Point x = p1.To2D();
+            Point y = p2.To2D();
+            Point z = p3.To2D();
+
+            Font font = new Font("Arial", 8);
+            SolidBrush brush = new SolidBrush(Color.Black);
+
+            g2.DrawString("X", font, brush, x);
+            g2.DrawString("Y", font, brush, y);
+            g2.DrawString("Z", font, brush, z);
+
+            Pen my_pen = new Pen(Color.Blue);
+            g2.DrawLine(my_pen, o, x);
+            my_pen.Color = Color.Red;
+            g2.DrawLine(my_pen, o, y);
+            my_pen.Color = Color.Green;
+            g2.DrawLine(my_pen, o, z);
+
             pictureBox2.Image = pictureBox2.Image;
         }
 
 
-        public void Clear()
+
+        public void ClearPic1()
         {
             g.Clear(pictureBox1.BackColor);
-            g2.Clear(pictureBox2.BackColor);
             pictureBox1.Image = pictureBox1.Image;
+
+            write_axes1();
+        }
+
+        public void ClearPic2()
+        {
+            g2.Clear(pictureBox2.BackColor);
             pictureBox2.Image = pictureBox2.Image;
 
-            comboBox1.SelectedItem = "...";
-            button4.Visible = false;
-            button5.Visible = false;
-            button6.Visible = false;
-            button7.Visible = false;
-
-            textBox6.Visible = false;
-            textBox7.Visible = false;
-            textBox8.Visible = false;
-            textBox9.Visible = false;
-
-            textBoxZ2.Visible = false;
-            textBoxX1.Visible = false;
-            textBoxY1.Visible = false;
-            textBoxY2.Visible = false;
-            textBoxZ1.Visible = false;
-            textBoxX2.Visible = false;
-            comboBox2.Visible = false;
-
-            label7.Visible = false;
-            label8.Visible = false;
-            textBoxAngle.Visible = false;
+            write_axes2();
         }
+
 
         private void button2_Click(object sender, EventArgs e)
         {
-            Clear();
+            double phi_a = double.Parse(textBox9.Text);
+            double psi_a = double.Parse(textBox10.Text);
+
+            ClearPic1();
+            ClearPic2();
+            //points.Clear();
+
         }
 
         public double[,] matrix_multiplication(double[,] m1, double[,] m2)
@@ -164,6 +159,73 @@ namespace Task_3
             return res;
         }
 
+
+        private bool vectorsEqual(Vector e1, Vector e2)
+        {
+            return (pointsEqual(e1.P1, e2.P1) && pointsEqual(e1.P2, e2.P2)) ||
+                (pointsEqual(e1.P1, e2.P2) && pointsEqual(e1.P2, e2.P1));
+        }
+
+       
+        private bool pointsEqual(PointPol p1, PointPol p2)
+        {
+            return (p1.X == p2.X) && (p1.Y == p2.Y) && (p1.Z == p2.Z);
+        }
+
+       
+
+
+        public void find_center(List<Polygon> pols, ref double x, ref double y, ref double z)
+        {
+            x = 0; y = 0; z = 0;
+
+            double a = 0, b = 0, c = 0;
+
+            foreach (var p in pols)
+            {
+                find_center(pols, ref a, ref b, ref c);
+                x += a;
+                y += b;
+                z += c;
+            }
+
+            x /= pols.Count();
+            y /= pols.Count();
+            z /= pols.Count();
+        }
+
+
+        private string save()
+        {
+            string result = "";
+            foreach (var p in figure.pol)
+            {
+                foreach (var e in p.edges)
+                {
+                    //t.X -= pictureBox1.Width / 2;
+                    if (p.edges.Last() == e)
+                    {
+                        var t = figure.points[e.nP1];
+                        result += t.X.ToString() + ";" + t.Y.ToString() + ";" + t.Z.ToString();
+                        // t = figure.points[e.nP2];
+                        //result += t.X.ToString() + ";" + t.Y.ToString() + ";" + t.Z.ToString();
+                    }
+                    else
+                    {
+                        var t = figure.points[e.nP1];
+                        result += t.X.ToString() + ";" + t.Y.ToString() + ";" + t.Z.ToString() + " ";
+                        // t = figure.points[e.nP2];
+                        //result += t.X.ToString() + ";" + t.Y.ToString() + ";" + t.Z.ToString() + " ";
+                    }
+                }
+
+                if (p != figure.pol.Last())
+                    result += Environment.NewLine;
+            }
+            //textBox1.Text = result;
+            return result;
+        }
+
         private void make_curve(ref List<PointPol> l, double x, double y0, double y1, double step)
         {
             for (double y = y0; y <= y1; y += step)
@@ -173,6 +235,22 @@ namespace Task_3
             }
         }
 
+
+        private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            switch (comboBox1.SelectedItem.ToString())
+            {
+                case "x^2 + y^2 = z":
+                    f = (x, y) => x * x + y * y;
+                    break;
+                case "Sin(x)*Cos(x) = z":
+                    f = (x, y) => Math.Sin(x) * Math.Cos(y);
+                    break;
+                case "((1 – x)^2 + 100 * (1 + y – x^2)^2) / 500 - 2.5 = z":
+                    f = (x, y) => ((1 - x) * (1 - x) + 100 * (1 + y - x * x) * (1 + y - x * x)) / 500 - 2.5;
+                    break;
+            }
+        }
 
         private void create_pol()
         {
@@ -192,17 +270,17 @@ namespace Task_3
             {
                 make_curve(ref l2, x, y0, y1, step);
 
-				for(int i = 0; i < l1.Count() - 1; ++i)
+                for (int i = 0; i < l1.Count() - 1; ++i)
                 {
-					List<Edge> gList = new List<Edge>();
+                    List<Edge> gList = new List<Edge>();
                     int n1 = num + i;
-					gList.Add(new Edge(n1, n1 + 1));
+                    gList.Add(new Edge(n1, n1 + 1));
                     gList.Add(new Edge(n1 + 1, n1 + 1 + l1.Count));
 
                     gList.Add(new Edge(n1 + 1 + l1.Count, n1 + l1.Count()));
-					gList.Add(new Edge(n1 + l1.Count(), n1));
+                    gList.Add(new Edge(n1 + l1.Count(), n1));
 
-					polygons.Add(new Polygon(gList));
+                    polygons.Add(new Polygon(gList));
                 }
 
                 num += l1.Count();
@@ -228,7 +306,7 @@ namespace Task_3
             public int x, y, z;
             PointPol p;
             public point3(int x1, int y1, int z1)
-            { x = x1;  y = y1;  z = z1; p = new PointPol(0, 0, 0); }
+            { x = x1; y = y1; z = z1; p = new PointPol(0, 0, 0); }
             public point3(int x1, int y1, int z1, PointPol p1)
             { x = x1; y = y1; z = z1; p = p1; }
         }
@@ -246,7 +324,7 @@ namespace Task_3
 
         public PointPol PointToView(PointPol p)
         {
-            return new PointPol(p.X/p.Z, p.Y/p.Z, p.Z);
+            return new PointPol(p.X / p.Z, p.Y / p.Z, p.Z);
         }
 
         private static int[] Interpolate(int i0, int d0, int i1, int d1)
@@ -306,7 +384,7 @@ namespace Task_3
                 var cur_hor = new List<Point>();
                 foreach (PointPol p in hor)
                 {
-                     point3 vp = ViewPortTranform(p);
+                    point3 vp = ViewPortTranform(p);
                     cur_hor.Add(new Point((int)p.X, (int)p.Y));
                 }
                 cur_hor = cur_hor.OrderBy(p => p.X).ToList();
@@ -348,12 +426,10 @@ namespace Task_3
         private void old_print_figure()
         {
             Pen my_pen = new Pen(Color.BlueViolet);
-            string s = comboBox3.SelectedItem.ToString();
 
-            foreach (var pl in figure.pol)
-                foreach (var e in pl.edges)
+            foreach (var pl in figure.points)
                 {
-                    Point p1 = figure.points[e.nP1].To2D(s), p2 = figure.points[e.nP2].To2D(s);
+                    Point p1 = figure.points[e.nP1].To2D(), p2 = figure.points[e.nP2].To2D();
                     g.DrawLine(my_pen, p1, p2);
                 }
 
@@ -384,201 +460,166 @@ namespace Task_3
 
         }
 
-    private void button1_Click(object sender, EventArgs e)
+        private void button1_Click(object sender, EventArgs e)
         {
+            ClearPic1();
             create_pol();
-            ClearWithout();
-            Create_point_fors_Hor();
-            Horizont_figure();
+            Init();
             old_print_figure();
-
-            button4.Visible = true;
-            button5.Visible = true;
-            button6.Visible = true;
-            button7.Visible = true;
-
-            textBox6.Visible = true;
-            textBox7.Visible = true;
-            textBox8.Visible = true;
-            textBox9.Visible = true;
-            textBox6.Text = "10";
-            textBox7.Text = "10";
-            textBox8.Text = "10";
-            textBox9.Text = "0,5";
-
-            textBoxZ2.Visible = true;
-            textBoxX1.Visible = true;
-            textBoxY1.Visible = true;
-            textBoxY2.Visible = true;
-            textBoxZ1.Visible = true;
-            textBoxX2.Visible = true;
-            comboBox2.Visible = true;
-            comboBox2.SelectedItem = "X";
-
-            label7.Visible = true;
-            label8.Visible = true;
-            textBoxAngle.Visible = true;
         }
 
-        private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
+
+
+
+
+
+        private void buttonScale_Click(object sender, EventArgs e)
         {
-            switch (comboBox1.SelectedItem.ToString())
+            double ind = Double.Parse(textBoxScale.Text);
+            double phi_a = double.Parse(textBox9.Text);
+            double psi_a = double.Parse(textBox10.Text);
+
+            // scalePols(pols_rotate, ind);
+            // scalePols(fig, ind);
+        }
+
+        private void buttonShift_Click(object sender, EventArgs e)
+        {
+            int x = Int32.Parse(textBoxShiftX.Text);
+            int y = Int32.Parse(textBoxShiftY.Text);
+            int z = Int32.Parse(textBoxShiftZ.Text);
+
+           // shiftPols(pols_rotate, x, y, z);
+           // shiftPols(fig, x, y, z);
+
+        }
+
+
+        private void buttonReflection_Click(object sender, EventArgs e)
+        {
+            string axis = comboBoxReflection.SelectedItem.ToString();
+
+            //reflectionPols(pols_rotate, axis);
+            //reflectionPols(fig, axis);
+        }
+
+
+        private void buttonRotate_Click(object sender, EventArgs e)
+        {
+            int x1 = Int32.Parse(textBoxX1.Text);
+            int y1 = Int32.Parse(textBoxY1.Text);
+            int z1 = Int32.Parse(textBoxZ1.Text);
+            int x2 = Int32.Parse(textBoxX2.Text);
+            int y2 = Int32.Parse(textBoxY2.Text);
+            int z2 = Int32.Parse(textBoxZ2.Text);
+            double angle = Double.Parse(textBoxAngle.Text);
+
+           // rotatePols(pols_rotate, x1, y1, z1, x2, y2, z2, angle);
+           // rotatePols(fig, x1, y1, z1, x2, y2, z2, angle);
+        }
+
+        private void buttonBuild2_Click(object sender, EventArgs e)
+        {
+
+        }
+
+
+        private void buttonSave_Click(object sender, EventArgs e)
+        {
+            SaveFileDialog saveFileDialog1 = new SaveFileDialog();
+            saveFileDialog1.RestoreDirectory = true;
+            saveFileDialog1.Filter = "Text Files(*.txt)|*.txt|All files (*.*)|*.*";
+            if (saveFileDialog1.ShowDialog() == DialogResult.OK)
             {
-                case "x^2 + y^2 = z":
-                    f = (x, y) => x * x + y * y;
-                    break;
-                case "Sin(x)*Cos(x) = z":
-                    f = (x, y) => Math.Sin(x) * Math.Cos(y);
-                    break;
-                case "((1 – x)^2 + 100 * (1 + y – x^2)^2) / 500 - 2.5 = z":
-                    f = (x, y) => ((1 - x)*(1-x) + 100*(1 + y - x*x)* (1 + y - x * x))/500 - 2.5;
-                    break;
+                using (System.IO.StreamWriter sw = new System.IO.StreamWriter(saveFileDialog1.FileName, false, System.Text.Encoding.Default))
+                {
+                    string text = save();
+                    sw.WriteLine(text);
+                }
             }
         }
 
-        private void button5_Click(object sender, EventArgs e)
+
+        private PointPol normVecOfPlane(PointPol p1, PointPol p2, PointPol p3)
         {
-            ClearWithout();
-            string axis = comboBox2.SelectedItem.ToString();
-            figure.reflection(axis);
+            double kx, ky, kz, d;
+            double xa = p1.X, ya = p1.Y, za = p1.Z;
+            double a21 = p2.X - xa, a22 = p2.Y - ya, a23 = p2.Z - za;
+            double a31 = p3.X - xa, a32 = p3.Y - ya, a33 = p3.Z - za;
 
-            PointPol[] ps = new PointPol[(step + 1) * (step + 1)];
-            for(int i = 0; i < points.Count(); ++i)
-            {
-                var p = points[i];
-                if (axis == "X")
-                    ps[i] = new PointPol(-p.X, p.Y, p.Z);
-                if (axis == "Y")
-                    ps[i] = new PointPol(p.X, -p.Y, p.Z);
-                if (axis == "Z")
-                    ps[i] = new PointPol(p.X, p.Y, -p.Z);
-            }
+            kx = a22 * a33 - a23 * a32;
+            ky = -(a21 * a33 - a23 * a31);
+            kz = a21 * a32 - a22 * a31;
+            d = (kx * -xa) + (ky * -ya) + (kz * -za);
 
-            points = ps; 
-            Horizont_figure();
-            old_print_figure();
+            return new PointPol(kx, ky, kz);
         }
 
-        private void button7_Click(object sender, EventArgs e)
+        private double scalarProduct(PointPol vec1, PointPol vec2)
         {
-            ClearWithout();
-            double ind_scale = Double.Parse(textBox9.Text.ToString());
-            figure.scale(ind_scale);
-
-            double a = 0, b = 0, c = 0;
-            find_center(points, ref a, ref b, ref c);
-           /* PointPol[] ps = new PointPol[(step + 1) * (step + 1)];
-            for(int i = 0; i < points.Count(); ++i)
-                ps[i] = points[i].scale(ind_scale, a, b, c);
-            points = ps;
-            */
-            Horizont_figure();
-            old_print_figure();
+            return (vec1.X * vec2.X + vec1.Y * vec2.Y + vec1.Z * vec2.Z);
         }
 
         private void button4_Click(object sender, EventArgs e)
         {
-            ClearWithout();
-            double x = Double.Parse(textBox6.Text.ToString());
-            double y = Double.Parse(textBox7.Text.ToString());
-            double z = Double.Parse(textBox8.Text.ToString());
+            double x = double.Parse(textBox1.Text);
+            double y = double.Parse(textBox2.Text);
+            double z = double.Parse(textBox3.Text);
 
-            figure.shift(x, y, z);
+            double t = double.Parse(textBoxT.Text);
+            double ya = double.Parse(textBoxY.Text);
+            double r = double.Parse(textBoxR.Text);
 
-            PointPol[] ps = new PointPol[(step + 1) * (step + 1)];
-            for (int i = 0; i < points.Count(); ++i)
-                ps[i] = points[i].shift(x, y, z);
-            points = ps;
+            cam = new Camera(x, y, z, t, ya, r);
 
-            Horizont_figure();
-            old_print_figure();
+            pointInit();
         }
 
-		private string save()
-		{
-			string result = "";
-			foreach (var p in figure.pol)
-			{
-				foreach (var e in p.edges)
-				{
-                    //t.X -= pictureBox1.Width / 2;
-                    if (p.edges.Last() == e)
-                    {
-                        var t = figure.points[e.nP1];
-                        result += t.X.ToString() + ";" + t.Y.ToString() + ";" + t.Z.ToString();
-                       // t = figure.points[e.nP2];
-                        //result += t.X.ToString() + ";" + t.Y.ToString() + ";" + t.Z.ToString();
-                    }
-                    else
-                    {
-                        var t = figure.points[e.nP1];
-                        result += t.X.ToString() + ";" + t.Y.ToString() + ";" + t.Z.ToString() + " ";
-                       // t = figure.points[e.nP2];
-                        //result += t.X.ToString() + ";" + t.Y.ToString() + ";" + t.Z.ToString() + " ";
-                    }
-                }
 
-				if (p != figure.pol.Last())
-					result += Environment.NewLine;
-			}
-			//textBox1.Text = result;
-			return result;
-		}
-
-        private void button6_Click(object sender, EventArgs e)
+        public void Init()
         {
-            ClearWithout();
-            write_axes();
+            double x = double.Parse(textBox1.Text);
+            double y = double.Parse(textBox2.Text);
+            double z = double.Parse(textBox3.Text);
 
-            double x1 = Double.Parse(textBoxX1.Text.ToString());
-            double y1 = Double.Parse(textBoxY1.Text.ToString());
-            double z1 = Double.Parse(textBoxZ1.Text.ToString());
-            double x2 = Double.Parse(textBoxX2.Text.ToString());
-            double y2 = Double.Parse(textBoxY2.Text.ToString());
-            double z2 = Double.Parse(textBoxZ2.Text.ToString());
+            double t = double.Parse(textBoxT.Text);
+            double ya = double.Parse(textBoxY.Text);
+            double r = double.Parse(textBoxR.Text);
 
-            double angle = Double.Parse(textBoxAngle.Text.ToString());
+            cam = new Camera(x, y, z, t, ya, r);
 
-            PointPol p1 = new PointPol(x1, y1, z1);
-            PointPol p2 = new PointPol(x2, y2, z2);
+            for (int i = 0; i < figure.points.Count(); ++i)
+            {
 
-            figure.rotate(Tuple.Create(p1,p2), angle);
+                var t0 = matrix_multiplication(cam.translateAtPosition(), figure.points[i].getPol());
+                var t1 = matrix_multiplication(cam.translateAtAngles(),
+                new double[3, 1] { { t0[0, 0] }, { t0[1, 0] }, { t0[2, 0] } });
+                figure.points[i] = new PointPol(t1[0, 0], t1[1, 0], t1[2, 0]);
 
-            double a = 0, b = 0, c = 0;
-            find_center(points, ref a, ref b, ref c);
-            PointPol[] ps = new PointPol[(step + 1) * (step + 1)];
-            for (int i = 0; i < points.Count(); ++i)
-                ps[i] = points[i].rotate(Tuple.Create(p1, p2), angle, a, b, c);
-
-            points = ps;
-            Horizont_figure();
-            old_print_figure();
+            }
         }
 
-		private void button3_Click(object sender, EventArgs e)
-		{
-			SaveFileDialog saveFileDialog1 = new SaveFileDialog();
-			saveFileDialog1.RestoreDirectory = true;
-			saveFileDialog1.Filter = "Text Files(*.txt)|*.txt|All files (*.*)|*.*";
-			if (saveFileDialog1.ShowDialog() == DialogResult.OK)
-			{
-				using (System.IO.StreamWriter sw = new System.IO.StreamWriter(saveFileDialog1.FileName, false, System.Text.Encoding.Default))
-				{
-					string text = save();
-					sw.WriteLine(text);
-				}
-			}
-		}
 
-      
+        private void button1_Click_1(object sender, EventArgs e)
+        {
+
+        }
+
+        private void pointInit()
+        {
+            for(int i = 0; i < figure.points.Count(); ++i)
+            {
+                var t1 = matrix_multiplication(cam.translateAtAngles(),
+                        figure.points[i].getP1());
+                figure.points[i] = new PointPol(t1[0, 0], t1[1, 0], t1[2, 0]);
+                
+            }
+        }
     }
-
 
     public class PointPol
     {
         public double X, Y, Z, W;
-
-        Form1 _form = new Form1();
 
         public PointPol(double x, double y, double z)
         {
@@ -605,31 +646,40 @@ namespace Task_3
             return new double[4, 1] { { X }, { Y }, { Z }, { W } };
         }
 
+        public double[,] matrix_multiplication(double[,] m1, double[,] m2)
+        {
+            double[,] res = new double[m1.GetLength(0), m2.GetLength(1)];
+            for (int i = 0; i < m1.GetLength(0); ++i)
+                for (int j = 0; j < m2.GetLength(1); ++j)
+                    for (int k = 0; k < m2.GetLength(0); k++)
+                        res[i, j] += m1[i, k] * m2[k, j];
+            return res;
+        }
 
         public PointPol scale(double ind_scale, double a, double b, double c)
         {
             double[,] transfer = new double[4, 4] { { 1, 0, 0, 0 }, { 0, 1, 0, 0 }, { 0, 0, 1, 0 }, { -a, -b, -c, 1 } };
-            var t1 = _form.matrix_multiplication(getP(), transfer);
+            var t1 = matrix_multiplication(getP(), transfer);
 
-            t1 = _form.matrix_multiplication(t1, new double[4, 4] { { ind_scale, 0, 0, 0 }, { 0, ind_scale, 0, 0 }, { 0, 0, ind_scale, 0 }, { 0, 0, 0, 1 } });
+            t1 = matrix_multiplication(t1, new double[4, 4] { { ind_scale, 0, 0, 0 }, { 0, ind_scale, 0, 0 }, { 0, 0, ind_scale, 0 }, { 0, 0, 0, 1 } });
             transfer = new double[4, 4] { { 1, 0, 0, 0 }, { 0, 1, 0, 0 }, { 0, 0, 1, 0 }, { a, b, c, 1 } };
-            t1 = _form.matrix_multiplication(t1, transfer);
+            t1 = matrix_multiplication(t1, transfer);
 
             return translatePol(t1);
         }
 
-        public PointPol rotate(Tuple<PointPol, PointPol> direction, double angle, double a, double b, double c)
+        public PointPol rotate(Vector direction, double angle, double a, double b, double c)
         {
             double phi = Math.PI / 360 * angle;
             PointPol p = shift(-a, -b, -c);
 
-            double x1 = direction.Item1.X;
-            double y1 = direction.Item1.Y;
-            double z1 = direction.Item1.Z;
+            double x1 = direction.P1.X;
+            double y1 = direction.P1.Y;
+            double z1 = direction.P1.Z;
 
-            double x2 = direction.Item2.X;
-            double y2 = direction.Item2.Y;
-            double z2 = direction.Item2.Z;
+            double x2 = direction.P2.X;
+            double y2 = direction.P2.Y;
+            double z2 = direction.P2.Z;
 
             double vecx = x2 - x1;
             double vecy = y2 - y1;
@@ -642,18 +692,36 @@ namespace Task_3
             double n = vecz / len;
 
             double[,] transfer = new double[4, 4] {
-                { l*l+Math.Cos(phi)*(1 - l*l), l*(1-Math.Cos(phi))*m + n*Math.Sin(phi), l*(1-Math.Cos(phi))*n - m*Math.Sin(phi), 0 },
-                { l*(1-Math.Cos(phi))*m - n*Math.Sin(phi), m*m+Math.Cos(phi)*(1 - m*m), m*(1-Math.Cos(phi))*n + l*Math.Sin(phi), 0 },
-                { l*(1-Math.Cos(phi))*n + m*Math.Sin(phi), m*(1-Math.Cos(phi))*n - l*Math.Sin(phi), n*n+Math.Cos(phi)*(1 - n*n), 0 },
-                { 0, 0, 0, 1 } };
-            var t1 = _form.matrix_multiplication(p.getP(), transfer);
+                    { l*l+Math.Cos(phi)*(1 - l*l), l*(1-Math.Cos(phi))*m + n*Math.Sin(phi), l*(1-Math.Cos(phi))*n - m*Math.Sin(phi), 0 },
+                    { l*(1-Math.Cos(phi))*m - n*Math.Sin(phi), m*m+Math.Cos(phi)*(1 - m*m), m*(1-Math.Cos(phi))*n + l*Math.Sin(phi), 0 },
+                    { l*(1-Math.Cos(phi))*n + m*Math.Sin(phi), m*(1-Math.Cos(phi))*n - l*Math.Sin(phi), n*n+Math.Cos(phi)*(1 - n*n), 0 },
+                    { 0, 0, 0, 1 } };
+            var t1 = matrix_multiplication(p.getP(), transfer);
 
-            t1 = _form.matrix_multiplication(t1, transfer);
+            t1 = matrix_multiplication(t1, transfer);
 
             PointPol p2 = translatePol(t1);
             PointPol p3 = p2.shift(a, b, c);
 
             return p3;
+        }
+
+        public PointPol reflection(string axis)
+        {
+
+            if (axis == "X")
+            {
+                return new PointPol(-X, Y, Z);
+            }
+            if (axis == "Y")
+            {
+                return new PointPol(X, -Y, Z);
+            }
+            if (axis == "Z")
+            {
+                return new PointPol(X, Y, -Z);
+            }
+            return new PointPol(X, Y, Z);
         }
 
         private PointPol translatePol(double[,] f)
@@ -669,35 +737,119 @@ namespace Task_3
         public PointPol shift(double x, double y, double z)
         {
             double[,] shiftMatrix = new double[4, 4] { { 1, 0, 0, x }, { 0, 1, 0, y }, { 0, 0, 1, z }, { 0, 0, 0, 1 } };
-            return translatePol1(_form.matrix_multiplication(shiftMatrix, getPol()));
+            return translatePol1(matrix_multiplication(shiftMatrix, getPol()));
         }
-        //Изометрическая проекция
-        public Point To2D(string display)
-        {
-            double[,] displayMatrix = new double[4, 4] { { Math.Sqrt(0.5), 0, -Math.Sqrt(0.5), 0 }, { 1 / Math.Sqrt(6), 2 / Math.Sqrt(6), 1 / Math.Sqrt(6), 0 }, { 1 / Math.Sqrt(3), -1 / Math.Sqrt(3), 1 / Math.Sqrt(3), 0 }, { 0, 0, 0, 1 } };;
-  
-            if (display == "Ортогональная по Z")
-                displayMatrix = new double[4, 4] { { 1, 0, 0, 0 }, { 0, 1, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 1 } };
 
-            var temp = _form.matrix_multiplication(displayMatrix, getP1());
-            var temp2d = new Point(Convert.ToInt32(temp[0, 0]), Convert.ToInt32(temp[1, 0]));
+        public Point To2D()
+        {
+            double phi = Math.PI / 180 * 145;
+            double psi = Math.PI / 180 * 45;
+            double[,] displayMatrix1 = new double[4, 4] {
+                { 1, 0, 0, 0 },
+                { 0, Math.Cos(phi), Math.Sin(phi), 0 },
+                { 0, -Math.Sin(phi), Math.Cos(phi), 0 },
+                { 0, 0, 0, 1 } };
+            double[,] displayMatrix2 = new double[4, 4] {
+                { Math.Cos(psi), 0, -Math.Sin(psi), 0 },
+                { 0, 1, 0, 0 },
+                { Math.Sin(psi), 0, Math.Cos(psi), 0 },
+                { 0, 0, 0, 1 } };
+
+            var displayMatrix = matrix_multiplication(displayMatrix1, displayMatrix2);
+            var temp = matrix_multiplication(displayMatrix, getP1());
+            int x = Convert.ToInt32(temp[0, 0]);
+            int y = Convert.ToInt32(temp[1, 0]);
+
+            var temp2d = new Point(x, y);
             return temp2d;
+        }
+
+        public Point To2D(double phi_a, double psi_a)
+        {
+            double phi = Math.PI / 180 * phi_a;
+            double psi = Math.PI / 180 * psi_a;
+            double[,] displayMatrix1 = new double[4, 4] {
+                { 1, 0, 0, 0 },
+                { 0, Math.Cos(phi), Math.Sin(phi), 0 },
+                { 0, -Math.Sin(phi), Math.Cos(phi), 0 },
+                { 0, 0, 0, 1 } };
+            double[,] displayMatrix2 = new double[4, 4] {
+                { Math.Cos(psi), 0, -Math.Sin(psi), 0 },
+                { 0, 1, 0, 0 },
+                { Math.Sin(psi), 0, Math.Cos(psi), 0 },
+                { 0, 0, 0, 1 } };
+
+            var displayMatrix = matrix_multiplication(displayMatrix1, displayMatrix2);
+            var temp = matrix_multiplication(displayMatrix, getP1());
+            int x = Convert.ToInt32(temp[0, 0]);
+            int y = Convert.ToInt32(temp[1, 0]);
+
+            var temp2d = new Point(x, y);
+            return temp2d;
+        }
+    }
+
+    public class Vector
+    {
+        public PointPol P1;
+        public PointPol P2;
+
+        public Vector(PointPol p1, PointPol p2) { P1 = p1; P2 = p2; }
+
+        public void scale(double ind_scale, double a, double b, double c)
+        {
+            P1 = P1.scale(ind_scale, a, b, c);
+            P2 = P2.scale(ind_scale, a, b, c);
+        }
+
+        public void shift(double a, double b, double c)
+        {
+            P1 = P1.shift(a, b, c);
+            P2 = P2.shift(a, b, c);
+        }
+
+        public void rotate(Vector e, double angle, double a, double b, double c)
+        {
+            P1 = P1.rotate(e, angle, a, b, c);
+            P2 = P2.rotate(e, angle, a, b, c);
+        }
+
+        public void reflection(string axis)
+        {
+
+            if (axis == "X")
+            {
+                P1.X = -P1.X;
+            }
+            if (axis == "Y")
+            {
+                P1.Y = -P1.Y;
+            }
+            if (axis == "Z")
+            {
+                P1.Z = -P1.Z;
+            }
+        }
+
+        public Tuple<Point, Point> to2d()
+        {
+            return Tuple.Create(P1.To2D(), P2.To2D());
         }
     }
 
     public class Edge
     {
-        public int  nP1;
-        public int  nP2;
+        public int nP1;
+        public int nP2;
 
 
         public Edge(int p1, int p2) { nP1 = p1; nP2 = p2; }
-	}
+    }
 
     public class Polygon
     {
         public List<Edge> edges = new List<Edge>();
-        
+
         //по граням
         public Polygon(List<Edge> edg)
         {
@@ -719,7 +871,7 @@ namespace Task_3
             foreach (var el in pl)
             {
                 pol.Add(el);
-			}
+            }
 
             points = p;
         }
@@ -753,7 +905,7 @@ namespace Task_3
             points = ch_points;
         }
 
-        public void rotate(Tuple<PointPol, PointPol> dir, double angle)
+        public void rotate(Vector dir, double angle)
         {
             double a = 0;
             double b = 0;
@@ -781,5 +933,4 @@ namespace Task_3
             }
         }
     }
-
 }
