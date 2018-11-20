@@ -298,7 +298,7 @@ namespace Task_3
 
             var groupedPoints = figure1.points.GroupBy(x => x.Z);
             //newFigure = new Polyhedron();
-            var counts = 1;
+            var counts = 0;
             var preSize = 0;
             foreach (var Zs in groupedPoints)
             {
@@ -307,29 +307,35 @@ namespace Task_3
                     newFigure.points.Add(xs);
                 }
 
-                for (int i = counts; i < newFigure.points.Count - 1; i++)
+                for (int i = counts; i < newFigure.points.Count; i++)
                 {
                     if (newFigure.points[i].Y > Ymax[newFigure.points[i].X])
                     {
-                        newFigure.points[i].AddNeighbour(newFigure.points[i - 1]);
-                        newFigure.points[i].AddNeighbour(newFigure.points[i + 1]);
+                        if (counts != 0)
+                            newFigure.points[i].AddNeighbour(newFigure.points[i - 1]);
+                        if (i != newFigure.points.Count() - 1)
+                            newFigure.points[i].AddNeighbour(newFigure.points[i + 1]);
 
-                        if (preSize != 0)
+                        if (preSize != 0 && i - preSize != 0)
                         {
                             newFigure.points[i].AddNeighbour(newFigure.points[i - preSize]);
-                            newFigure.points[i - preSize].AddNeighbour(newFigure.points[i + 1]);
+                            if (i + 1 != newFigure.points.Count())
+                                newFigure.points[i - preSize].AddNeighbour(newFigure.points[i + 1]);
                         }
 
                         Ymax[newFigure.points[i].X] = newFigure.points[i].Y;
                     }
                     else if (newFigure.points[i].Y < Ymin[newFigure.points[i].X])
                     {
-                        newFigure.points[i].AddNeighbour(newFigure.points[i - 1]);
-                        newFigure.points[i].AddNeighbour(newFigure.points[i + 1]);
-                        if (preSize != 0)
+                        if (counts != 0)
+                            newFigure.points[i].AddNeighbour(newFigure.points[i - 1]);
+                        if (i != newFigure.points.Count() - 1)
+                            newFigure.points[i].AddNeighbour(newFigure.points[i + 1]);
+                        if (preSize != 0 && i - preSize != 0)
                         {
                             newFigure.points[i].AddNeighbour(newFigure.points[i - preSize]);
-                            newFigure.points[i - preSize].AddNeighbour(newFigure.points[i + 1]);
+                            if (i + 1 != newFigure.points.Count())
+                                newFigure.points[i - preSize].AddNeighbour(newFigure.points[i + 1]);
                         }
 
                         Ymin[newFigure.points[i].X] = newFigure.points[i].Y;
@@ -343,10 +349,12 @@ namespace Task_3
 
         private void DrawHorFigure(Polyhedron fig)
         {
-            Pen mp = new Pen(Color.BlueViolet);
+            
             foreach (var p in fig.points)
-                foreach (var n in p.Neighbour)
-                    g2.DrawLine(mp, p.To2D("Ортогональная по Z"), n.To2D("Ортогональная по Z"));
+            {
+                foreach (var p1 in p.Neighbour)
+                    g2.DrawLine(new Pen(Color.BlueViolet), p.To2D("Ортогональная по Z"), p1.To2D("Ортогональная по Z"));
+            }
             pictureBox2.Image = pictureBox2.Image;
         }
 
