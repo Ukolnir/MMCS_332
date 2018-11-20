@@ -710,11 +710,11 @@ namespace Task_3
                             }
                             foreach (var y in pol_borders.Keys)
                             {
-                                //int xmin = pol_borders[y].Min(t => t.Item1);
-                                //int xmax = pol_borders[y].Max(t => t.Item1);
-                                //if (xmax - xmin > 0)
+                                xmin = pol_borders[y].Min(t => t.Item1);
+                                xmax = pol_borders[y].Max(t => t.Item1);
+                                if (xmax - xmin > 0)
                                 {
-                                    //curr_tex = ResizeBitmap(texture, (xmax - xmin), (ymax - ymin));
+                                    curr_tex = ResizeBitmap(texture, (xmax - xmin), (ymax - ymin));
                                     Tuple<int, double> tmin = pol_borders[y].First();
                                     Tuple<int, double> tmax = pol_borders[y].First();
                                     foreach (var t in pol_borders[y])

@@ -612,7 +612,8 @@ namespace Task_3
             if (w1 <= 1)
                 return;
 
-            g4.DrawImage(tex, new Rectangle(p1.X, p1.Y, p2.X - p1.X, 1), p1.X - xminglob, p1.Y - ymin, p2.X - p1.X, 1, GraphicsUnit.Pixel);
+            g4.DrawImage(tex, new Rectangle(p1.X, p1.Y, p2.X - p1.X, 1), 
+				p1.X - xminglob, p1.Y - ymin, /*xmaxglob - xminglob*/p2.X - p1.X, 1, GraphicsUnit.Pixel);
         }
 
         public void drawPolyhedron(Polyhedron polyhed, Color c, double phi_a, double psi_a, PointPol view_vector)
