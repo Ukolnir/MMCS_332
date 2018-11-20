@@ -16,9 +16,12 @@ namespace Task_3
         Polyhedron figure, newFigure; //= new Polyhedron();
         delegate double lambda(double a, double b);
         lambda f;
-        double step; 
+        //double step;
+		Dictionary<double, double> Ymax = new Dictionary<double, double>();
+		Dictionary<double, double> Ymin = new Dictionary<double, double>();
 
-        public Form1()
+
+		public Form1()
         {
             InitializeComponent();
             pictureBox1.Image = new Bitmap(pictureBox1.Width, pictureBox1.Height);
@@ -28,8 +31,8 @@ namespace Task_3
             
             g.ScaleTransform(1, -1);
 			g.TranslateTransform(pictureBox1.Width / 2, -pictureBox1.Height / 2);
-            g2.ScaleTransform(1, -1);
-            g2.TranslateTransform(pictureBox2.Width / 2, -pictureBox2.Height / 2);
+            //g2.ScaleTransform(1, -1);
+            //g2.TranslateTransform(pictureBox2.Width / 2, -pictureBox2.Height / 2);
             pictureBox2.Image = pictureBox2.Image;
             pictureBox1.Image = pictureBox1.Image;
 
@@ -64,24 +67,7 @@ namespace Task_3
             z /= count;
         }
 
-        /*public void find_center(PointPol[] pList, ref double x, ref double y, ref double z)
-        {
-            x = 0; y = 0; z = 0;
-
-            int count = 0;
-
-            foreach (var p in pList)
-            {
-                count++;
-                x += p.X;
-                y += p.Y;
-                z += p.Z;
-            }
-
-            x /= count;
-            y /= count;
-            z /= count;
-        }*/
+       
 
         public void write_axes()
         {
@@ -223,30 +209,6 @@ namespace Task_3
         }
 
 
-
-       /* private static int[] Interpolate(int i0, int d0, int i1, int d1)
-        {
-            if (i0 == i1)
-            {
-                return new int[] { d0, d1 };
-            }
-            int[] res;
-            int a = (d1 - d0) / (i1 - i0);
-            res = new int[i1 - i0 + 1];
-            d1 = 0;
-            for (int i = i0; i <= i1; i++)
-            {
-                res[d1] = d0;
-                d0 += a;
-                ++d1;
-            }
-
-
-            return res;
-
-        }
-        */
-
         private void old_print_figure()
         {
             Pen my_pen = new Pen(Color.BlueViolet);
@@ -262,113 +224,180 @@ namespace Task_3
             pictureBox1.Image = pictureBox1.Image;
         }
 
-        private void Create_point_fors_Hor()
-        {
-            Dictionary<double, List<Point>> res = new Dictionary<double, List<Point>>();
-            double x0 = Double.Parse(textBox1.Text);
-            double x1 = Double.Parse(textBox2.Text);
-            double y0 = Double.Parse(textBox3.Text);
-            double y1 = Double.Parse(textBox4.Text);
 
-            Polyhedron figure1 = new Polyhedron();
+		private void DrawLine(Point p1, Point p2)
+		{
+			Bitmap bmp = (Bitmap)pictureBox2.Image;
+			int dx = Math.Abs(p2.X - p1.X);
+			int dy = Math.Abs(p2.Y - p1.Y);
 
-            step = Double.Parse(textBox5.Text);
+			int sx = p2.X >= p1.X ? 1 : -1;
+			int sy = p2.Y >= p1.Y ? 1 : -1;
 
-            Dictionary<double, double> Ymax = new Dictionary<double, double>();
-            Dictionary<double, double> Ymin = new Dictionary<double, double>();
 
-            
-            for (double i = x0; i <= x1; i += step)
-            {
-                Ymax[i] = double.MinValue;
-                Ymin[i] = double.MaxValue;
-                for (double j = y0; j <= y1; j += step)
-                {
-                    var p = new PointPol(i, j, f(i, j));
-                    figure1.points.Add(p);
-                }
-            }
+			int xs = p2.X > p1.X ? p1.X : p2.X;
+			int xe = p2.X > p1.X ? p2.X : p1.X;
+			for (int i = xs; i <= 2*xe + dx; ++i)
+				if (!Ymax.Keys.Contains(i))
+				{ Ymax[i] = Ymin[i] = Int32.MaxValue; }
 
-            figure1.points.Sort(delegate (PointPol a, PointPol b)
-            {
-                int xdiff = a.Z.CompareTo(b.Z);
-                if (xdiff != 0) return xdiff;
-                else return a.X.CompareTo(b.X);
-            });
+			if (dy <= dx)
+			{
+				int d = -dx;
+				int d1 = dy << 1;
+				int d2 = (dy - dx) << 1;
+				for (int x = p1.X, y = p1.Y, i = 0; i <= dx; i++, x += sx)
+				{
+					if (Ymin[x] == Int32.MaxValue) // YMin, YMax not inited
+					{
+						if (x >= 0 && x < pictureBox2.Width && y >= 0 && y < pictureBox2.Height)
+							bmp.SetPixel(x, y, Color.BlueViolet);
+						Ymin[x] = Ymax[x] = y;
+					}
+					else
+					if (y < Ymin[x])
+					{
+						if (x >= 0 && x < pictureBox2.Width && y >= 0 && y < pictureBox2.Height)
+							bmp.SetPixel(x, y, Color.BlueViolet);
+						Ymin[x] = y;
+					}
+					else
+					if (y > Ymax[x])
+					{
+						if (x >= 0 && x < pictureBox2.Width && y >= 0 && y < pictureBox2.Height)
+							bmp.SetPixel(x, y, Color.Azure);
+						Ymax[x] = y;
+					}
+					if (d > 0)
+					{
+						d += d2;
+						y += sy;
+					}
+					else
+						d += d1;
+				}
+			}
+			else
+			{
+				int d = dy;
+				int d1 = dx << 1;
+				int d2 = (dx - dy) << 1;
+				
+				double m1 = Ymin[p1.X];
+				double m2 = Ymax[p1.X];
+				for (int x = p1.X, y = p1.Y, i = 0; i <= dy; i++, y += sy)
+				{
+					if (Ymin[x] == Int32.MaxValue) // YMin, YMax not inited
+					{
+						if (x >= 0 && x < pictureBox2.Width && y >= 0 && y < pictureBox2.Height) 
+							bmp.SetPixel(x, y, Color.BlueViolet);
+						Ymin[x] = Ymax[x] = y;
+					}
+					else
+					if (y < m1)
+					{
+						if (x >= 0 && x < pictureBox2.Width && y >= 0 && y < pictureBox2.Height)
+							bmp.SetPixel(x, y, Color.BlueViolet);
+						if (y < Ymin[x])
+							Ymin[x] = y;
 
-            var groupedPoints = figure1.points.GroupBy(x => x.Z);
-            //newFigure = new Polyhedron();
-            var counts = 0;
-            var preSize = 0;
-            foreach (var Zs in groupedPoints)
-            {
-                foreach (var xs in Zs)
-                {
-                    newFigure.points.Add(xs);
-                }
+					}
+					else
+					if (y > m2)
+					{
+						if (x >= 0 && x < pictureBox2.Width && y >= 0 && y < pictureBox2.Height)
+							bmp.SetPixel(x, y, Color.Azure);
+						if (y > Ymax[x])
+							Ymax[x] = y;
+					}
+					if (d > 0)
+					{
+						d += d2;
+						x += sx;
+						m1 = Ymin[x];
+						m2 = Ymax[x];
+					}
+					else
+						d += d1;
+				}
+			}
 
-                for (int i = counts; i < newFigure.points.Count; i++)
-                {
-                    if (newFigure.points[i].Y > Ymax[newFigure.points[i].X])
-                    {
-                        if (counts != 0)
-                            newFigure.points[i].AddNeighbour(newFigure.points[i - 1]);
-                        if (i != newFigure.points.Count() - 1)
-                            newFigure.points[i].AddNeighbour(newFigure.points[i + 1]);
+			pictureBox2.Image = bmp;
+		}
 
-                        if (preSize != 0 && i - preSize != 0)
-                        {
-                            newFigure.points[i].AddNeighbour(newFigure.points[i - preSize]);
-                            if (i + 1 != newFigure.points.Count())
-                                newFigure.points[i - preSize].AddNeighbour(newFigure.points[i + 1]);
-                        }
+		void PlotSurface(double x1, double y1, double x2, double y2, double fmin, double fmax, int n1, int n2)
+		{
+			List<Point> CurLine = new List<Point>();
+			double phi = 30 * 3.1415926 / 180;
+			double psi = 10 * 3.1415926 / 180;
+			double sphi = Math.Sin(phi);
+			double cphi = Math.Cos(phi);
+			double spsi = Math.Sin(psi);
+			double cpsi = Math.Cos(psi);
+			double [] e1 = { cphi, sphi, 0 };
+			double [] e2 = { spsi * sphi, spsi * cphi, cpsi};
 
-                        Ymax[newFigure.points[i].X] = newFigure.points[i].Y;
-                    }
-                    else if (newFigure.points[i].Y < Ymin[newFigure.points[i].X])
-                    {
-                        if (counts != 0)
-                            newFigure.points[i].AddNeighbour(newFigure.points[i - 1]);
-                        if (i != newFigure.points.Count() - 1)
-                            newFigure.points[i].AddNeighbour(newFigure.points[i + 1]);
-                        if (preSize != 0 && i - preSize != 0)
-                        {
-                            newFigure.points[i].AddNeighbour(newFigure.points[i - preSize]);
-                            if (i + 1 != newFigure.points.Count())
-                                newFigure.points[i - preSize].AddNeighbour(newFigure.points[i + 1]);
-                        }
+			double x, y;
+			double hx = (x2 - x1) / n1;
+			double hy = (y2 - y1) / n2;
 
-                        Ymin[newFigure.points[i].X] = newFigure.points[i].Y;
-                    }
-                }
+			double xmin = (e1[0] >= 0 ? x1 : x2) * e1[0] + (e1[1] >= 0 ? y1 : y2) * e1[1];
+			double xmax = (e1[0] >= 0 ? x2 : x1) * e1[0] + (e1[1] >= 0 ? y2 : y1) * e1[1];
+			double ymin = (e2[0] >= 0 ? x1 : x2) * e2[0] + (e2[1] >= 0 ? y1 : y2) * e2[1];
+			double ymax = (e2[0] >= 0 ? x2 : x1) * e2[0] + (e2[1] >= 0 ? y2 : y1) * e2[1];
 
-                preSize = Zs.Count();
-                counts = newFigure.points.Count();
-            }
-        }
+			
+			if (e2[2] >= 0)
+			{
+				ymin += fmin * e2[2];
+				ymax += fmax * e2[2];
+			}
+			else
+			{
+				ymin += fmax * e2[2];
+				ymax += fmin * e2[2];
+			}
+			double ax = 50;
+			double bx = 100;
+			double ay = -10;
+			double by = -100;
 
-        private void DrawHorFigure(Polyhedron fig)
-        {
-            
-            foreach (var p in fig.points)
-            {
-                foreach (var p1 in p.Neighbour)
-                    g2.DrawLine(new Pen(Color.BlueViolet), p.To2D("Ортогональная по Z"), p1.To2D("Ортогональная по Z"));
-            }
-            pictureBox2.Image = pictureBox2.Image;
-        }
+			for (int i = 0; i < Math.Abs(x2 - x1); i++)
+				Ymin[i] = Ymax[i] = Int32.MaxValue;
 
-    private void button1_Click(object sender, EventArgs e)
+			for (int i = n2 - 1; i > -1; --i)
+{
+				for (int j = 0; j < n1; j++)
+				{
+					x = x1 + j * hx;
+					y = y1 + i * hy;
+					int newX = (int)(ax + bx * (x * e1[0] + y * e1[1]));
+					int newY = (int)(ay + by * (x * e2[0] + y * e2[1] + f(x, y)*  e2[2]));
+					CurLine.Add(new Point(newX, newY));
+				}
+				for(int j = 0; j < n1 - 1; ++j)
+					DrawLine(CurLine[j], CurLine[j + 1]);
+			}
+			CurLine.Clear();
+		}
+
+		private void button1_Click(object sender, EventArgs e)
         {
             create_pol();
             ClearWithout();
             old_print_figure();
 
             newFigure = new Polyhedron();
-            Create_point_fors_Hor();
-            DrawHorFigure(newFigure);
 
-            button4.Visible = true;
+			double x0 = Double.Parse(textBox1.Text.ToString());
+			double x1 = Double.Parse(textBox2.Text.ToString());
+			double y0 = Double.Parse(textBox3.Text.ToString());
+			double y1 = Double.Parse(textBox4.Text.ToString());
+			double step = Double.Parse(textBox5.Text.ToString());
+
+			PlotSurface(x0, y0, x1, y1, -1, 1, (int)((x1-x0)/step), (int)((x1-x0)/step));
+
+			button4.Visible = true;
             button5.Visible = true;
             button6.Visible = true;
             button7.Visible = true;
@@ -421,7 +450,7 @@ namespace Task_3
 
             //Create_point_fors_Hor();
             newFigure.reflection(axis);
-            DrawHorFigure(newFigure);
+           // DrawHorFigure(newFigure);
 
         }
 
@@ -434,7 +463,7 @@ namespace Task_3
             old_print_figure();
             //Polyhedron p = Create_point_fors_Hor();
             newFigure.scale(ind_scale);
-            DrawHorFigure(newFigure);
+           // DrawHorFigure(newFigure);
 
         }
 
@@ -449,7 +478,7 @@ namespace Task_3
             old_print_figure();
            // Polyhedron p = Create_point_fors_Hor();
             newFigure.shift(x, y, z);
-            DrawHorFigure(newFigure);
+         //   DrawHorFigure(newFigure);
 
         }
 
@@ -504,7 +533,7 @@ namespace Task_3
 
             //Polyhedron p = Create_point_fors_Hor();
             newFigure.rotate(Tuple.Create(p1, p2), angle);
-            DrawHorFigure(newFigure);
+           // DrawHorFigure(newFigure);
             old_print_figure();
         }
 
@@ -644,13 +673,14 @@ namespace Task_3
         public Point To2D(string display)
         {
             double[,] displayMatrix = new double[4, 4] { { Math.Sqrt(0.5), 0, -Math.Sqrt(0.5), 0 }, { 1 / Math.Sqrt(6), 2 / Math.Sqrt(6), 1 / Math.Sqrt(6), 0 }, { 1 / Math.Sqrt(3), -1 / Math.Sqrt(3), 1 / Math.Sqrt(3), 0 }, { 0, 0, 0, 1 } };;
-  
-            if (display == "Ортогональная по Z")
+
+			/*if (display == "Ортогональная по Z")
                 displayMatrix = new double[4, 4] { { 1, 0, 0, 0 }, { 0, 1, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 1 } };
 
-            var temp = _form.matrix_multiplication(displayMatrix, getP1());
-            var temp2d = new Point(Convert.ToInt32(temp[0, 0]), Convert.ToInt32(temp[1, 0]));
-            return temp2d;
+            var temp = _form.matrix_multiplication(displayMatrix, getP1());*/
+			//var temp2d = new Point(Convert.ToInt32(temp[0, 0]), Convert.ToInt32(temp[1, 0]));
+			var temp2d = new Point(Convert.ToInt32(X), Convert.ToInt32(Y));
+			return temp2d;
         }
     }
 
