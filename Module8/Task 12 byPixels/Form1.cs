@@ -526,6 +526,8 @@ namespace Task_3
             return arcos / Math.PI * 180;
         }
 
+        //public Point pointCoordsBetweenPoints(Point p1, Point p2, )
+
         public void drawLineBetweenPoints(Point p1, Point p2, double diffuse1, double diffuse2,
             int wdiv2, int hdiv2, ref Dictionary<int, List<Tuple<int, double>>> pol_borders)
         {
