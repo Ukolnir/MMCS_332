@@ -574,6 +574,39 @@ namespace Task_3
             }
         }
 
+        public void drawPolygonWithTex(Polygon pol, Bitmap tex, int tex_width, int tex_height,
+            double phi_a, double psi_a, PointPol view_vector)
+        {
+            int wdiv2 = pictureBox4.Width / 2;
+            int hdiv2 = pictureBox4.Height / 2;
+            if (isVisible(pol, view_vector))
+            {
+                Dictionary<int, Point> vertex_to_texpoint = new Dictionary<int, Point>();
+                if ((pol.points.Count() == 3) || (pol.points.Count() == 4))
+                {
+                    vertex_to_texpoint.Add(0, new Point(0, 0));
+                    vertex_to_texpoint.Add(1, new Point(tex_width, 0));
+                    vertex_to_texpoint.Add(2, new Point(tex_width, tex_height));
+                    if (pol.points.Count() == 4)
+                        vertex_to_texpoint.Add(3, new Point(0, tex_height));
+                }
+                else
+                    return;
+
+                List<Point> points2d = new List<Point>();
+                foreach (var p in pol.points)
+                {
+                    points2d.Add(p.To2D(phi_a, psi_a));
+                }
+
+                Dictionary<Point, Point> borders_to_texpoint = new Dictionary<Point, Point>();
+                foreach (var e in pol.edges)
+                {
+                    
+                }
+            }
+        }
+
         public void drawTextureBetweenPoints(Point p1, Point p2, double diffuse1, double diffuse2,
             int wdiv2, int hdiv2, int xmin, int xmax, int ymin, int ymax, Bitmap tex)
         {
