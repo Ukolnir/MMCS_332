@@ -492,7 +492,7 @@ namespace Task_3
             pictureBox1.Image = pictureBox1.Image;
             pictureBox3.Image = pictureBox3.Image;
         }
-
+        /*
         public Color colorByDiffuse(Color c, double diffuse)
         {
             double r = c.R;
@@ -515,7 +515,7 @@ namespace Task_3
                 return Color.FromArgb((int)r, (int)g, (int)b);
             }
             
-        }
+        }*/
 
         public double angleByVectors(Point p1, Point p2)
         {
@@ -526,8 +526,63 @@ namespace Task_3
             return arcos / Math.PI * 180;
         }
 
-        //public Point pointCoordsBetweenPoints(Point p1, Point p2, )
+        public void texPointsOnOneBorder(Point p1, Point p2, Point ptex1, Point ptex2, 
+            int wdiv2, int hdiv2, Bitmap tex, int tex_w, int tex_h,
+            ref Dictionary<int, List<Tuple<int, Point>>> pol_borders)
+        {
+            int x1 = p1.X;
+            int y1 = p1.Y;
+            int x2 = p2.X;
+            int y2 = p2.Y;
+            int diffx = Math.Abs(x2 - x1);
+            int diffy = Math.Abs(y2 - y1);
+            int diff = Math.Max(diffx, diffy);
+            double stepx = (double)(x2 - x1) / diff;
+            double stepy = (double)(y2 - y1) / diff;
+            double steptexx = (ptex2.X = ptex1.X) / diff;
+            double steptexy = (ptex2.Y = ptex1.Y) / diff;
 
+            List<int> xs = new List<int>();
+            List<int> ys = new List<int>();
+            for (int i = 0; i < diff; ++i)
+            {
+                int currx = (int)Math.Round(x1 + stepx * i);
+                int curry = (int)Math.Round(y1 + stepy * i);
+                int currtexx = (int)Math.Round(ptex1.X + steptexx * i);
+                int currtexy = (int)Math.Round(ptex1.Y + steptexy * i);
+                //int currb = (int)Math.Round(c1.B + stepb * i);
+
+                int indxinxs = xs.FindIndex(xinl => (xinl == currx));// || (p.Item1.Y == curry));// && (p.Item1.Y == curry));
+                int indyinys = ys.FindIndex(yinl => (yinl == curry));
+                if ((indxinxs == -1) || (indyinys == -1))
+                {
+                    bool y_repeat = pol_borders.Keys.Contains(curry);
+                    if (y_repeat)
+                    {
+                        pol_borders[curry].Add(Tuple.Create(currx, new Point(currtexx, currtexy)));
+                    }
+                    else
+                    {
+                        pol_borders.Add(curry, new List<Tuple<int, Point>>());
+                        pol_borders[curry].Add(Tuple.Create(currx, new Point(currtexx, currtexy)));
+                    }
+                }
+                if (indxinxs == -1)
+                    xs.Add(currx);
+                if (indyinys == -1)
+                    ys.Add(curry);
+
+                if ((currx > -wdiv2) && (currx < wdiv2) && (curry > -hdiv2) && (curry < hdiv2))
+                {
+                    if ((currtexx > 0) && (currtexx < tex_w) && (currtexy > 0) && (currtexy < tex_h))
+                    {
+                        Color currcolor = tex.GetPixel(currtexx, currtexy);
+                        image4.SetPixel(currx + wdiv2, curry + hdiv2, currcolor);
+                    }
+                }
+            }
+        }
+        /*
         public void drawLineBetweenPoints(Point p1, Point p2, double diffuse1, double diffuse2,
             int wdiv2, int hdiv2, ref Dictionary<int, List<Tuple<int, double>>> pol_borders)
         {
@@ -574,8 +629,8 @@ namespace Task_3
                 if ((currx > -wdiv2) && (currx < wdiv2) && (curry > -hdiv2) && (curry < hdiv2))
                     image4.SetPixel(currx + wdiv2, curry + hdiv2, colorByDiffuse(light_color, currdiffuse));
             }
-        }
-
+        }*/
+        
         public void drawPolygonWithTex(Polygon pol, Bitmap tex, int tex_width, int tex_height,
             double phi_a, double psi_a, PointPol view_vector)
         {
@@ -601,14 +656,65 @@ namespace Task_3
                     points2d.Add(p.To2D(phi_a, psi_a));
                 }
 
-                Dictionary<Point, Point> borders_to_texpoint = new Dictionary<Point, Point>();
+                //y, [<x, texPoint>]
+                Dictionary<int, List<Tuple<int, Point>>> pol_borders = new Dictionary<int, List<Tuple<int, Point>>>();
+
+                //find indices of points in edges
+                List<Tuple<int, int>> ind_edges_in_points = new List<Tuple<int, int>>();
                 foreach (var e in pol.edges)
                 {
-                    
+                    int ind1 = pol.points.FindIndex(pinpol => pointsEqual(pinpol, pol.points[e.Item1]));
+                    int ind2 = pol.points.FindIndex(pinpol => pointsEqual(pinpol, pol.points[e.Item2]));
+                    ind_edges_in_points.Add(Tuple.Create(ind1, ind2));
+                }
+
+                //draw borders
+                foreach (var edge in ind_edges_in_points)
+                {
+                    Point p1 = points2d[edge.Item1];
+                    Point p2 = points2d[edge.Item2];
+                    Point ptex1 = vertex_to_texpoint[edge.Item1];
+                    Point ptex2 = vertex_to_texpoint[edge.Item2];
+
+                    texPointsOnOneBorder(p1, p2, ptex1, ptex2, wdiv2, hdiv2, tex, tex_width, tex_height, ref pol_borders);
+                }
+
+                //find 
+                int ymin = pol_borders.Keys.Min();
+                int ymax = pol_borders.Keys.Max();
+                int xmin = pol_borders.Values.Min(t1 => t1.Min(t2 => t2.Item1));
+                int xmax = pol_borders.Values.Max(t1 => t1.Max(t2 => t2.Item1));
+                Bitmap curr_tex = new Bitmap(texture);
+
+                //draw inner part
+                if ((ymax - ymin > 0) && (xmax - xmin > 0))
+                {
+                    foreach (var y in pol_borders.Keys)
+                    {
+                        xmin = pol_borders[y].Min(t => t.Item1);
+                        xmax = pol_borders[y].Max(t => t.Item1);
+                        if (xmax - xmin > 0)
+                        {
+                            curr_tex = ResizeBitmap(texture, (xmax - xmin), (ymax - ymin));
+                            Tuple<int, Point> tmin = pol_borders[y].First();
+                            Tuple<int, Point> tmax = pol_borders[y].First();
+                            foreach (var t in pol_borders[y])
+                            {
+                                if (t.Item1 < tmin.Item1)
+                                    tmin = t;
+                                if (t.Item1 > tmax.Item1)
+                                    tmax = t;
+                            }
+
+                            Dictionary<int, List<Tuple<int, double>>> to_del = new Dictionary<int, List<Tuple<int, double>>>();
+                            texPointsOnOneBorder(new Point(tmin.Item1, y), new Point(tmax.Item1, y),
+                                tmin.Item2, tmax.Item2, wdiv2, hdiv2, tex, tex_width, tex_height, ref pol_borders);
+                        }
+                    }
                 }
             }
         }
-
+        /*
         public void drawTextureBetweenPoints(Point p1, Point p2, double diffuse1, double diffuse2,
             int wdiv2, int hdiv2, int xmin, int xmax, int ymin, int ymax, Bitmap tex)
         {
@@ -648,8 +754,8 @@ namespace Task_3
                     image4.SetPixel(currx + wdiv2, curry + hdiv2, colorByDiffuse(currcolor, currdiffuse));
                 }
             }
-        }
-
+        }*/
+        /*
         public void drawPolyhedron(Polyhedron polyhed, Color c, double phi_a, double psi_a, 
             PointPol view_vector)
         {
@@ -767,6 +873,40 @@ namespace Task_3
                             }
                         }
                     } 
+                }
+                pictureBox4.Image = image4;
+                //pictureBox4.Image = pictureBox4.Image;
+                //image4 = (Bitmap)pictureBox4.Image;
+            }
+        }*/
+
+        public void drawPolyhedron(Polyhedron polyhed, Color c, double phi_a, double psi_a,
+            PointPol view_vector)
+        {
+            int wdiv2 = pictureBox4.Width / 2;
+            int hdiv2 = pictureBox4.Height / 2;
+
+            string mode = comboBoxMode.Text;
+
+            image4 = new Bitmap(pictureBox4.Image);
+            //g4 = Graphics.FromImage(pictureBox4.Image);
+            if (polyhed.polygons.Count() > 3)
+            {
+                foreach (var pol in polyhed.polygons)
+                {
+                    List<Point> points2d = new List<Point>();
+                    foreach (var p in pol.points)
+                    {
+                        points2d.Add(p.To2D(phi_a, psi_a));
+                    }
+                    int xmax = Math.Min(points2d.Max(p => p.X), wdiv2*2);
+                    int xmin = Math.Max(points2d.Min(p => p.X), 0);
+                    int ymax = Math.Min(points2d.Max(p => p.Y), hdiv2 * 2);
+                    int ymin = Math.Max(points2d.Min(p => p.Y), 0);
+                    int w = xmax - xmin;
+                    int h = ymax - ymin;
+                    Bitmap curr_tex = ResizeBitmap(texture, w, h);
+                    drawPolygonWithTex(pol, curr_tex, w, h, phi_a, psi_a, view_vector);
                 }
                 pictureBox4.Image = image4;
                 //pictureBox4.Image = pictureBox4.Image;
