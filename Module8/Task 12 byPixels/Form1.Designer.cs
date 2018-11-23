@@ -108,7 +108,6 @@
             this.groupBox17 = new System.Windows.Forms.GroupBox();
             this.textBoxLightTime = new System.Windows.Forms.TextBox();
             this.buttonLoadTexture = new System.Windows.Forms.Button();
-            this.comboBoxMode = new System.Windows.Forms.ComboBox();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
@@ -205,7 +204,7 @@
             this.textBoxBuildCount.Name = "textBoxBuildCount";
             this.textBoxBuildCount.Size = new System.Drawing.Size(60, 20);
             this.textBoxBuildCount.TabIndex = 16;
-            this.textBoxBuildCount.Text = "3";
+            this.textBoxBuildCount.Text = "4";
             // 
             // label7
             // 
@@ -927,24 +926,11 @@
             this.buttonLoadTexture.UseVisualStyleBackColor = true;
             this.buttonLoadTexture.Click += new System.EventHandler(this.buttonLoadTexture_Click);
             // 
-            // comboBoxMode
-            // 
-            this.comboBoxMode.FormattingEnabled = true;
-            this.comboBoxMode.Items.AddRange(new object[] {
-            "NormalMode",
-            "RotateMode"});
-            this.comboBoxMode.Location = new System.Drawing.Point(615, 181);
-            this.comboBoxMode.Name = "comboBoxMode";
-            this.comboBoxMode.Size = new System.Drawing.Size(121, 21);
-            this.comboBoxMode.TabIndex = 89;
-            this.comboBoxMode.Text = "NormalMode";
-            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1203, 659);
-            this.Controls.Add(this.comboBoxMode);
             this.Controls.Add(this.buttonLoadTexture);
             this.Controls.Add(this.groupBox14);
             this.Controls.Add(this.pictureBox4);
@@ -1092,7 +1078,6 @@
         private System.Windows.Forms.GroupBox groupBox16;
         private System.Windows.Forms.TextBox textBoxLightAngle;
         private System.Windows.Forms.Button buttonLoadTexture;
-        private System.Windows.Forms.ComboBox comboBoxMode;
     }
 }
 
