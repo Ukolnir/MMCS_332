@@ -12,15 +12,6 @@ void LoadImage() {
 
 }
 
-void DrawCube()
-{
-	glBegin(GL_QUADS);
-	glColor3f(1, 0.2, 0.2);
-
-	glEnd();
-}
-
-
 
 void Init(void) {
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
@@ -31,14 +22,11 @@ void Update(void) {
 	double angle = 1;
 	angle += 0.5f;
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	//glEnable(GL_TEXTURE_2D);
-	//glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
-	//glBindTexture(GL_TEXTURE_2D, texture);
 
 	gluLookAt(100.0f, 100.0f, 100.0f, 60.0f, 50.0f, 40.0f, 0.0f, 1.0f, 0.0f);
 	glRotatef(angle, 0.0f, 1.0f, 0.0f);
 
-	texture = SOIL_load_OGL_texture("..\road.bmp", SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_INVERT_Y);
+	texture = SOIL_load_OGL_texture("road.bmp", SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_INVERT_Y);
 	glGenTextures(1, &texture);
 	glBindTexture(GL_TEXTURE_2D, texture);
 	
@@ -48,11 +36,8 @@ void Update(void) {
 	glTexCoord2d(1, 1); glVertex3d(320, 0, 320);
 	glTexCoord2d(0, 1); glVertex3d(0, 0, 320);
 	glEnd();
-
-
-	//DrawCube();
 	glFlush();
-	//glDisable(GL_TEXTURE_2D);
+	glDisable(GL_TEXTURE_2D);
 }
 //‘ункц€ вызываема€ при изменении размеров окна
 void Reshape(int width, int height) {
@@ -62,7 +47,8 @@ void Reshape(int width, int height) {
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 	gluPerspective(65.0f, w / h, 1.0f, 1000.0f);
-	glMatrixMode(GL_MODELVIEW);
+	glMatrixMode(GL_MODELVIEW);
+
 }
 
 int main(int argc, char ** argv) {
@@ -76,7 +62,6 @@ int main(int argc, char ** argv) {
 	//glutIdleFunc(Update);
 	glutDisplayFunc(Update);
 	glutReshapeFunc(Reshape);
-	//Init();
 	Update();
 	glutMainLoop();
 	return 0;
