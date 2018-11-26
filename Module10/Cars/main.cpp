@@ -5,38 +5,16 @@
 #include "D:\Документы\OneDrive\Документы\7 семестр\комп. графика\freeglut\include\GL\freeglut.h"
 #include "D:\Документы\OneDrive\Документы\7 семестр\комп. графика\freeglut\include\GL\SOIL.h"
 
-GLuint texture;
-unsigned int photo_tex;
+GLuint texture, textCar, texWindow;
+
 int w, h, w1, l1;
 float p1x, p1z, rotate_x, rotate_y, rotate_z;
 bool flags[] = { false, false, false, false, false };
 
 void LoadImage1() {
-	texture = SOIL_load_OGL_texture("texture.jpg", SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_MIPMAPS | SOIL_FLAG_INVERT_Y | SOIL_FLAG_NTSC_SAFE_RGB | SOIL_FLAG_COMPRESS_TO_DXT);
-	glGenTextures(1, &texture);
-	glBindTexture(GL_TEXTURE_2D, texture);
-}
-
-#define checkImageWidth 200 
-#define checkImageHeight 200 
-GLubyte checkImage[checkImageHeight][checkImageWidth][4];
-GLuint texName;
-void makeCheckImage()
-{
-	int i, j, c;
-	for (i = 0; i<checkImageHeight; i++)
-	{
-		for (j = 0; j<checkImageWidth; j++)
-		{
-			c = ((i + j) % 8 + (i * j) % 8) * 25;
-
-			checkImage[i][j][0] = (GLubyte)c - 5;
-			checkImage[i][j][1] = (GLubyte)c - 5;
-			checkImage[i][j][2] = (GLubyte)c;
-			checkImage[i][j][3] = (GLubyte)255;
-		}
-	}
-
+	texture = SOIL_load_OGL_texture("road.bmp", SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_MIPMAPS | SOIL_FLAG_INVERT_Y | SOIL_FLAG_NTSC_SAFE_RGB | SOIL_FLAG_COMPRESS_TO_DXT);
+	textCar = SOIL_load_OGL_texture("D:\\Games\\5.jpg", SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_MIPMAPS | SOIL_FLAG_INVERT_Y | SOIL_FLAG_NTSC_SAFE_RGB | SOIL_FLAG_COMPRESS_TO_DXT);
+	texWindow = SOIL_load_OGL_texture("D:\\Games\\window.jpg", SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_MIPMAPS | SOIL_FLAG_INVERT_Y | SOIL_FLAG_NTSC_SAFE_RGB | SOIL_FLAG_COMPRESS_TO_DXT);
 }
 
 void Init(void) {
@@ -48,16 +26,6 @@ void Init(void) {
 	glClearColor(0.3f, 0.5f, 0.5f, 1.0f);
 	glLoadIdentity();
 	LoadImage1();
-	makeCheckImage();
-	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-	glGenTextures(1, &texName);
-	glBindTexture(GL_TEXTURE_2D, texName);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, checkImageWidth, checkImageHeight,
-		0, GL_RGBA, GL_UNSIGNED_BYTE, checkImage);
 
 	glLightModelf(GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE);
 
@@ -67,7 +35,11 @@ void Init(void) {
 
 void DrawRoad()
 {
+
 	glBindTexture(GL_TEXTURE_2D, texture);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_REPEAT);
+
 	glEnable(GL_TEXTURE_2D);
 
 	glBegin(GL_QUADS);
@@ -142,17 +114,17 @@ void AddLight()
 	glPushMatrix();
 	glLoadIdentity();
 	
-	GLfloat light_pos[] = { 300.0, 30.0, 10.0, 1.0 };
-	GLfloat light_pos1[] = { 10.0, 30.0, 10.0, 1.0 };
-	GLfloat light_pos2[] = { 10.0, 30.0, 300.0, 1.0 };
-	GLfloat light_pos3[] = { 300.0, 30.0, 300.0, 1.0 };
+	GLfloat light_pos[] = { 300.0, 20.0, 10.0, 1.0 };
+	GLfloat light_pos1[] = { 10.0, 20.0, 10.0, 1.0 };
+	GLfloat light_pos2[] = { 10.0, 20.0, 300.0, 1.0 };
+	GLfloat light_pos3[] = { 300.0, 20.0, 300.0, 1.0 };
 
 	GLfloat light_pos0[] = { 360, 360.0, 360.0, 1.0 };
 
-	GLfloat dif[] = { 1, 0.76, 0.678, 1.0 };
+	GLfloat dif[] = { 1, 0.76, 0.978, 1.0 };
 	GLfloat dif_p[] = { 0.7, 0.7, 0.2, 1.0 };
 
-	GLfloat sp1[] = {0,0,-1};
+	GLfloat sp1[] = { 0, 0, 0 };
 	GLfloat coff1[] = { 180 };
 	glLightfv(GL_LIGHT0, GL_POSITION, light_pos0);
 	glLightfv(GL_LIGHT0, GL_SPOT_DIRECTION, sp1);
@@ -179,7 +151,7 @@ void AddLight()
 	glTranslatef(p1x, 25, p1z + 7);
 	GLfloat light_pos_p[] = { 0, 0, 1 };
 	GLfloat sp[] = { 0, 0,  -1 };
-	GLfloat coff[] = { 40.0 };
+	GLfloat coff[] = { 45.0 };
 	GLfloat se[] = { 15.0 };
 
 	glLightfv(GL_LIGHT5, GL_POSITION, light_pos_p);
@@ -232,76 +204,93 @@ void DrawCar()
 	glutSolidTorus(3, r, 54, 54);
 	glPopMatrix();
 
+
+	glBindTexture(GL_TEXTURE_2D, textCar);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_REPEAT);
+
+	glEnable(GL_TEXTURE_2D);
+
+
 	//рисуем низ
 	int d = 12;
 
 	glColor3f(0.40, 0.35, 0.35);
 
 	glBegin(GL_QUAD_STRIP);
-	glVertex3f(p1x, 40.0, p1z); //glNormal3f(p1x, 40.0, -p1z);
-	glVertex3f(p1x + w1, 40.0, p1z); //glNormal3f(p1x + w1, 40.0, -p1z);
+	glVertex3f(p1x, 40.0, p1z); glTexCoord2f(0, 0);
+	glVertex3f(p1x + w1, 40.0, p1z); glTexCoord2f(1, 0);
 
-	glVertex3f(p1x, 40.0, p1z + l1); //glNormal3f(p1x, 40.0, -(p1z + l1));
-	glVertex3f(p1x + w1, 40.0, p1z + l1); //glNormal3f(p1x + w1, 40.0, -(p1z + l1));
+	glVertex3f(p1x, 40.0, p1z + l1); glTexCoord2f(0, 1);
+	glVertex3f(p1x + w1, 40.0, p1z + l1); glTexCoord2f(1, 1);
 	
-	glVertex3f(p1x, d, p1z + l1); //glNormal3f(p1x, d, -(p1z + l1));
-	glVertex3f(p1x + w1, d, p1z + l1); //glNormal3f(p1x + w1, d, -(p1z + l1));
+	glVertex3f(p1x, d, p1z + l1); glTexCoord2f(0, 0);
+	glVertex3f(p1x + w1, d, p1z + l1); glTexCoord2f(1, 0);
 
-	glVertex3f(p1x, d, p1z);
-	glVertex3f(p1x + w1, d, p1z);
+	glVertex3f(p1x, d, p1z);  glTexCoord2f(1, 1);
+	glVertex3f(p1x + w1, d, p1z);  glTexCoord2f(0, 1);
 
-	glVertex3f(p1x, 40.0, p1z);
-	glVertex3f(p1x + w1, 40.0, p1z);
+	glVertex3f(p1x, 40.0, p1z);  glTexCoord2f(0, 0);
+	glVertex3f(p1x + w1, 40.0, p1z);  glTexCoord2f(1, 0);
 	glEnd();
 
 
 	glBegin(GL_QUADS);
-	glVertex3f(p1x, 40.0, p1z);
-	glVertex3f(p1x, 40.0, p1z + l1);
-	glVertex3f(p1x, d, p1z + l1);
-	glVertex3f(p1x, d, p1z);
+	glVertex3f(p1x, 40.0, p1z);  glTexCoord2f(0, 1);
+	glVertex3f(p1x, 40.0, p1z + l1);  glTexCoord2f(1, 1);
+	glVertex3f(p1x, d, p1z + l1);  glTexCoord2f(1, 0);
+	glVertex3f(p1x, d, p1z);  glTexCoord2f(0, 0);
 	glEnd();
 
 	glBegin(GL_QUADS);
-	glVertex3f(p1x + w1, 40.0, p1z);
-	glVertex3f(p1x + w1, 40.0, p1z + l1);
-	glVertex3f(p1x + w1, d, p1z + l1);
-	glVertex3f(p1x + w1, d, p1z);
+	glVertex3f(p1x + w1, 40.0, p1z); glTexCoord2f(0, 1);
+	glVertex3f(p1x + w1, 40.0, p1z + l1); glTexCoord2f(1, 1);
+	glVertex3f(p1x + w1, d, p1z + l1); glTexCoord2f(1, 0);
+	glVertex3f(p1x + w1, d, p1z); glTexCoord2f(0, 0);
 	glEnd();
 	
 	//кабина
 	glBegin(GL_QUAD_STRIP);
-	glVertex3f(p1x + w1 - 30, 70.0, p1z);
-	glVertex3f(p1x + w1, 70.0, p1z);
+	glVertex3f(p1x + w1 - 30, 70.0, p1z); glTexCoord2f(0, 0);
+	glVertex3f(p1x + w1, 70.0, p1z); glTexCoord2f(1, 0);
 
-	glVertex3f(p1x + w1 - 30, 70.0, p1z + l1);
-	glVertex3f(p1x + w1, 70.0, p1z + l1);
+	glVertex3f(p1x + w1 - 30, 70.0, p1z + l1); glTexCoord2f(1, 1);
+	glVertex3f(p1x + w1, 70.0, p1z + l1); glTexCoord2f(0, 1);
 
-	glVertex3f(p1x + w1 - 30, 40.0, p1z + l1);
-	glVertex3f(p1x + w1, 40.0, p1z + l1);
+	glVertex3f(p1x + w1 - 30, 40.0, p1z + l1); glTexCoord2f(0, 0);
+	glVertex3f(p1x + w1, 40.0, p1z + l1); glTexCoord2f(1, 0);
 
-	glVertex3f(p1x + w1 - 30, 40.0, p1z);
-	glVertex3f(p1x + w1, 40.0, p1z);
+	glVertex3f(p1x + w1 - 30, 40.0, p1z); glTexCoord2f(0, 1);
+	glVertex3f(p1x + w1, 40.0, p1z); glTexCoord2f(1, 1);
 
-	glVertex3f(p1x + w1 - 30, 70.0, p1z);
-	glVertex3f(p1x + w1, 70.0, p1z);
+	glVertex3f(p1x + w1 - 30, 70.0, p1z); glTexCoord2f(1, 0);
+	glVertex3f(p1x + w1, 70.0, p1z); glTexCoord2f(0, 0);
 	glEnd();
 
 	glBegin(GL_QUADS);
-	glVertex3f(p1x + w1 - 30, 70.0, p1z);
-	glVertex3f(p1x + w1 - 30, 70.0, p1z + l1);
-	glVertex3f(p1x + w1 - 30, 40.0, p1z + l1);
-	glVertex3f(p1x + w1 - 30, 40.0, p1z);
+	glVertex3f(p1x + w1 - 30, 70.0, p1z); glTexCoord2f(0, 0);
+	glVertex3f(p1x + w1 - 30, 70.0, p1z + l1); glTexCoord2f(1, 0);
+	glVertex3f(p1x + w1 - 30, 40.0, p1z + l1); glTexCoord2f(1, 1);
+	glVertex3f(p1x + w1 - 30, 40.0, p1z); glTexCoord2f(0, 1);
 	glEnd();
 	
+	glDisable(GL_TEXTURE_2D);
+
+	glBindTexture(GL_TEXTURE_2D, texWindow);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_REPEAT);
+
+	glEnable(GL_TEXTURE_2D);
 	glColor3f(0.55, 0.9, 0.9);
 
 	glBegin(GL_QUADS);
-	glVertex3f(p1x + w1, 70.0, p1z);
-	glVertex3f(p1x + w1, 70.0, p1z + l1);
-	glVertex3f(p1x + w1, 40.0, p1z + l1);
-	glVertex3f(p1x + w1, 40.0, p1z);
+	glVertex3f(p1x + w1, 70.0, p1z); glTexCoord2f(0, 0);
+	glVertex3f(p1x + w1, 70.0, p1z + l1); glTexCoord2f(1, 0);
+	glVertex3f(p1x + w1, 40.0, p1z + l1); glTexCoord2f(1, 1);
+	glVertex3f(p1x + w1, 40.0, p1z); glTexCoord2f(0, 1);
 	glEnd();
+
+	glDisable(GL_TEXTURE_2D);
 
 	//фары
 	glPushMatrix();
