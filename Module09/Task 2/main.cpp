@@ -1,7 +1,7 @@
 #include <GL\glew.h>
 #include <GL\freeglut.h>
 
-static int w = 0, h = 0;
+static int w = 800, h = 800;
 
 double rotate_x = 0;
 double rotate_y = 0;
@@ -46,7 +46,7 @@ void drawWireCube() {
 		gluPerspective(65.0f, w / h, 1.0f, 1000.0f);
 		glMatrixMode(GL_MODELVIEW);
 		glLoadIdentity();
-		gluLookAt(-0.1, 0.1, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
+		gluLookAt(-0.3, 0.5, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
 	}
 	
 	glLoadIdentity();
@@ -135,10 +135,10 @@ void specialKeys(int key, int x, int y) {
 int main(int argc, char** argv) {
 	glutInit(&argc, argv);
 	glutInitWindowPosition(500, 0);
-	glutInitWindowSize(800, 800);
+	glutInitWindowSize(w, h);
 	glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH);
 	glutCreateWindow("OpenGL");
-	//glutReshapeFunc(Reshape);
+	glutReshapeFunc(Reshape);
 	glutDisplayFunc(drawWireCube);
 	glutSpecialFunc(specialKeys);
 	
