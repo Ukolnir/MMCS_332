@@ -7,6 +7,7 @@ double rotate_x = 0;
 double rotate_y = 0;
 double rotate_z = 0;
 int mode = 0;
+int projection = 0;
 
 void Init(void) {
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
@@ -32,7 +33,22 @@ void Reshape(int width, int height) {
 
 void drawWireCube() {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
+	if(!projection){
+		glMatrixMode(GL_PROJECTION);
+		glLoadIdentity();
+		glOrtho(-1, 1, -1, 1, -1, 1);
+		glMatrixMode(GL_MODELVIEW);
+		glLoadIdentity();
+	}
+	else {
+		glMatrixMode(GL_PROJECTION);
+		glLoadIdentity();
+		gluPerspective(65.0f, w / h, 1.0f, 1000.0f);
+		glMatrixMode(GL_MODELVIEW);
+		glLoadIdentity();
+		gluLookAt(-0.1, 0.1, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
+	}
+	
 	glLoadIdentity();
 	
 	if(!mode)
@@ -110,6 +126,8 @@ void specialKeys(int key, int x, int y) {
 		case GLUT_KEY_F1: rotate_x = rotate_y = rotate_z = mode = 0; break;
 		case GLUT_KEY_F2: rotate_x = rotate_y = rotate_z = 0; mode = 1; break;
 		case GLUT_KEY_F3: rotate_x = rotate_y = rotate_z = 0; mode = 2; break;
+		case GLUT_KEY_SHIFT_L: rotate_x = rotate_y = rotate_z = 0; projection = 0; break;
+		case GLUT_KEY_CTRL_L: rotate_x = rotate_y = rotate_z = 0; projection = 1; break;
 	}
 	glutPostRedisplay();
 }
