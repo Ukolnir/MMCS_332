@@ -119,12 +119,12 @@ void AddLight()
 	GLfloat light_pos2[] = { 10.0, 20.0, 300.0, 1.0 };
 	GLfloat light_pos3[] = { 300.0, 20.0, 300.0, 1.0 };
 
-	GLfloat light_pos0[] = { 360, 360.0, 360.0, 1.0 };
+	GLfloat light_pos0[] = { 0, 0, 0, 1.0 };
 
 	GLfloat dif[] = { 1, 0.76, 0.978, 1.0 };
 	GLfloat dif_p[] = { 0.7, 0.7, 0.2, 1.0 };
 
-	GLfloat sp1[] = { 0, 0, 0 };
+	GLfloat sp1[] = { 0, 0, -1 };
 	GLfloat coff1[] = { 180 };
 	glLightfv(GL_LIGHT0, GL_POSITION, light_pos0);
 	glLightfv(GL_LIGHT0, GL_SPOT_DIRECTION, sp1);
@@ -149,8 +149,8 @@ void AddLight()
 
 	glPushMatrix();
 	glTranslatef(p1x, 25, p1z + 7);
-	GLfloat light_pos_p[] = { 0, 0, 1 };
-	GLfloat sp[] = { 0, 0,  -1 };
+	GLfloat light_pos_p[] = { 0, 0, 0, 1 };
+	GLfloat sp[] = { -0.45, 0.15, -1 };
 	GLfloat coff[] = { 45.0 };
 	GLfloat se[] = { 15.0 };
 
