@@ -3,10 +3,12 @@
 
 #include <iostream>
 #include <Windows.h>
-#include "D:\Документы\OneDrive\Документы\7 семестр\комп. графика\freeglut\include\GL\glew.h"
-#include "D:\Документы\OneDrive\Документы\7 семестр\комп. графика\freeglut\include\GL\wglew.h"
-#include "D:\Документы\OneDrive\Документы\7 семестр\комп. графика\freeglut\include\GL\freeglut.h"
-#include "D:\Документы\OneDrive\Документы\7 семестр\комп. графика\freeglut\include\GL\SOIL.h"
+#include "D:\_Downloads\MMCS_332\glew-2.1.0\include\GL\glew.h"
+#include "D:\_Downloads\MMCS_332\glew-2.1.0\include\GL\wglew.h"
+#include "D:\_Downloads\MMCS_332\Module10\lib\freeglut.h"
+#include "D:\_Downloads\MMCS_332\Module10\lib\freeglut_std.h"
+#include "D:\_Downloads\MMCS_332\Module10\lib\freeglut_ext.h"
+#include "D:\_Downloads\MMCS_332\Module10\lib\SOIL.h"
 #include <string>
 #include <vector>
 #include <algorithm>
@@ -32,6 +34,8 @@ void checkOpenGLerror()
 
 void createBuffers()
 {
+	VBO = 12345;
+	VBI = 12345;
 	glGenBuffers(1, &VBO);
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 
@@ -40,6 +44,7 @@ void createBuffers()
 		vertices.data(),
 		GL_STATIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	
 
 	glGenBuffers(1, &VBI);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, VBI);
@@ -58,7 +63,7 @@ void loadOBJ(string path)
 	ifstream in(path, ios::in);
 	if (!in)
 	{
-		cerr << "Cannot open " << "sample.obj" << endl; exit(1);
+		cerr << "Cannot open " << path << endl; system("pause");
 	}
 
 	string line;
@@ -84,7 +89,7 @@ void loadOBJ(string path)
 }
 
 void Init(void) {
-	loadOBJ("vase.obj");
+	loadOBJ("D:\\_Downloads\\MMCS_332\\Module11\\Task1\\x64\\Debug\\vase.obj");
 	createBuffers();
 }
 
@@ -131,7 +136,7 @@ int main(int argc, char ** argv) {
 	glutCreateWindow("OpenGL");
 	glutReshapeFunc(Reshape);
 	glutDisplayFunc(DrawVBO);
-
+	glewInit();
 	Init();
 
 	glutMainLoop();
