@@ -9,9 +9,9 @@ using System.Windows.Forms;
 
 namespace Individual_ASR
 {
-    public partial class Form1 : Form
+    public partial class FormRayTracing : Form
     {
-        public Form1()
+        public FormRayTracing()
         {
             InitializeComponent();
 
@@ -21,16 +21,16 @@ namespace Individual_ASR
             Cw = pictureBox1.Image.Width;
             Ch = pictureBox1.Image.Height;
             Vw = Vh = d = 1;
-
-
-            Render();
         }
 
         Bitmap bmp;
-        int Cw, Ch, Vw, Vh, d;
+        int Cw, Ch;     //Размер экрана
+        double Vw, Vh;  //Окно просмотра
+        double d;       //Расстояние до камеры
         double inf = Double.MaxValue;
         Scene scene;
         int recursion_depth = 5;
+        Camera camera;
 
         static double d_eps = 0.00001;
 
@@ -73,19 +73,33 @@ namespace Individual_ASR
             }
         }
 
+        private struct Camera
+        {
+            public Vec3d position;
+            public Vec3d direction;
+
+            public Camera(Vec3d Position, Vec3d Direction)
+            {
+                position = Position; direction = Direction;
+            }
+        }
+
         private struct Sphere
         {
             public Vec3d center;
             public double radius;
             public Color col;
-            public int specular;    // насколько блестящий
-            public double reflective; // отражение
+            public int specular;        // насколько блестящий
+            public double reflective;   // отражение
+            public double refraction;   // прозрачность
 
             public Sphere(Vec3d Center, double Radius, 
-                Color Col, int Specular, double Reflective)
+                Color Col, int Specular, double Reflective, 
+                double Refraction)
             {
                 center = Center; radius = Radius; col = Col;
                 specular = Specular; reflective = Reflective;
+                refraction = Refraction;
             }
         }
 
@@ -129,15 +143,22 @@ namespace Individual_ASR
 
         private void Render()
         {
-            Vec3d O = new Vec3d(0, 0, 0);
+            Init();
+
+            Vec3d O = camera.position;
             for (int x = -Cw/2; x < Cw/2; ++x)
             {
                 for (int y = -Ch/2+1; y < Ch/2; ++y)
                 {
+                    //Определить квадрат сетки, соответствующий этому пикселю
                     Vec3d D = CanvasToViewport(x, y);
+                    //Определить цвет, видимый сквозь этот квадрат
                     Color color = TraceRay(O, D, 1, inf, recursion_depth);
+                    //Закрасить пиксель этим цветом
                     PutPixel(x, y, color);
                 }
+                if (x % 99 == 0)
+                UpdateProgress((double)(x + Cw/2) / Cw);
             }
 
 
@@ -151,8 +172,6 @@ namespace Individual_ASR
 
         private Color TraceRay(Vec3d O, Vec3d D, double t_min, double t_max, int depth)
         {
-            InitScene();
-
             var pair = ClosestIntersection(O, D, t_min, t_max);
             double closest_t = pair.Item2;
             Sphere? closest_sphere = pair.Item1;
@@ -163,10 +182,15 @@ namespace Individual_ASR
                 Vec3d P = O + D * closest_t; // Вычисление точки пересечения
                 Vec3d N = P - closest_sphere.Value.center; // Вычисление нормали к сфере в точке пересечения
                 N = N / N.Length();
-
+                
                 double k = ComputeLightning(P, N, -D, closest_sphere.Value.specular);
                 Color local_color = ColorDotDouble(closest_sphere.Value.col, k);
-            
+
+                //Прозрачность
+                double refr = closest_sphere.Value.refraction;
+                //Color refrected_color = TraceRay(P, D, 0.001, inf, 1);
+                //local_color = ColorPlusColor(local_color, ColorDotDouble(refrected_color, refr));
+                
                 //Если мы достигли предела рекурсии или объект не отражающий, то мы закончили
                 double refl = closest_sphere.Value.reflective;
                 if ((depth <= 0) || (refl <= 0))
@@ -175,12 +199,18 @@ namespace Individual_ASR
                 }
 
                 //Вычисление отражённого цвета
-                Vec3d R = ReflectRay(-D, N);
-                Color reflected_color = TraceRay(P, R, 0.001, inf, depth - 1);
+                Vec3d ReflRay = ReflectRay(-D, N);
+                Color reflected_color = TraceRay(P, ReflRay, 0.001, inf, depth - 1);
+
+                //Вычисление цвета от прозрачности
+                Color refrected_color = TraceRay(P, D, 0.001, inf, 1);
 
                 return ColorPlusColor(
-                    ColorDotDouble(local_color, 1 - refl), 
-                    ColorDotDouble(reflected_color, refl)
+                    ColorPlusColor(
+                        ColorDotDouble(local_color, 1 - refl),
+                        ColorDotDouble(reflected_color, refl)
+                        ),
+                    ColorDotDouble(refrected_color, refr)
                     );
             }
             return Color.Black;
@@ -225,25 +255,28 @@ namespace Individual_ASR
             return Tuple.Create(t1, t2);
         }
 
-        private void InitScene()
+        private void Init()
         {
-            Vw = Vh = d = 1;
+            Vw = 2;
+            Vh = 1;
+            d = 1;
+            camera = new Camera(new Vec3d(0, 0, 0), new Vec3d(0, 0, 1));
 
             List<Sphere> spheres = new List<Sphere>();
-            spheres.Add(new Sphere(new Vec3d(0, -1, 3), 1, Color.Red, 500, 0.0));
-            spheres.Add(new Sphere(new Vec3d(2, 0, 4), 1, Color.DarkBlue, 500, 0.3));
-            spheres.Add(new Sphere(new Vec3d(-2, 0, 4), 1, Color.Green, 10, 0.4));
+            spheres.Add(new Sphere(new Vec3d(0, 0, 3), 1, Color.Yellow, 500, 1, 0));
+            spheres.Add(new Sphere(new Vec3d(2, 0, 4), 1, Color.DarkBlue, 500, 0.3, 0));
+            spheres.Add(new Sphere(new Vec3d(-2, 0, 4), 1, Color.Green, 10, 0.4, 0));
             //spheres.Add(new Sphere(new Vec3d(0, -0.5, 3), 0.5, Color.Red));
             //spheres.Add(new Sphere(new Vec3d(1.5, -0.5, 4), 0.5, Color.Blue));
             //spheres.Add(new Sphere(new Vec3d(-2, -0.5, 10), 0.5, Color.Green));
-            spheres.Add(new Sphere(new Vec3d(0, -5001, 0), 5000, Color.Blue, 1000, 0.5));
-            spheres.Add(new Sphere(new Vec3d(0, 0, 5006), 5000, Color.Yellow, 10, 0));
+            spheres.Add(new Sphere(new Vec3d(0, -5001, 0), 5000, Color.Blue, 1000, 0.5, 0));
+            spheres.Add(new Sphere(new Vec3d(0, 0, 0), 5, Color.Turquoise, 10, 0, 0));
 
 
             List<Light> lights = new List<Light>();
             lights.Add(new Light(LightType.Ambient, 0.2));
-            lights.Add(new Light(LightType.Point, 0.6, new Vec3d(2, 1, 0)));
-            lights.Add(new Light(LightType.Directional, 0.6, new Vec3d(1, 4, 4)));
+            lights.Add(new Light(LightType.Point, 0.8, camera.position));
+            //lights.Add(new Light(LightType.Directional, 0.2, new Vec3d(1, 4, 4)));
 
             scene = new Scene(spheres, lights);
         }
@@ -341,5 +374,32 @@ namespace Individual_ASR
         {
             return N * Dot(N, R) * 2 - R;
         }
+
+        private void UpdateProgress(double progress)
+        {
+            if (progress <= 1)
+            {
+                int p = (int)Math.Round(progress * 100);
+
+                progressBar1.Value = p;
+                labelProgress.Text = p.ToString() + "%";
+
+                progressBar1.Invalidate();
+                progressBar1.Update();
+
+                pictureBox1.Invalidate();
+                pictureBox1.Update();
+
+                Invalidate();
+                Update();
+            }
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            Render();
+        }
+
+            
     }
 }
