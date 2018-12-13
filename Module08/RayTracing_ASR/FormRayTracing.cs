@@ -67,6 +67,20 @@ namespace Individual_ASR
                 return new Vec3d(-v.x, -v.y, -v.z);
             }
 
+            public static Vec3d operator *(List<List<double>> rotation, Vec3d v)
+            {
+                double x = 0, y = 0, z = 0;
+
+                for (int i = 0; i < 3; ++i)
+                {
+                    x += rotation[0][i] * v.x;
+                    y += rotation[1][i] * v.y;
+                    z += rotation[2][i] * v.z;
+                }
+
+                return new Vec3d(x, y, z);
+            }
+
             public double Length()
             {
                 return Math.Sqrt(x*x + y*y+ z*z);
@@ -76,11 +90,36 @@ namespace Individual_ASR
         private struct Camera
         {
             public Vec3d position;
-            public Vec3d direction;
+            public List<List<double>> rotation;
 
-            public Camera(Vec3d Position, Vec3d Direction)
+            public Camera(Vec3d Position)
             {
-                position = Position; direction = Direction;
+                position = Position;
+                rotation = new List<List<double>>();
+
+                for (int i = 0; i < 3; ++i)
+                {
+                    rotation.Add(new List<double>());
+                    for (int j = 0; j < 3; ++j)
+                    {
+                        rotation[i].Add((i == j) ? 1.0 : 0.0);
+                    }
+                }
+            }
+
+            public void rotate(double ay)
+            {
+                double a = ay * Math.PI / 360;
+
+                rotation[0][0] = Math.Cos(a);
+                rotation[0][1] = 0;
+                rotation[0][2] = -Math.Sin(a);
+                rotation[1][0] = 0;
+                rotation[1][1] = 1;
+                rotation[1][2] = 0;
+                rotation[2][0] = Math.Sin(a);
+                rotation[2][1] = 0;
+                rotation[2][2] = Math.Cos(a);
             }
         }
 
@@ -151,7 +190,7 @@ namespace Individual_ASR
                 for (int y = -Ch/2+1; y < Ch/2; ++y)
                 {
                     //Определить квадрат сетки, соответствующий этому пикселю
-                    Vec3d D = CanvasToViewport(x, y);
+                    Vec3d D = camera.rotation * CanvasToViewport(x, y);
                     //Определить цвет, видимый сквозь этот квадрат
                     Color color = TraceRay(O, D, 1, inf, recursion_depth);
                     //Закрасить пиксель этим цветом
@@ -260,17 +299,18 @@ namespace Individual_ASR
             Vw = 2;
             Vh = 1;
             d = 1;
-            camera = new Camera(new Vec3d(0, 0, 0), new Vec3d(0, 0, 1));
+            camera = new Camera(new Vec3d(0, 0, 0));
+            camera.rotate(30);
 
             List<Sphere> spheres = new List<Sphere>();
-            spheres.Add(new Sphere(new Vec3d(0, 0, 3), 1, Color.Yellow, 500, 1, 0));
-            spheres.Add(new Sphere(new Vec3d(2, 0, 4), 1, Color.DarkBlue, 500, 0.3, 0));
-            spheres.Add(new Sphere(new Vec3d(-2, 0, 4), 1, Color.Green, 10, 0.4, 0));
+            spheres.Add(new Sphere(new Vec3d(0, 0, 4), 1, Color.Yellow, 500, 1, 0));
+            spheres.Add(new Sphere(new Vec3d(2, 0, 3), 1, Color.DarkBlue, 500, 0.3, 0));
+            spheres.Add(new Sphere(new Vec3d(-2, 0, 3), 1, Color.Green, 10, 0.4, 0));
             //spheres.Add(new Sphere(new Vec3d(0, -0.5, 3), 0.5, Color.Red));
             //spheres.Add(new Sphere(new Vec3d(1.5, -0.5, 4), 0.5, Color.Blue));
             //spheres.Add(new Sphere(new Vec3d(-2, -0.5, 10), 0.5, Color.Green));
             spheres.Add(new Sphere(new Vec3d(0, -5001, 0), 5000, Color.Blue, 1000, 0.5, 0));
-            spheres.Add(new Sphere(new Vec3d(0, 0, 0), 5, Color.Turquoise, 10, 0, 0));
+            spheres.Add(new Sphere(new Vec3d(0, 0, 0), 5, Color.Yellow, 10, 0, 0));
 
 
             List<Light> lights = new List<Light>();
