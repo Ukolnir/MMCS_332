@@ -17,15 +17,15 @@
 #include <trigonometric.hpp>
 using namespace std;
 
-//----------------------------”√ŒÀ
-float angle = 45.0f;
-//----------------------------—∆¿“»≈ œŒ ’
-float scale_x = 0.5f;
-//----------------------------—∆¿“»≈ œŒ Y
+//----------------------------ANGLE
+float angle = 10.0f;
+//----------------------------SCALE ’
+float scale_x = 0.9f;
+//----------------------------SCALE Y
 float scale_y = 0.5f;
 
-//----------------------------Ã¿“–»÷¿ œ–≈Œ¡–¿«Œ¬¿Õ»…
-//----------------------------  == 0 - Ï‡Ò¯Ú‡·ËÓ‚‡ÌËÂ, != 0 - ÔÓ‚ÓÓÚ
+//----------------------------MATRIX TRANSFORM
+//----------------------------  == 0 - scale, != 0 - rotate
 char mode = 0;
 
 
@@ -33,7 +33,7 @@ char mode = 0;
 
 
 
-
+float rotate_z = 1.0f;
 
 //-------------------------------------------------------------------
 int w, h;
@@ -97,7 +97,7 @@ void initShader() {
 	Attrib_vertex = glGetAttribLocation(Program, attr_name);  
 	if (Attrib_vertex == -1) { cout << "could not bind attrib " << attr_name << endl;   return; }
 
-	const char* unif_name = "scale";  
+	const char* unif_name = "matrix";  
 	Unif_matr = glGetUniformLocation(Program, unif_name);  
 	if (Unif_matr == -1)  {   std::cout << "could not bind uniform " << unif_name << std::endl;   return;  } 
 
@@ -122,26 +122,34 @@ void render2() {
 
 	glUseProgram(Program); 
 
-	static glm::mat3 scale = { scale_x, 0.0f, 0.0f, 0.0f, scale_y, 0.0f, 0.0f, 0.0f, 1.0f };
+	static glm::mat4 scale = {  scale_x, 0.0f, 0.0f, 0.0f, 
+								0.0f, scale_y, 0.0f, 0.0f, 
+								0.0f, 0.0f, 1.0f, 0.0f, 
+								0.0f, 0.0f, 0.0f, 1.0f};
 
 	float a = angle * 3.14f / 180.0f;
 
-	static glm::mat3 rotate = { glm::cos(a), glm::sin(a), 0.0f, -glm::sin(a),  glm::cos(a), 0.0f, 0.0f, 0.0f, 1.0f };
+	static glm::mat4 rotate = { 1.0f, 0.0f, 0.0f, 0.0f, 
+								0.0f, glm::cos(a), -glm::sin(a), 0.0f, 
+								0.0f, glm::sin(a), glm::cos(a), 0.0f, 
+								0.0f, 0.0f, 0.0f, 1.0f };
 
 	if(mode)
 		glUniformMatrix3fv(Unif_matr, 1, GL_FALSE, &rotate[0][0]);
 	else
-		glUniformMatrix3fv(Unif_matr, 1, GL_FALSE, &scale[0][0]);
+		glUniformMatrix4fv(Unif_matr, 1, GL_FALSE, &scale[0][0]);
 
 	static float red[4] = { 1.0f, 0.0f, 0.0f, 1.0f };
 	glUniform4fv(Unif_color, 1, red);
 
-	glBegin(GL_QUADS);  
+	glutSolidCube(1);
+
+	/*glBegin(GL_QUADS);  
 	glColor3f(1.0, 0.0, 0.0); glVertex2f(-0.5f, -0.5f); 
 	glColor3f(0.0, 1.0, 0.0); glVertex2f(-0.5f, 0.5f);  
 	glColor3f(0.0, 0.0, 1.0); glVertex2f(0.5f, 0.5f);  
 	glColor3f(1.0, 1.0, 1.0); glVertex2f(0.5f, -0.5f);  
-	glEnd();
+	glEnd();*/
 
 	glFlush();
 
@@ -157,6 +165,7 @@ int main(int argc, char **argv) {
 	glutInitDisplayMode(GLUT_DEPTH | GLUT_RGBA | GLUT_ALPHA | GLUT_DOUBLE);  
 	glutInitWindowSize(800, 800);  
 	glutCreateWindow("Simple shaders");  
+	glEnable(GL_DEPTH_TEST);
 	glClearColor(0, 0, 1, 0);
 
 	GLenum glew_status = glewInit();  
