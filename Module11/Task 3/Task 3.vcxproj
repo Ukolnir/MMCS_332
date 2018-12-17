@@ -145,7 +145,9 @@
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="fragment.shader" />
+    <None Include="fragment_mixColor.shader" />
+    <None Include="fragment_oneText.shader" />
+    <None Include="fragment_twoText.shader" />
     <None Include="vertex.shader" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

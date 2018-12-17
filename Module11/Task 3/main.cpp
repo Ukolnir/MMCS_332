@@ -12,13 +12,34 @@
 #include <gtc/matrix_transform.hpp>
 using namespace std;
 
+//-----------------------------SHADER_MODE
+//-------------------------- 0 - oneTexture, 1 - mix with Color, 2 - twoTextures
+int shader_mode = 2;
+
+//-----------------------------FACTOR MIX
+int factor = 0.2;
+
+
+
+
+
+
+
+
+
+
+///----------------------------------------------------------------------------
+
 string vsPath = "C:\\Users\\Эллоне\\Desktop\\Task 3\\vertex.shader";
-string fsPath1 = "C:\\Users\\Эллоне\\Desktop\\Task 3\\fragment.shader";
+string fsPath1 = "C:\\Users\\Эллоне\\Desktop\\Task 3\\fragment_oneText.shader";
+string fsPath2 = "C:\\Users\\Эллоне\\Desktop\\Task 3\\fragment_mixColor.shader";
+string fsPath3 = "C:\\Users\\Эллоне\\Desktop\\Task 3\\fragment_twoText.shader";
 
 int w, h;
 GLuint Program;
 
-GLuint texture;
+GLuint textureID;
+GLuint textureID1;
 
 string loadFile(string path) {
 	ifstream fs(path, ios::in);
@@ -46,7 +67,12 @@ void initShader() {
 	glShaderSource(vShader, 1, &vsSource, NULL);
 	glCompileShader(vShader);
 
-	_f = loadFile(fsPath1);
+	if(!shader_mode)
+		_f = loadFile(fsPath1);
+	else if(shader_mode == 1)
+		_f = loadFile(fsPath2);
+	else
+		loadFile(fsPath3);
 
 	const char* fsSource = _f.c_str();
 
@@ -77,18 +103,24 @@ void resizeWindow(int width, int height) { glViewport(0, 0, width, height); }
 
 GLuint vertexbuffer;
 GLuint colorbuffer;
+GLuint texturebuffer;
+
+void _LoadImage() {
+	textureID1 = SOIL_load_OGL_texture("Krushochki.bmp", SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_MIPMAPS | SOIL_FLAG_INVERT_Y | SOIL_FLAG_NTSC_SAFE_RGB | SOIL_FLAG_COMPRESS_TO_DXT);
+	textureID = SOIL_load_OGL_texture("road.bmp", SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_MIPMAPS | SOIL_FLAG_INVERT_Y | SOIL_FLAG_NTSC_SAFE_RGB | SOIL_FLAG_COMPRESS_TO_DXT);
+}
 
 void initVBO() {
 	GLuint VertexArrayID;
 	glGenVertexArrays(1, &VertexArrayID);
 	glBindVertexArray(VertexArrayID);
 	static const GLfloat g_vertex_buffer_data[] = {
-	-1.0f,-1.0f,-1.0f, // Треугольник 1 : начало
-	-1.0f,-1.0f, 1.0f,
-	-1.0f, 1.0f, 1.0f, // Треугольник 1 : конец
-	1.0f, 1.0f,-1.0f, // Треугольник 2 : начало
 	-1.0f,-1.0f,-1.0f,
-	-1.0f, 1.0f,-1.0f, // Треугольник 2 : конец
+	-1.0f,-1.0f, 1.0f,
+	-1.0f, 1.0f, 1.0f, 
+	1.0f, 1.0f,-1.0f,
+	-1.0f,-1.0f,-1.0f,
+	-1.0f, 1.0f,-1.0f,
 	1.0f,-1.0f, 1.0f,
 	-1.0f,-1.0f,-1.0f,
 	1.0f,-1.0f,-1.0f,
@@ -160,23 +192,65 @@ void initVBO() {
 	0.982f,  0.099f,  0.879f
 	};
 
+	static const GLfloat g_uv_buffer_data[] = {
+	0.000059f, 1.0f - 0.000004f,
+	0.000103f, 1.0f - 0.336048f,
+	0.335973f, 1.0f - 0.335903f,
+	1.000023f, 1.0f - 0.000013f,
+	0.667979f, 1.0f - 0.335851f,
+	0.999958f, 1.0f - 0.336064f,
+	0.667979f, 1.0f - 0.335851f,
+	0.336024f, 1.0f - 0.671877f,
+	0.667969f, 1.0f - 0.671889f,
+	1.000023f, 1.0f - 0.000013f,
+	0.668104f, 1.0f - 0.000013f,
+	0.667979f, 1.0f - 0.335851f,
+	0.000059f, 1.0f - 0.000004f,
+	0.335973f, 1.0f - 0.335903f,
+	0.336098f, 1.0f - 0.000071f,
+	0.667979f, 1.0f - 0.335851f,
+	0.335973f, 1.0f - 0.335903f,
+	0.336024f, 1.0f - 0.671877f,
+	1.000004f, 1.0f - 0.671847f,
+	0.999958f, 1.0f - 0.336064f,
+	0.667979f, 1.0f - 0.335851f,
+	0.668104f, 1.0f - 0.000013f,
+	0.335973f, 1.0f - 0.335903f,
+	0.667979f, 1.0f - 0.335851f,
+	0.335973f, 1.0f - 0.335903f,
+	0.668104f, 1.0f - 0.000013f,
+	0.336098f, 1.0f - 0.000071f,
+	0.000103f, 1.0f - 0.336048f,
+	0.000004f, 1.0f - 0.671870f,
+	0.336024f, 1.0f - 0.671877f,
+	0.000103f, 1.0f - 0.336048f,
+	0.336024f, 1.0f - 0.671877f,
+	0.335973f, 1.0f - 0.335903f,
+	0.667969f, 1.0f - 0.671889f,
+	1.000004f, 1.0f - 0.671847f,
+	0.667979f, 1.0f - 0.335851f
+	};
+
 	glGenBuffers(1, &vertexbuffer);
 	glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data), g_vertex_buffer_data, GL_STATIC_DRAW);
 
-
 	glGenBuffers(1, &colorbuffer);
 	glBindBuffer(GL_ARRAY_BUFFER, colorbuffer);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(g_color_buffer_data), g_color_buffer_data, GL_STATIC_DRAW);
+
+	glGenBuffers(1, &texturebuffer);
+	glBindBuffer(GL_ARRAY_BUFFER, texturebuffer);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(g_uv_buffer_data), g_uv_buffer_data, GL_STATIC_DRAW);
 }
 
 void render1() {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glm::mat4 Projection = glm::perspective(glm::radians(45.0f), 4.0f / 3.0f, 0.1f, 100.0f);
 	glm::mat4 View = glm::lookAt(
-		glm::vec3(4, 3, -3), // Камера находится в мировых координатах (4,3,-3)
-		glm::vec3(0, 0, 0), // И направлена в начало координат
-		glm::vec3(0, 1, 0)  // "Голова" находится сверху
+		glm::vec3(4, 3, -3),
+		glm::vec3(0, 0, 0), 
+		glm::vec3(0, 1, 0) 
 	);
 	glm::mat4 Model = glm::mat4(1.0f);
 	glm::mat4 MVP = Projection * View * Model;
@@ -186,28 +260,56 @@ void render1() {
 	glEnableVertexAttribArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
 	glVertexAttribPointer(
-		0,                  // Атрибут 0. Подробнее об этом будет рассказано в части, посвященной шейдерам.
-		3,                  // Размер
-		GL_FLOAT,           // Тип
-		GL_FALSE,           // Указывает, что значения не нормализованы
-		0,                  // Шаг
-		(void*)0            // Смещение массива в буфере
+		0,   
+		3,             
+		GL_FLOAT,          
+		GL_FALSE,        
+		0,              
+		(void*)0        
 	);
 
 	glEnableVertexAttribArray(1);
+	glBindBuffer(GL_ARRAY_BUFFER, texturebuffer);
+	glVertexAttribPointer(
+		1,
+		2,
+		GL_FLOAT,
+		GL_FALSE,
+		0,
+		(void*)0
+	);
+
+	glEnableVertexAttribArray(2);
 	glBindBuffer(GL_ARRAY_BUFFER, colorbuffer);
 	glVertexAttribPointer(
-		1,                                // Атрибут. Здесь необязательно указывать 1, но главное, чтобы это значение совпадало с layout в шейдере..
-		3,                                // Размер
-		GL_FLOAT,                         // Тип
-		GL_FALSE,                         // Нормализован?
-		0,                                // Шаг
-		(void*)0                          // Смещение
+		2,
+		3,
+		GL_FLOAT,
+		GL_FALSE,
+		0,
+		(void*)0
 	);
 
 	GLuint MatrixID = glGetUniformLocation(Program, "MVP");
 	glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP[0][0]);
 
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, textureID);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+
+	glUniform1i(glGetUniformLocation(Program,"myTextureSampler"), 0);
+	if (shader_mode == 2) {
+
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, textureID1);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+
+		glUniform1i(glGetUniformLocation(Program, "myTextureSampler1"), 1);
+
+		//glUniform1f(glGetUniformLocation(Program, "mix_f"), factor);
+	}
 	glDrawArrays(GL_TRIANGLES, 0, 12 * 3);
 
 	glDisableVertexAttribArray(0);
@@ -224,7 +326,7 @@ void render1() {
 int main(int argc, char **argv) {
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DEPTH | GLUT_RGBA | GLUT_ALPHA | GLUT_DOUBLE);
-	glutInitWindowSize(800, 800);
+	glutInitWindowSize(1000, 800);
 	glutCreateWindow("Simple shaders");
 	glClearColor(0, 0, 0, 0);
 	glEnable(GL_DEPTH_TEST);
@@ -232,6 +334,8 @@ int main(int argc, char **argv) {
 	GLenum glew_status = glewInit();
 
 	initShader();
+
+	_LoadImage();
 
 	initVBO();
 
