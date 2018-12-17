@@ -51,16 +51,73 @@ namespace Individual2
     {
         public Vec position;
         public int dist;
+        public double center;
         private List<List<Vec>> pols = new List<List<Vec>>();
+        List<Vec> p = new List<Vec>();
+
+        public void CreatePoints()
+        {
+            p.Add(position); //0
+            p.Add(new Vec(position.x, position.y + dist, position.z)); //1 
+            p.Add(new Vec(position.x + dist, position.y, position.z)); //2
+            p.Add(new Vec(position.x + dist, position.y + dist, position.z)); //3
+            p.Add(new Vec(position.x + dist, position.y + dist, position.z + dist)); //4
+            p.Add(new Vec(position.x + dist, position.y, position.z + dist)); //5
+            p.Add(new Vec(position.x , position.y, position.z + dist)); //6
+            p.Add(new Vec(position.x, position.y + dist, position.z + dist)); //7
+        }
 
         public void CreatePols()
         {
-            List<Vec> points = new List<Vec>();
+            CreatePoints();
+            List<Vec> l = new List<Vec>();
 
-            points.Add(position);
-            points.Add(new Vec(position.x, position.y + dist, position.z));
-            points.Add(new Vec(position.x + dist, position.y, position.z));
-            points.Add(new Vec(position.x + dist, position.y + dist, position.z));
+            l.Add(p[0]); l.Add(p[1]); l.Add(p[2]);
+            pols.Add(l);
+
+            l = new List<Vec>();
+            l.Add(p[1]); l.Add(p[2]); l.Add(p[3]);
+            pols.Add(l);
+
+            l = new List<Vec>();
+            l.Add(p[2]); l.Add(p[3]); l.Add(p[4]);
+            pols.Add(l);
+
+            l = new List<Vec>();
+            l.Add(p[3]); l.Add(p[4]); l.Add(p[5]);
+            pols.Add(l);
+
+            l = new List<Vec>();
+            l.Add(p[4]); l.Add(p[5]); l.Add(p[6]);
+            pols.Add(l);
+
+            l = new List<Vec>();
+            l.Add(p[5]); l.Add(p[6]); l.Add(p[7]);
+            pols.Add(l);
+
+            l = new List<Vec>();
+            l.Add(p[6]); l.Add(p[7]); l.Add(p[1]);
+            pols.Add(l);
+
+            l = new List<Vec>();
+            l.Add(p[7]); l.Add(p[1]); l.Add(p[0]);
+            pols.Add(l);
+
+            l = new List<Vec>();
+            l.Add(p[0]); l.Add(p[2]); l.Add(p[5]);
+            pols.Add(l);
+
+            l = new List<Vec>();
+            l.Add(p[2]); l.Add(p[5]); l.Add(p[6]);
+            pols.Add(l);
+
+            l = new List<Vec>();
+            l.Add(p[1]); l.Add(p[3]); l.Add(p[4]);
+            pols.Add(l);
+
+            l = new List<Vec>();
+            l.Add(p[3]); l.Add(p[4]); l.Add(p[7]);
+            pols.Add(l);
         }
     
         public Cube(Vec pos, int d) : base("Cube")
@@ -113,7 +170,7 @@ namespace Individual2
         
             foreach(var l in pols)
             {
-                t = IntersectPol(o, d, l);
+                t = IntersectPol(o, -d, l);
                 if (t != -1 && (res == 0 || t < res))
                 {
                     res = t;

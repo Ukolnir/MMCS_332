@@ -225,6 +225,7 @@ namespace Individual2
                     Color color = TraceRay(camera.position, D, 1, Double.MaxValue, 5);
                     PutPixel(x, y, color);
                 }
+                pictureBox1.Image = bmp;
             }
 
             scene.lights.RemoveAt(scene.lights.Count() - 1);
@@ -233,7 +234,6 @@ namespace Individual2
         private void button1_Click(object sender, EventArgs e)
         {
             drawPicture();
-            pictureBox1.Image = bmp;
         }
 
         //закраска пикселя

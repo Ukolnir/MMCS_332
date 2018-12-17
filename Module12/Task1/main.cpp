@@ -1,18 +1,18 @@
-
 #define _CRT_SECURE_NO_WARNINGS
-
 #include <iostream>
 #include <Windows.h>
-#include "D:\_Downloads\MMCS_332\glew-2.1.0\include\GL\glew.h"
-#include "D:\_Downloads\MMCS_332\glew-2.1.0\include\GL\wglew.h"
-#include "D:\_Downloads\MMCS_332\Module10\lib\freeglut.h"
-#include "D:\_Downloads\MMCS_332\Module10\lib\freeglut_std.h"
-#include "D:\_Downloads\MMCS_332\Module10\lib\freeglut_ext.h"
-#include "D:\_Downloads\MMCS_332\Module10\lib\SOIL.h"
+//#include "D:\_Downloads\MMCS_332\glew-2.1.0\include\GL\glew.h"
+//#include "D:\_Downloads\MMCS_332\glew-2.1.0\include\GL\wglew.h"
+//#include "D:\_Downloads\MMCS_332\Module10\lib\freeglut.h"
+//#include "D:\_Downloads\MMCS_332\Module10\lib\freeglut_std.h"
+//#include "D:\_Downloads\MMCS_332\Module10\lib\freeglut_ext.h"
+#include "D:\Документы\OneDrive\Документы\7 семестр\комп. графика\MMCS_332\glew-2.1.0\include\GL\glew.h"
+#include "D:\Документы\OneDrive\Документы\7 семестр\комп. графика\MMCS_332\glew-2.1.0\include\GL\wglew.h"
+#include "D:\Документы\OneDrive\Документы\7 семестр\комп. графика\MMCS_332\Module10\lib\freeglut.h"
+#include "D:\Документы\OneDrive\Документы\7 семестр\комп. графика\MMCS_332\Module10\lib\freeglut_std.h"
+#include "D:\Документы\OneDrive\Документы\7 семестр\комп. графика\MMCS_332\Module10\lib\freeglut_ext.h"
 #include <string>
 #include <vector>
-#include <algorithm>
-#include <functional>
 #include <iterator>
 #include <fstream>
 #include <sstream>
@@ -22,8 +22,13 @@ using namespace std;
 vector<GLfloat> vertices;
 vector<GLushort> elements;
 int w, h;
-GLuint VBO, VBI;
+GLuint VBO, VBI, Program, VAO;
+GLint Attribute_vertex, UnifColor;
 
+void initGL()
+{
+	glClearColor(0, 0, 0, 0);
+}
 
 void checkOpenGLerror()
 {
@@ -32,10 +37,82 @@ void checkOpenGLerror()
 		std::cout << "OpenGl error! - " << gluErrorString(errCode);
 }
 
+void ShaderLog(unsigned int shader)
+{
+	int info = 0;
+	int charWritten = 0;
+	char * infolog;
+
+	glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &info);
+
+	if (info > 1)
+	{
+		infolog = new char[info];
+		if (infolog == NULL)
+		{
+			std::cout << "ERROR: Could not allocate InfoLog buffer\n";
+			exit(1);
+		}
+		glGetShaderInfoLog(shader, info, &charWritten, infolog);
+		std::cout << "InfoLog: " << infolog << "\n\n\n";
+		delete[] infolog;
+	}
+}
+
+void resizeWindow(int width, int height)
+{
+	glViewport(0, 0, width, height);
+}
+
+void InitShader()
+{
+	const char * VsSource = "attribute vec3 coord;\n"
+		"in vec3 vertexColor; \n"
+		"out vec3 fragmentColor; \n"
+		"void main {\n"
+		"glPosition = vec4(coord, 1.0); \n"
+		"fragmentColor = vertexColor; \n"
+		"}\n";
+
+	const char * fsSource = "uniform vec4 color_front; \n"
+
+		"void main() { \n"
+		"color_front = fragmentColor; \n"
+		"} \n";
+
+	GLuint vShader;
+	vShader = glCreateShader(GL_VERTEX_SHADER);
+	glShaderSource(vShader, 1, &VsSource, NULL);
+	glCompileShader(vShader);
+
+	std::cout << "vertex shader \n";
+	ShaderLog(vShader);
+
+	Program = glCreateProgram();
+	glAttachShader(Program, vShader);
+
+	glLinkProgram(Program);
+	int link_ok;
+	glGetProgramiv(Program, GL_LINK_STATUS, &link_ok);
+	if (!link_ok)
+	{
+		std::cout << "error attach shaders \n";
+		return;
+	}
+
+	const char* attr_name = "coord";
+	Attribute_vertex = glGetAttribLocation(Program, attr_name);
+	if (Attribute_vertex == -1)
+	{
+		std::cout << "could not bind attrib " << attr_name << std::endl;
+		return;
+	}
+	checkOpenGLerror();
+}
+
+
 void createBuffers()
 {
-	VBO = 12345;
-	VBI = 12345;
 	glGenBuffers(1, &VBO);
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 
@@ -43,7 +120,6 @@ void createBuffers()
 		vertices.size() * sizeof(GLfloat),
 		vertices.data(),
 		GL_STATIC_DRAW);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	
 
 	glGenBuffers(1, &VBI);
@@ -52,11 +128,32 @@ void createBuffers()
 		elements.size() * sizeof(GLushort),
 		elements.data(),
 		GL_STATIC_DRAW);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+	
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+	glEnableVertexAttribArray(0);
 
+	glClear(GL_COLOR_BUFFER_BIT);
+	glUseProgram(Program);
+	glBindVertexArray(VAO);
+	glDrawElements(GL_TRIANGLES, elements.size() / 3, GL_UNSIGNED_INT, 0);
+	glBindVertexArray(0);
 	checkOpenGLerror();
 }
 
+void freeShader()
+{
+	glUseProgram(0);
+	glDeleteProgram(Program);
+}
+
+void freeBuffers()
+{
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glDeleteBuffers(1, &VBO);
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+	glDeleteBuffers(1, &VBI);
+}
 
 void loadOBJ(string path)
 {
@@ -89,58 +186,37 @@ void loadOBJ(string path)
 }
 
 void Init(void) {
-	loadOBJ("D:\\_Downloads\\MMCS_332\\Module11\\Task1\\x64\\Debug\\vase.obj");
+	loadOBJ("D:\\Документы\\OneDrive\\Документы\\7 семестр\\комп. графика\\MMCS_332\\Module12\\Task1\\vase.obj");
 	createBuffers();
 }
 
-
-void DrawVBO()
+int main(int argc, char **argv)
 {
-	//GLvoid * p;// = new Glvoid[0];
-	glEnableClientState(GL_VERTEX_ARRAY);
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glVertexPointer(3, GL_FLOAT, 0, 0);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, VBI);
-	glDrawElements(GL_TRIANGLES, elements.size(), GL_UNSIGNED_BYTE, 0);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-	glDisableClientState(GL_VERTEX_ARRAY);
-}
-
-void Update(void) {
-	
-	//createBuffers();
-	//DrawVBO();
-	glFlush();
-	glutSwapBuffers();
-
-
-}
-//Функця вызываемая при изменении размеров окна
-void Reshape(int width, int height) {
-	w = width;
-	h = height;
-	glViewport(0, 0, w, h);
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	gluPerspective(65.0f, w / h, 1.0f, 1000.0f);
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
-}
-
-int main(int argc, char ** argv) {
 	glutInit(&argc, argv);
-	glutInitWindowPosition(250, 0);
-	glutInitWindowSize(w, h);
-	
-	glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH);
-	glutCreateWindow("OpenGL");
-	glutReshapeFunc(Reshape);
-	glutDisplayFunc(DrawVBO);
-	glewInit();
-	Init();
+	glutInitDisplayMode(GLUT_RGBA | GLUT_ALPHA | GLUT_DOUBLE);
+	glutInitWindowSize(800, 600);
+	glutCreateWindow("obj model");
 
+	GLenum glew_status = glewInit();
+	if (GLEW_OK != glew_status)
+	{
+		std::cout << "Error: " << glewGetErrorString(glew_status) << "\n";
+		return 1;
+	}
+
+	if (!GLEW_VERSION_2_0)
+	{
+		std::cout << "No support for OpenGL 2.0 found\n";
+		return 1;
+	}
+
+	initGL();
+	InitShader();
+	createBuffers();
+
+	glutReshapeFunc(resizeWindow);
+	glutDisplayFunc(createBuffers);
 	glutMainLoop();
 
-//	glutMainLoop();
-	return 0;
+	freeShader();
 }
