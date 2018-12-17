@@ -69,15 +69,15 @@ void InitShader()
 	const char * VsSource = "attribute vec3 coord;\n"
 		"in vec3 vertexColor; \n"
 		"out vec3 fragmentColor; \n"
-		"void main {\n"
-		"glPosition = vec4(coord, 1.0); \n"
+		"void main() {\n"
+		"gl_Position = vec4(coord, 1); \n"
 		"fragmentColor = vertexColor; \n"
 		"}\n";
 
 	const char * fsSource = "uniform vec4 color_front; \n"
 
 		"void main() { \n"
-		"color_front = fragmentColor; \n"
+		"gl_FragColor = color_front; \n"
 		"} \n";
 
 	GLuint vShader;
