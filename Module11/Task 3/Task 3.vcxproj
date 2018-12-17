@@ -143,7 +143,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="old_main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="fragment.shader" />

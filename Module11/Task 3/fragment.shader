@@ -1,5 +1,4 @@
-out vec3 color;
-
+in vec3 fragmentColor;
 void main() {
-	color = vec3(1.0, 0.0, 0.0);
+	gl_FragColor = vec4(fragmentColor, 1.0);
 }

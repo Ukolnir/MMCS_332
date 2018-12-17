@@ -23,9 +23,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="old_main.cpp">
-      <Filter>Исходные файлы</Filter>
-    </ClCompile>
     <ClCompile Include="main.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
