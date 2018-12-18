@@ -1,4 +1,3 @@
-
 #define _CRT_SECURE_NO_WARNINGS
 
 #include <iostream>
@@ -10,19 +9,18 @@
 #include <vector>
 #include <algorithm>
 #include <functional>
-#include <iterator>
 #include <fstream>
-#include <sstream>
 #include <mat3x3.hpp>
 #include <trigonometric.hpp>
+#include <gtc/matrix_transform.hpp>
 using namespace std;
 
 //----------------------------ANGLE
-float angle = 10.0f;
+float angle = 0.0f;
 //----------------------------SCALE ’
-float scale_x = 0.9f;
+float scale_x = 1.0f;
 //----------------------------SCALE Y
-float scale_y = 0.5f;
+float scale_y = 1.0f;
 
 //----------------------------MATRIX TRANSFORM
 //----------------------------  == 0 - scale, != 0 - rotate
@@ -42,8 +40,8 @@ GLuint Program;
 GLint  Unif_matr;
 GLint  Attrib_vertex;
 GLint  Unif_color;
-string vsPath = "C:\\Users\\Ёллоне\\Desktop\\Task 1\\vertex.shader";
-string fsPath = "C:\\Users\\Ёллоне\\Desktop\\Task 1\\fragment.shader";
+string vsPath = "D:\\_Desktop\\Task 1\\vertex.shader";
+string fsPath = "D:\\_Desktop\\Task 1\\fragment.shader";
 
 void checkOpenGLerror()
 {
@@ -135,21 +133,26 @@ void render2() {
 								0.0f, 0.0f, 0.0f, 1.0f };
 
 	if(mode)
-		glUniformMatrix3fv(Unif_matr, 1, GL_FALSE, &rotate[0][0]);
+		glUniformMatrix4fv(Unif_matr, 1, GL_FALSE, &rotate[0][0]);
 	else
 		glUniformMatrix4fv(Unif_matr, 1, GL_FALSE, &scale[0][0]);
+
+	glm::mat4 Projection = glm::perspective(glm::radians(45.0f), 4.0f / 3.0f, 0.1f, 100.0f);
+	glm::mat4 View = glm::lookAt(
+		glm::vec3(4, 3, 3),
+		glm::vec3(0, 0, 0),
+		glm::vec3(0, 1, 0)
+	);
+	glm::mat4 Model = glm::mat4(1.0f);
+	glm::mat4 MVP = Projection * View * Model;
+
+	GLuint MatrixID = glGetUniformLocation(Program, "MVP");
+	glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP[0][0]);
 
 	static float red[4] = { 1.0f, 0.0f, 0.0f, 1.0f };
 	glUniform4fv(Unif_color, 1, red);
 
-	glutSolidCube(1);
-
-	/*glBegin(GL_QUADS);  
-	glColor3f(1.0, 0.0, 0.0); glVertex2f(-0.5f, -0.5f); 
-	glColor3f(0.0, 1.0, 0.0); glVertex2f(-0.5f, 0.5f);  
-	glColor3f(0.0, 0.0, 1.0); glVertex2f(0.5f, 0.5f);  
-	glColor3f(1.0, 1.0, 1.0); glVertex2f(0.5f, -0.5f);  
-	glEnd();*/
+	glutSolidTeacup(1);
 
 	glFlush();
 
@@ -166,7 +169,7 @@ int main(int argc, char **argv) {
 	glutInitWindowSize(800, 800);  
 	glutCreateWindow("Simple shaders");  
 	glEnable(GL_DEPTH_TEST);
-	glClearColor(0, 0, 1, 0);
+	glClearColor(0, 0, 0, 0);
 
 	GLenum glew_status = glewInit();  
 	if (GLEW_OK != glew_status)  {   
