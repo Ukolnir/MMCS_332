@@ -299,18 +299,18 @@ namespace Individual_ASR
             Vw = 2;
             Vh = 1;
             d = 1;
-            camera = new Camera(new Vec3d(0, 0, 0));
-            camera.rotate(30);
+            camera = new Camera(new Vec3d(0, 3, -3));
+            camera.rotate(0);
 
             List<Sphere> spheres = new List<Sphere>();
-            spheres.Add(new Sphere(new Vec3d(0, 0, 4), 1, Color.Yellow, 500, 1, 0));
-            spheres.Add(new Sphere(new Vec3d(2, 0, 3), 1, Color.DarkBlue, 500, 0.3, 0));
-            spheres.Add(new Sphere(new Vec3d(-2, 0, 3), 1, Color.Green, 10, 0.4, 0));
+            spheres.Add(new Sphere(new Vec3d(0, 0, 8), 1, Color.Yellow, 500, 1, 0));
+            spheres.Add(new Sphere(new Vec3d(2, 0, 7), 1, Color.DarkBlue, 500, 0.3, 0));
+            spheres.Add(new Sphere(new Vec3d(-2, 0, 6), 1, Color.Green, 10, 0.4, 0));
             //spheres.Add(new Sphere(new Vec3d(0, -0.5, 3), 0.5, Color.Red));
             //spheres.Add(new Sphere(new Vec3d(1.5, -0.5, 4), 0.5, Color.Blue));
             //spheres.Add(new Sphere(new Vec3d(-2, -0.5, 10), 0.5, Color.Green));
-            spheres.Add(new Sphere(new Vec3d(0, -5001, 0), 5000, Color.Blue, 1000, 0.5, 0));
-            spheres.Add(new Sphere(new Vec3d(0, 0, 0), 5, Color.Yellow, 10, 0, 0));
+            spheres.Add(new Sphere(new Vec3d(0, -5001, 0), 5000, Color.Blue, 1000, 1, 0));
+            spheres.Add(new Sphere(new Vec3d(0, 0, 0), 10, Color.Yellow, 10, 0, 0));
 
 
             List<Light> lights = new List<Light>();
