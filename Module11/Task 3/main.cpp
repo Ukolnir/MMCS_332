@@ -14,21 +14,32 @@ using namespace std;
 
 //-----------------------------SHADER_MODE
 //-------------------------- 0 - oneTexture, 1 - mix with Color, 2 - twoTextures
-int shader_mode = 2;
+int shader_mode = 0;
 
 //-----------------------------FACTOR MIX
-int factor = 0.2;
+float factor = 0.2f;
 
+//-----------------------------TEXTURES
 
-
-
-
+string texPath1 = "Krushochki.bmp";
+string texPath2 = "road.bmp";
+string texPath3 = "D:\\4nqnbO1WtYI.jpg";
+string texPath4 = "D:\\textures\\-7gVNnL9cbM.jpg";
+string texPath5 = "D:\\textures\\Apo7X-181005-291.png";
+string texPath6 = "D:\\textures\\Apo7X-181008-96112.png";
+string texPath7 = "D:\\textures\\Apo7X-181018-59.png";
 
 
 
 
 
 ///----------------------------------------------------------------------------
+GLuint textureID;
+GLuint textureID1;
+void _LoadImage() {
+	textureID1 = SOIL_load_OGL_texture(texPath1.c_str(), SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_MIPMAPS | SOIL_FLAG_INVERT_Y | SOIL_FLAG_NTSC_SAFE_RGB | SOIL_FLAG_COMPRESS_TO_DXT);
+	textureID = SOIL_load_OGL_texture(texPath2.c_str(), SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_MIPMAPS | SOIL_FLAG_INVERT_Y | SOIL_FLAG_NTSC_SAFE_RGB | SOIL_FLAG_COMPRESS_TO_DXT);
+}
 
 string vsPath = "C:\\Users\\Ёллоне\\Desktop\\Task 3\\vertex.shader";
 string fsPath1 = "C:\\Users\\Ёллоне\\Desktop\\Task 3\\fragment_oneText.shader";
@@ -37,9 +48,6 @@ string fsPath3 = "C:\\Users\\Ёллоне\\Desktop\\Task 3\\fragment_twoText.shader";
 
 int w, h;
 GLuint Program;
-
-GLuint textureID;
-GLuint textureID1;
 
 string loadFile(string path) {
 	ifstream fs(path, ios::in);
@@ -50,11 +58,10 @@ string loadFile(string path) {
 	return fsS;
 }
 
-void checkOpenGLerror()
-{
+void checkOpenGLerror(){
 	GLenum errCode;
 	if ((errCode = glGetError()) != GL_NO_ERROR)
-		std::cout << "OpenGl error! - " << gluErrorString(errCode);
+		cout << "OpenGl error! - " << gluErrorString(errCode);
 }
 
 void initShader() {
@@ -72,7 +79,7 @@ void initShader() {
 	else if(shader_mode == 1)
 		_f = loadFile(fsPath2);
 	else
-		loadFile(fsPath3);
+		_f = loadFile(fsPath3);
 
 	const char* fsSource = _f.c_str();
 
@@ -104,11 +111,6 @@ void resizeWindow(int width, int height) { glViewport(0, 0, width, height); }
 GLuint vertexbuffer;
 GLuint colorbuffer;
 GLuint texturebuffer;
-
-void _LoadImage() {
-	textureID1 = SOIL_load_OGL_texture("Krushochki.bmp", SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_MIPMAPS | SOIL_FLAG_INVERT_Y | SOIL_FLAG_NTSC_SAFE_RGB | SOIL_FLAG_COMPRESS_TO_DXT);
-	textureID = SOIL_load_OGL_texture("road.bmp", SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_MIPMAPS | SOIL_FLAG_INVERT_Y | SOIL_FLAG_NTSC_SAFE_RGB | SOIL_FLAG_COMPRESS_TO_DXT);
-}
 
 void initVBO() {
 	GLuint VertexArrayID;
@@ -248,7 +250,7 @@ void render1() {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glm::mat4 Projection = glm::perspective(glm::radians(45.0f), 4.0f / 3.0f, 0.1f, 100.0f);
 	glm::mat4 View = glm::lookAt(
-		glm::vec3(4, 3, -3),
+		glm::vec3(4, 3, 3),
 		glm::vec3(0, 0, 0), 
 		glm::vec3(0, 1, 0) 
 	);
@@ -298,7 +300,8 @@ void render1() {
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 
-	glUniform1i(glGetUniformLocation(Program,"myTextureSampler"), 0);
+	glUniform1i(glGetUniformLocation(Program,"myTextureSampler"), 0);
+
 	if (shader_mode == 2) {
 
 		glActiveTexture(GL_TEXTURE1);
@@ -308,7 +311,7 @@ void render1() {
 
 		glUniform1i(glGetUniformLocation(Program, "myTextureSampler1"), 1);
 
-		//glUniform1f(glGetUniformLocation(Program, "mix_f"), factor);
+		glUniform1f(glGetUniformLocation(Program, "mix_f"), factor);
 	}
 	glDrawArrays(GL_TRIANGLES, 0, 12 * 3);
 
