@@ -196,8 +196,8 @@ namespace Individual_ASR
                     //Закрасить пиксель этим цветом
                     PutPixel(x, y, color);
                 }
-                if (x % 99 == 0)
-                UpdateProgress((double)(x + Cw/2) / Cw);
+                if (x % 9 == 0)
+					UpdateProgress((double)(x + Cw/2) / Cw);
             }
 
 
@@ -299,23 +299,41 @@ namespace Individual_ASR
             Vw = 2;
             Vh = 1;
             d = 1;
-            camera = new Camera(new Vec3d(0, 3, -3));
+            camera = new Camera(new Vec3d(0, 3, -5));
             camera.rotate(0);
 
             List<Sphere> spheres = new List<Sphere>();
-            spheres.Add(new Sphere(new Vec3d(0, 0, 8), 1, Color.Yellow, 500, 1, 0));
-            spheres.Add(new Sphere(new Vec3d(2, 0, 7), 1, Color.DarkBlue, 500, 0.3, 0));
-            spheres.Add(new Sphere(new Vec3d(-2, 0, 6), 1, Color.Green, 10, 0.4, 0));
+            spheres.Add(new Sphere(new Vec3d(-4, 0, 5), 1, Color.Aqua, 500, 0.001, 0.5));
+			spheres.Add(new Sphere(new Vec3d(-2, 0, 6), 1, Color.Green, 10, 0.3, 0));
+
+			//body
+			spheres.Add(new Sphere(new Vec3d(3, 1, 7), 2, Color.LightBlue, 500, 1, 0));
+			spheres.Add(new Sphere(new Vec3d(3, 4.5, 7), 1.5, Color.LightBlue, 500, 1, 0));
+			spheres.Add(new Sphere(new Vec3d(3, 7, 7), 1, Color.LightBlue, 500, 1, 0));
+
+			//hand 1
+			spheres.Add(new Sphere(new Vec3d(4.5, 4, 6), 0.8, Color.LightBlue, 500, 1, 0));
+			spheres.Add(new Sphere(new Vec3d(5, 3.5, 5), 0.5, Color.LightBlue, 500, 1, 0));
+			spheres.Add(new Sphere(new Vec3d(5.2, 3.2, 4), 0.3, Color.LightBlue, 500, 1, 0));
+
+			//hand 2
+			//spheres.Add(new Sphere(new Vec3d(3, 4.5, 7), 1.5, Color.DarkBlue, 500, 1, 0));
+			spheres.Add(new Sphere(new Vec3d(1, 4, 6.5), 0.8, Color.LightBlue, 500, 1, 0));
+			spheres.Add(new Sphere(new Vec3d(0, 3.5, 5.9), 0.5, Color.LightBlue, 500, 1, 0));
+			spheres.Add(new Sphere(new Vec3d(-0.6, 3.2, 5.5), 0.3, Color.LightBlue, 500, 1, 0));
+
+			
             //spheres.Add(new Sphere(new Vec3d(0, -0.5, 3), 0.5, Color.Red));
             //spheres.Add(new Sphere(new Vec3d(1.5, -0.5, 4), 0.5, Color.Blue));
             //spheres.Add(new Sphere(new Vec3d(-2, -0.5, 10), 0.5, Color.Green));
-            spheres.Add(new Sphere(new Vec3d(0, -5001, 0), 5000, Color.Blue, 1000, 1, 0));
-            spheres.Add(new Sphere(new Vec3d(0, 0, 0), 10, Color.Yellow, 10, 0, 0));
+            spheres.Add(new Sphere(new Vec3d(0, -5001, 0), 5000, Color.Blue, 1000, 0.2, 0));
+            spheres.Add(new Sphere(new Vec3d(0, 0, 0), 15, Color.GreenYellow, 10, 0.7, 0));
 
 
             List<Light> lights = new List<Light>();
-            lights.Add(new Light(LightType.Ambient, 0.2));
-            lights.Add(new Light(LightType.Point, 0.8, camera.position));
+            lights.Add(new Light(LightType.Ambient, 0.3));
+            lights.Add(new Light(LightType.Point, 0.7, 
+				new Vec3d(camera.position.x+5, camera.position.y-3, camera.position.z)));
             //lights.Add(new Light(LightType.Directional, 0.2, new Vec3d(1, 4, 4)));
 
             scene = new Scene(spheres, lights);
