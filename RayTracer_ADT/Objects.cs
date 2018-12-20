@@ -25,8 +25,11 @@ namespace RayTracer
             Center = center;
             Radius = radius;
             Color = color;
+            //Зеркальность
             Specular = spec;
+            //Отражение
             Reflective = refl;
+            //Прозрачность
             Refraction = refr;
         }
 

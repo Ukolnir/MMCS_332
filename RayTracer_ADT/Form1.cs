@@ -26,39 +26,59 @@ namespace RayTracer
             render();
         }
 
-        ColorT background = new ColorT(135, 206, 250);
+        ColorT background = new ColorT(0, 0, 0);
 
         private void InitScene() {
-            Sphere s1 = new Sphere(new Vector3(0.0f, 0.0f, 3.0f), 1.0f, 
-                new ColorT(255, 0, 0), 500, 0.2, 0.7);
-            Sphere s2 = new Sphere(new Vector3(2.0f, 0.0f, 4.0f), 1.0f, 
-                new ColorT(0, 0, 255), 500, 0.3);
-            Sphere s3 = new Sphere(new Vector3(-2.0f, 0.0f, 4.0f), 1.0f, 
-                new ColorT(0, 255, 0), 10, 0.4);
-            Sphere s4 = new Sphere(new Vector3(0.0f, -5001.0f, 0.0f), 5000.0f, 
-                new ColorT(255, 255, 0), 1000, 0.5);
+            Sphere s1 = new Sphere(new Vector3(0.0f, 0.0f, 3.0f), 0.9f, 
+                new ColorT(25, 25, 112), 10, 0);
+            Sphere s2 = new Sphere(new Vector3(-5.0f, 0.0f, 2.0f), 1.0f, 
+                new ColorT(215, 106, 106), 1000, 0.1, 0);
+            Sphere s3 = new Sphere(new Vector3(-2.0f, 0.0f, 2.0f), 1.0f, 
+                new ColorT(255, 215, 0), 10, 0.3, 0.5);
+            Sphere s6 = new Sphere(new Vector3(3.0f, 2.0f, 7.0f), 2.0f,
+                new ColorT(225, 255, 250), 10, 0.6,0.4);
+            Sphere s7 = new Sphere(new Vector3(1.0f, 2.0f, 5.0f), 0.5f,
+                new ColorT(144, 238, 144), 10, 0.6, 0.4);
+            Sphere s8 = new Sphere(new Vector3(-4.0f, -0.5f, 1.0f), 0.5f,
+                new ColorT(151, 255, 255), 10, 0,0);
+            Sphere s9 = new Sphere(new Vector3(-1.0f, -0.5f, -4.0f), 0.5f,
+                new ColorT(255, 0, 0), 500, 0.1, 0);
+
+
+            Sphere s4 = new Sphere(new Vector3(0.0f, -5001.0f, 0.0f), 5000.0f,
+                new ColorT(221, 160, 221), 10, 0.4);
+            Sphere s5 = new Sphere(new Vector3(0.0f, 0.0f, 40.0f), 30.0f,
+                new ColorT(255, 255, 255), 100, 0.2);
+
+            Light l1 = new Light("ambient", 0.2);
+            Light l2 = new Light("point", 0.3, new Vector3(2.0f, 1.0f, 0.0f));
+            Light l3 = new Light("point", 0.9, new Vector3(-5.0f, 0.0f, -5.0f));
+
             scene.Spheres.Add(s1);
             scene.Spheres.Add(s2);
             scene.Spheres.Add(s3);
             scene.Spheres.Add(s4);
-
-            Light l1 = new Light("ambient", 0.2);
-            Light l2 = new Light("point", 0.6, new Vector3(2.0f, 1.0f, 0.0f));
+            scene.Spheres.Add(s5);
+            scene.Spheres.Add(s6);
+            scene.Spheres.Add(s7);
+            scene.Spheres.Add(s8);
+            scene.Spheres.Add(s9);
 
             scene.Lights.Add(l1);
-            scene.Lights.Add(l2);
+            //scene.Lights.Add(l2);
+            scene.Lights.Add(l3);
         }
 
         private void render() {
             ViewPort Port = new ViewPort(1, 1, 1, Cw, Ch);
-            Camera camera = new Camera(new Vector3(0.0f, 0.0f, 0.0f));
+            Camera camera = new Camera(new Vector3(-1.0f, 0.0f, -11.0f));
 
             InitScene();
 
             //Отрисовка
-            for(int x = -Cw/2; x < Cw/2; ++x)
-                for (int y = -Ch/2 + 1; y < Ch/2; ++y) {
-                    Vector3 D = Port.PictureToViewPort(x,y);
+            for (int x = -Cw / 2; x < Cw / 2; ++x)
+                for (int y = -Ch / 2 + 1; y < Ch / 2; ++y){
+                    Vector3 D = camera.Rotation * Port.PictureToViewPort(x, y);
                     ColorT c = TraceRay(camera.Position, D, 1, float.MaxValue, 3);
                     PutPixel(x, y, c.Trunc());
                 }
@@ -104,7 +124,9 @@ namespace RayTracer
 
             ColorT reflected_color = TraceRay(P, R, t_min, t_max, Depth - 1);
 
-            ColorT refracted_color = TraceRay(P, D, 0.1f, t_max, 0);
+            ColorT refracted_color = new ColorT();
+            if (ResultIntersect.Item1.Refraction != 0)
+                refracted_color = TraceRay(P, D, 0.1f, t_max, 0);
 
             return local_color * (1 - r) + reflected_color * r + refracted_color * ResultIntersect.Item1.Refraction;
         }
