@@ -21,7 +21,7 @@ int shader_mode = 0;
 //-----------------------------FACTOR MIX
 float factor = 0.2f;
 
-//-----------------------------TEXTURES
+//-----------------------------TEXTURES AND MODELS
 
 string texPath3 = "D:\\4nqnbO1WtYI.jpg";
 
@@ -70,8 +70,6 @@ void initShader() {
 	glCompileShader(vShader);
 
 	_f = loadFile(fsPath1);
-
-
 	const char* fsSource = _f.c_str();
 
 	fShader = glCreateShader(GL_FRAGMENT_SHADER);
@@ -114,13 +112,11 @@ void loadOBJ(const std::string & path, std::vector<glm::vec3> & out_vertices, st
 
 	int obj_scale = 1;
 
-	while (getline(infile, line))
-	{
+	while (getline(infile, line)){
 		std::stringstream ss(line);
 		std::string lineHeader;
 		getline(ss, lineHeader, ' ');
-		if (lineHeader == "v")
-		{
+		if (lineHeader == "v"){
 			glm::vec3 vertex;
 			ss >> vertex.x >> vertex.y >> vertex.z;
 
@@ -129,14 +125,12 @@ void loadOBJ(const std::string & path, std::vector<glm::vec3> & out_vertices, st
 			vertex.z *= obj_scale;
 			temp_vertices.push_back(vertex);
 		}
-		else if (lineHeader == "vt")
-		{
+		else if (lineHeader == "vt"){
 			glm::vec2 uv;
 			ss >> uv.x >> uv.y;
 			temp_uvs.push_back(uv);
 		}
-		else if (lineHeader == "vn")
-		{
+		else if (lineHeader == "vn"){
 			glm::vec3 normal;
 			ss >> normal.x >> normal.y >> normal.z;
 			//normal.x *= -1;
@@ -144,12 +138,10 @@ void loadOBJ(const std::string & path, std::vector<glm::vec3> & out_vertices, st
 			//normal.z *= -1;
 			temp_normals.push_back(normal);
 		}
-		else if (lineHeader == "f")
-		{
+		else if (lineHeader == "f"){
 			int vertex_index, uv_index, normal_index;
 			char slash;
-			while (ss >> vertex_index >> slash >> uv_index >> slash >> normal_index)
-			{
+			while (ss >> vertex_index >> slash >> uv_index >> slash >> normal_index){
 				vertex_indices.push_back(vertex_index);
 				uv_indices.push_back(uv_index);
 				normal_indices.push_back(normal_index);
@@ -158,8 +150,7 @@ void loadOBJ(const std::string & path, std::vector<glm::vec3> & out_vertices, st
 	}
 
 	// For each vertex of each triangle
-	for (unsigned int i = 0; i < vertex_indices.size(); i++)
-	{
+	for (unsigned int i = 0; i < vertex_indices.size(); i++){
 		unsigned int vertexIndex = vertex_indices[i];
 		glm::vec3 vertex = temp_vertices[vertexIndex - 1];
 		out_vertices.push_back(vertex);
@@ -189,15 +180,10 @@ bool getSimilarVertexIndex_fast(
 	PackedVertex & packed,
 	std::map<PackedVertex, unsigned short> & VertexToOutIndex,
 	unsigned short & result
-)
-{
+){
 	std::map<PackedVertex, unsigned short>::iterator it = VertexToOutIndex.find(packed);
-	if (it == VertexToOutIndex.end())
-	{
-		return false;
-	}
-	else
-	{
+	if (it == VertexToOutIndex.end()) return false;
+	else{
 		result = it->second;
 		return true;
 	}
@@ -214,14 +200,13 @@ void indexVBO(
 	std::vector<glm::vec3> & out_vertices,
 	std::vector<glm::vec2> & out_uvs,
 	std::vector<glm::vec3> & out_normals
-)
-{
+){
 	std::map<PackedVertex, unsigned short> VertexToOutIndex;
 
 	// For each input vertex
 	for (unsigned int i = 0; i < in_vertices.size(); i++)
 	{
-		PackedVertex packed = { in_vertices[i], in_uvs[i], in_normals[i] }; // 
+		PackedVertex packed = { in_vertices[i], in_uvs[i], in_normals[i] };
 
 		// Try to find a similar vertex in out_XXXX
 		unsigned short index;
@@ -273,6 +258,9 @@ void initVBO() {
 	glBindBuffer(GL_ARRAY_BUFFER, uvbuffer);
 	glBufferData(GL_ARRAY_BUFFER, indexed_uvs.size() * sizeof(glm::vec2), &indexed_uvs[0], GL_STATIC_DRAW);
 
+	glBindBuffer(GL_ARRAY_BUFFER, normalbuffer);
+	glBufferData(GL_ARRAY_BUFFER, indexed_normals.size() * sizeof(glm::vec2), &indexed_normals[0], GL_STATIC_DRAW);
+
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementbuffer);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned short), &indices[0], GL_STATIC_DRAW);
 }
@@ -312,6 +300,17 @@ void render1() {
 		(void*)0
 	);
 
+	glEnableVertexAttribArray(2);
+	glBindBuffer(GL_ARRAY_BUFFER, normalbuffer);
+	glVertexAttribPointer(
+		2,
+		3,
+		GL_FLOAT,
+		GL_FALSE,
+		0,
+		(void*)0
+	);
+
 	GLuint MatrixID = glGetUniformLocation(Program, "MVP");
 	glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP[0][0]);
 
@@ -324,8 +323,6 @@ void render1() {
 
 	glBindVertexArray(VAO);
 	glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_SHORT, 0);
-
-	//glDrawArrays(GL_TRIANGLES, 0, 12 * 3);
 
 	glDisableVertexAttribArray(0);
 
