@@ -10,91 +10,97 @@
 #include <vector>
 #include <fstream>
 #include "D:\Документы\OneDrive\Документы\7 семестр\комп. графика\MMCS_332\glm\glm\glm.hpp"
-#include <gtc/matrix_transform.hpp>
+#include "D:\Документы\OneDrive\Документы\7 семестр\комп. графика\MMCS_332\glm\glm\gtc\matrix_transform.hpp"
 #include <iterator>
 #include <sstream>
 
 using namespace std;
+#include "GlShader.h";
 
-//-----------------------------SHADER_MODE
-//-------------------------- 0 - oneTexture, 1 - mix with Color, 2 - twoTextures
-int shader_mode = 0;
+// Наш класс шейдера
+GlShader shader;
+//! Переменные с индентификаторами ID
+//! ID атрибута вершин
+GLint  Attrib_vertex;
+//! ID атрибута цветов
+GLint  Attrib_color;
+//! ID юниформ матрицы проекции
+GLint  Unif_matrix;
+//! ID Vertex Buffer Object
+GLuint VBO_vertex;
+//! ID Vertex Buffer Object
+GLuint VBO_color;
+//! ID VBO for element indices
+GLuint VBO_element;
+//! Количество индексов
+GLint Indices_count;
+//! Матрица проекции
+mat4 Matrix_projection;
 
-//-----------------------------FACTOR MIX
-float factor = 0.2f;
+//! Вершина
+struct vertex
+{
+	GLfloat x;
+	GLfloat y;
+	GLfloat z;
+};
 
-///----------------------------------------------------------------------------
-
-
-string vsPath = "C:\\Users\\user\\Desktop\\Task 3\\vertex.shader";
-string fsPath1 = "C:\\Users\\user\\Desktop\\Task 3\\fragment_oneText.shader";
-
-int w, h;
-GLuint Program;
-
-string loadFile(string path) {
-	ifstream fs(path, ios::in);
-	if (!fs) cerr << "Cannot open " << path << endl;
-	string fsS;
-	while (getline(fs, fsS, '\0'))
-		cout << fsS << endl;
-	return fsS;
+//! Инициализация OpenGL, здесь пока по минимальному
+void initGL()
+{
+	glClearColor(0, 0, 0, 0);
+	glEnable(GL_DEPTH_TEST);
 }
 
-void checkOpenGLerror(){
+//! Проверка ошибок OpenGL, если есть то выводит в консоль тип ошибки
+void checkOpenGLerror()
+{
 	GLenum errCode;
 	if ((errCode = glGetError()) != GL_NO_ERROR)
-		cout << "OpenGl error! - " << gluErrorString(errCode);
+		std::cout << "OpenGl error! - " << gluErrorString(errCode);
 }
 
-void initShader() {
-	string _f = loadFile(vsPath);
-	const char* vsSource = _f.c_str();
+//! Инициализация шейдеров
+void initShader()
+{
+	//! Исходный код шейдеров
+	const GLchar* vsSource =
+		"attribute vec3 coord;\n"
+		"attribute vec3 color;\n"
+		"varying vec3 var_color;\n"
+		"uniform mat4 matrix;\n"
+		"void main() {\n"
+		"  gl_Position = matrix * vec4(coord, 1.0);\n"
+		"  var_color = color;\n"
+		"}\n";
+	const GLchar* fsSource =
+		"varying vec3 var_color;\n"
+		"void main() {\n"
+		"  gl_FragColor = vec4(var_color, 1.0);\n"
+		"}\n";
 
-	GLuint vShader, fShader;
+	if (!shader.load(vsSource, fsSource))
+	{
+		std::cout << "error load shader \n";
+		return;
+	}
 
-	vShader = glCreateShader(GL_VERTEX_SHADER);
-	glShaderSource(vShader, 1, &vsSource, NULL);
-	glCompileShader(vShader);
+	///! Вытягиваем ID атрибута из собранной программы 
+	Attrib_vertex = shader.getAttribLocation("coord");
 
-	//if(!shader_mode)
-		_f = loadFile(fsPath1);
+	//! Вытягиваем ID юниформ
+	Attrib_color = shader.getAttribLocation("color");
 
-	const char* fsSource = _f.c_str();
-
-	fShader = glCreateShader(GL_FRAGMENT_SHADER);
-	glShaderSource(fShader, 1, &fsSource, NULL);
-	glCompileShader(fShader);
-
-	//----
-
-	Program = glCreateProgram();
-	glAttachShader(Program, vShader);
-	glAttachShader(Program, fShader);
-
-	glLinkProgram(Program);
-	int link_ok;
-	glGetProgramiv(Program, GL_LINK_STATUS, &link_ok);
-	if (!link_ok) { std::cout << "error attach shaders \n"; }//   return;
-
+	//! Вытягиваем ID юниформ матрицы проекции
+	Unif_matrix = shader.getUniformLocation("matrix");
 
 	checkOpenGLerror();
 }
 
-void freeShader() {
-	glUseProgram(0);
-	glDeleteProgram(Program);
-}
-
-void resizeWindow(int width, int height) { glViewport(0, 0, width, height); }
-
-GLuint vertexbuffer;
-GLuint colorbuffer;
-GLuint texturebuffer;
-GLuint VBI;
-
-vector<GLfloat> vertices;
-vector<GLushort> elements;
+vector<GLfloat> vert;
+vector<GLint> elements;
+vertex * vertices, * colors;
+GLint * indices;
 
 void loadOBJ(string path)
 {
@@ -111,109 +117,199 @@ void loadOBJ(string path)
 		{
 			istringstream s(line.substr(2));
 			GLfloat v;
-			s >> v; vertices.push_back(v);
-			s >> v; vertices.push_back(v);
-			s >> v; vertices.push_back(v);
+			s >> v; vert.push_back(v);
+			s >> v; vert.push_back(v);
+			s >> v; vert.push_back(v);
 		}
 		else if (line.substr(0, 2) == "f ")
 		{
 			istringstream s(line.substr(2));
-			GLushort a, b, c;
+			GLint a, b, c;
 			s >> a; s >> b; s >> c;
 			elements.push_back(a); elements.push_back(b); elements.push_back(c);
 		}
 	}
 }
 
+void normalobj()
+{
+	vertices = new vertex[vert.size() / 3];
+	colors = new vertex[vert.size() / 3];
+	indices = new GLint[elements.size()];
 
-void initVBO() {
-	GLuint VertexArrayID;
-	glGenVertexArrays(1, &VertexArrayID);
-	glBindVertexArray(VertexArrayID);
-
-	vector<GLfloat> g_color_buffer_data;
-
-	for (int i = 0; i < vertices.size() / 3; ++i)
+	for (int i = 0; i < vert.size() / 3; ++i)
 	{
-		for (int j = 0; j < 3; ++j)
-		{
-			float c = rand() % 255 / 255.0;
-			g_color_buffer_data.push_back(c);
-		}
+		vertex v = { vert[i * 3], vert[i * 3 + 1], vert[i * 3 + 2] };
+		vertices[i] = v;
 	}
-	
 
-	glGenBuffers(1, &vertexbuffer);
-	glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * vertices.size(), vertices.data(), GL_STATIC_DRAW);
-
-	glGenBuffers(1, &colorbuffer);
-	glBindBuffer(GL_ARRAY_BUFFER, colorbuffer);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * g_color_buffer_data.size(), g_color_buffer_data.data(), GL_STATIC_DRAW);
-	
-	glGenBuffers(1, &VBI);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, VBI);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLfloat) * elements.size(), elements.data(), GL_STATIC_DRAW);
+	for (int i = 0; i < vert.size() / 3; ++i)
+	{
+		vertex v = { rand() % 255 / 255.0, rand() % 255 / 255.0, rand() % 255 / 255.0 };
+		colors[i] = v;
+	}
+	for (int i = 0; i < elements.size(); ++i)
+		indices[i] = elements[i];
 }
 
-void render1() {
+//! Инициализация VBO_vertex
+void initVBO()
+{
+	//! Вершины куба
+	normalobj();
+
+	/*vertex vertices[] = {
+		{ -1.0f, -1.0f, -1.0f },
+		{ 1.0f, -1.0f, -1.0f },
+		{ 1.0f,  1.0f, -1.0f },
+		{ -1.0f, 1.0f, -1.0f },
+		{ -1.0f, -1.0f,  1.0f },
+		{ 1.0f, -1.0f,  1.0f },
+		{ 1.0f,  1.0f,  1.0f },
+		{ -1.0f,  1.0f,  1.0f }
+	};
+	//! Цвета куба без альфа компонента
+	vertex colors[] = {
+		{ 1.0f, 0.5f, 1.0f },
+		{ 1.0f, 0.5f, 0.5f },
+		{ 0.5f, 0.5f, 1.0f },
+		{ 0.0f, 1.0f, 1.0f },
+		{ 1.0f, 0.0f, 1.0f },
+		{ 1.0f, 1.0f, 0.0f },
+		{ 1.0f, 0.0f, 1.0f },
+		{ 0.0f, 1.0f, 1.0f }
+	};
+	//! Индексы вершин, обшие и для цветов
+	GLint indices[] = {
+		0, 4, 5, 0, 5, 1,
+		1, 5, 6, 1, 6, 2,
+		2, 6, 7, 2, 7, 3,
+		3, 7, 4, 3, 4, 0,
+		4, 7, 6, 4, 6, 5,
+		3, 0, 1, 3, 1, 2
+	};*/
+
+	// Создаем буфер для вершин
+	glGenBuffers(1, &VBO_vertex);
+	glBindBuffer(GL_ARRAY_BUFFER, VBO_vertex);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertex) * vert.size()/3, vertices, GL_STATIC_DRAW);
+
+	// Создаем буфер для цветов вершин
+	glGenBuffers(1, &VBO_color);
+	glBindBuffer(GL_ARRAY_BUFFER, VBO_color);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertex) * vert.size() / 3, colors, GL_STATIC_DRAW);
+
+	// Создаем буфер для индексов вершин
+	glGenBuffers(1, &VBO_element);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, VBO_element);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLint) * elements.size(), indices, GL_STATIC_DRAW);
+
+	Indices_count = elements.size(); //sizeof(indices) / sizeof(indices[0]);
+
+	checkOpenGLerror();
+}
+
+void freeVBO()
+{
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
+	glDeleteBuffers(1, &VBO_element);
+	glDeleteBuffers(1, &VBO_element);
+	glDeleteBuffers(1, &VBO_color);
+}
+
+void resizeWindow(int width, int height)
+{
+	glViewport(0, 0, width, height);
+
+	height = height > 0 ? height : 1;
+	const GLfloat aspectRatio = (GLfloat)width / (GLfloat)height;
+
+	Matrix_projection = glm::perspective(45.0f, aspectRatio, 1.0f, 200.0f);
+	// Перемещаем центр нашей оси координат для того чтобы увидеть куб
+	Matrix_projection = glm::translate(Matrix_projection, vec3(-40.0f, 20.0f, -220.0f));
+	// Поворачиваем ось координат(тоесть весь мир), чтобы развернуть отрисованное
+	Matrix_projection = glm::rotate(Matrix_projection, 0.0f, vec3(1.0f, 1.0f, 0.0f));
+}
+
+//! Отрисовка
+void render()
+{
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glm::mat4 Projection = glm::perspective(glm::radians(45.0f), 4.0f / 3.0f, 0.1f, 100.0f);
-	glm::mat4 View = glm::lookAt(
-		glm::vec3(-4, -2, -4),
-		glm::vec3(0, 0, 0),
-		glm::vec3(0, 1, 0)
-	);
-	glm::mat4 Model = glm::mat4(1.0f);
-	glm::mat4 MVP = Projection * View * Model;
+
+	//! Устанавливаем шейдерную программу текущей
+	shader.use();
+	//! Передаем матрицу в шейдер
+	shader.setUniform(Unif_matrix, Matrix_projection);
+
+	//! Подлючаем буфер с индексами вершин общий для цветов и их вершин
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, VBO_element);
+
+	//! ВЕРШИНЫ
+	//! Включаем массив атрибутов для вершин
+	glEnableVertexAttribArray(Attrib_vertex);
+	//! Подключаем VBO
+	glBindBuffer(GL_ARRAY_BUFFER, VBO_vertex);
+	//! Указывая pointer 0 при подключенном буфере, мы указываем что данные в VBO
+	glVertexAttribPointer(Attrib_vertex, 3, GL_FLOAT, GL_FALSE, 0, 0);
+
+	//! ЦВЕТА
+	//! Включаем массив атрибутов для цветов
+	glEnableVertexAttribArray(Attrib_color);
+	glBindBuffer(GL_ARRAY_BUFFER, VBO_color);
+	glVertexAttribPointer(Attrib_color, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
 
-	glUseProgram(Program);
+	//! Передаем данные на видеокарту(рисуем)
+	glDrawElements(GL_TRIANGLES, Indices_count, GL_UNSIGNED_INT, 0);
 
-	glEnableVertexAttribArray(0);
-	glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+	//! Отключаем массив атрибутов
+	glDisableVertexAttribArray(Attrib_vertex);
 
-	glEnableVertexAttribArray(1);
-	glBindBuffer(GL_ARRAY_BUFFER, colorbuffer);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
-
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, VBI);
-
-	GLuint MatrixID = glGetUniformLocation(Program, "MVP");
-	glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP[0][0]);
-	
-	glDrawArrays(GL_TRIANGLES, 0, elements.size() / 3);
-
-	glDisableVertexAttribArray(0);
-
-	glFlush();
-
-	glUseProgram(0);
+	//! Отключаем массив атрибутов
+	glDisableVertexAttribArray(Attrib_color);
 
 	checkOpenGLerror();
 
 	glutSwapBuffers();
 }
 
-int main(int argc, char **argv) {
+int main(int argc, char **argv)
+{
 	glutInit(&argc, argv);
-	glutInitDisplayMode(GLUT_DEPTH | GLUT_RGBA | GLUT_ALPHA | GLUT_DOUBLE);
-	glutInitWindowSize(1000, 800);
+	glutInitDisplayMode(GLUT_RGBA | GLUT_ALPHA | GLUT_DOUBLE);
+	glutInitWindowSize(800, 600);
 	glutCreateWindow("Simple shaders");
-	glClearColor(0, 0, 0, 0);
-	glEnable(GL_DEPTH_TEST);
-	glDepthFunc(GL_LESS);
+
+	//! Обязательно перед инициализации шейдеров
 	GLenum glew_status = glewInit();
+	if (GLEW_OK != glew_status)
+	{
+		//! GLEW не проинициализировалась
+		std::cout << "Error: " << glewGetErrorString(glew_status) << "\n";
+		return 1;
+	}
 
-	initShader();
-	loadOBJ("C:\\Users\\user\\Desktop\\Task 3\\cube.obj");
+	//! Проверяем доступность OpenGL 2.0
+	if (!GLEW_VERSION_2_0)
+	{
+		//! OpenGl 2.0 оказалась не доступна
+		std::cout << "No support for OpenGL 2.0 found\n";
+		return 1;
+	}
 
+	//! Инициализация
+	initGL();
+	loadOBJ("D:\\Документы\\OneDrive\\Документы\\7 семестр\\комп. графика\\MMCS_332\\Module12\\Task1\\vase.obj");
 	initVBO();
+	initShader();
 
 	glutReshapeFunc(resizeWindow);
-	glutDisplayFunc(render1);
+	glutDisplayFunc(render);
 	glutMainLoop();
 
-	freeShader();
+	//! Освобождение ресурсов, хотя в нашем случаи сюда выполнение никогда не дойдет,
+	// так, как управление не выйдет из glutMainLoop цикла
+	freeVBO();
 }

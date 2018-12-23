@@ -15,22 +15,16 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <None Include="vertex.shader">
+    <ClCompile Include="main.cpp">
       <Filter>Файлы ресурсов</Filter>
-    </None>
-    <None Include="fragment_mixColor.shader">
+    </ClCompile>
+    <ClCompile Include="GlShader.cpp">
       <Filter>Файлы ресурсов</Filter>
-    </None>
-    <None Include="fragment_oneText.shader">
-      <Filter>Файлы ресурсов</Filter>
-    </None>
-    <None Include="fragment_twoText.shader">
-      <Filter>Файлы ресурсов</Filter>
-    </None>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="main.cpp">
-      <Filter>Исходные файлы</Filter>
-    </ClCompile>
+    <ClInclude Include="GlShader.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
