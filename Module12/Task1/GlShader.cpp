@@ -17,7 +17,7 @@ GlShader::~GlShader()
   glDeleteProgram(ShaderProgram);
 }
 
-GLuint GlShader::loadFiles(const string& vertex_file_name,const string& fragment_file_name)
+GLuint GlShader::loadFiles(string& vertex_file_name,string& fragment_file_name)
 {
   vertex_shader = loadSourcefile(vertex_file_name, GL_VERTEX_SHADER);
   fragment_shader = loadSourcefile(fragment_file_name, GL_FRAGMENT_SHADER);

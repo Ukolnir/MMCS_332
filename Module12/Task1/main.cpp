@@ -17,6 +17,10 @@
 using namespace std;
 #include "GlShader.h";
 
+string vsPath = "D:\\Документы\\OneDrive\\Документы\\7 семестр\\комп. графика\\MMCS_332\\Module12\\Task1\\vertex.shader";
+string fsPath = "D:\\Документы\\OneDrive\\Документы\\7 семестр\\комп. графика\\MMCS_332\\Module12\\Task1\\fragment.shader";
+
+int w, h;
 // Наш класс шейдера
 GlShader shader;
 //! Переменные с индентификаторами ID
@@ -36,6 +40,8 @@ GLuint VBO_element;
 GLint Indices_count;
 //! Матрица проекции
 mat4 Matrix_projection;
+float x, y, z, model_angle, is_ahead, is_back;
+
 
 //! Вершина
 struct vertex
@@ -50,6 +56,8 @@ void initGL()
 {
 	glClearColor(0, 0, 0, 0);
 	glEnable(GL_DEPTH_TEST);
+	x = -80; y = 0; z = -350;
+	model_angle = 0;
 }
 
 //! Проверка ошибок OpenGL, если есть то выводит в консоль тип ошибки
@@ -64,22 +72,9 @@ void checkOpenGLerror()
 void initShader()
 {
 	//! Исходный код шейдеров
-	const GLchar* vsSource =
-		"attribute vec3 coord;\n"
-		"attribute vec3 color;\n"
-		"varying vec3 var_color;\n"
-		"uniform mat4 matrix;\n"
-		"void main() {\n"
-		"  gl_Position = matrix * vec4(coord, 1.0);\n"
-		"  var_color = color;\n"
-		"}\n";
-	const GLchar* fsSource =
-		"varying vec3 var_color;\n"
-		"void main() {\n"
-		"  gl_FragColor = vec4(var_color, 1.0);\n"
-		"}\n";
+	shader.loadFiles(vsPath, fsPath);
 
-	if (!shader.load(vsSource, fsSource))
+	if (!shader.isLoad())
 	{
 		std::cout << "error load shader \n";
 		return;
@@ -157,38 +152,6 @@ void initVBO()
 {
 	//! Вершины куба
 	normalobj();
-
-	/*vertex vertices[] = {
-		{ -1.0f, -1.0f, -1.0f },
-		{ 1.0f, -1.0f, -1.0f },
-		{ 1.0f,  1.0f, -1.0f },
-		{ -1.0f, 1.0f, -1.0f },
-		{ -1.0f, -1.0f,  1.0f },
-		{ 1.0f, -1.0f,  1.0f },
-		{ 1.0f,  1.0f,  1.0f },
-		{ -1.0f,  1.0f,  1.0f }
-	};
-	//! Цвета куба без альфа компонента
-	vertex colors[] = {
-		{ 1.0f, 0.5f, 1.0f },
-		{ 1.0f, 0.5f, 0.5f },
-		{ 0.5f, 0.5f, 1.0f },
-		{ 0.0f, 1.0f, 1.0f },
-		{ 1.0f, 0.0f, 1.0f },
-		{ 1.0f, 1.0f, 0.0f },
-		{ 1.0f, 0.0f, 1.0f },
-		{ 0.0f, 1.0f, 1.0f }
-	};
-	//! Индексы вершин, обшие и для цветов
-	GLint indices[] = {
-		0, 4, 5, 0, 5, 1,
-		1, 5, 6, 1, 6, 2,
-		2, 6, 7, 2, 7, 3,
-		3, 7, 4, 3, 4, 0,
-		4, 7, 6, 4, 6, 5,
-		3, 0, 1, 3, 1, 2
-	};*/
-
 	// Создаем буфер для вершин
 	glGenBuffers(1, &VBO_vertex);
 	glBindBuffer(GL_ARRAY_BUFFER, VBO_vertex);
@@ -224,14 +187,9 @@ void resizeWindow(int width, int height)
 	glViewport(0, 0, width, height);
 
 	height = height > 0 ? height : 1;
-	const GLfloat aspectRatio = (GLfloat)width / (GLfloat)height;
-
-	Matrix_projection = glm::perspective(45.0f, aspectRatio, 1.0f, 200.0f);
-	// Перемещаем центр нашей оси координат для того чтобы увидеть куб
-	Matrix_projection = glm::translate(Matrix_projection, vec3(-40.0f, 20.0f, -220.0f));
-	// Поворачиваем ось координат(тоесть весь мир), чтобы развернуть отрисованное
-	Matrix_projection = glm::rotate(Matrix_projection, 0.0f, vec3(1.0f, 1.0f, 0.0f));
+	w = width; h = height;
 }
+
 
 //! Отрисовка
 void render()
@@ -275,6 +233,64 @@ void render()
 	glutSwapBuffers();
 }
 
+void draw()
+{
+	const GLfloat aspectRatio = (GLfloat)w / (GLfloat)h;
+	Matrix_projection = glm::perspective(45.0f, aspectRatio, 1.0f, 400.0f);
+	// Перемещаем центр нашей оси координат для того чтобы увидеть куб
+	Matrix_projection = glm::translate(Matrix_projection, vec3(x, y, z)); // for vase
+	//Matrix_projection = glm::translate(Matrix_projection, vec3(-1.0f, 0.0f, -5.0f)); //for cube1
+	// Поворачиваем ось координат(тоесть весь мир), чтобы развернуть отрисованное
+	Matrix_projection = glm::rotate(Matrix_projection, model_angle, vec3(1.0f, 1.0f, 0.0f));
+
+	render();
+}
+
+double gr_cos(float angle) noexcept
+{
+	return cos(angle / 180 * 3.1415926535);
+}
+
+double gr_sin(float angle) noexcept
+{
+	return sin(angle / 180 * 3.1415926535);
+}
+
+
+void specialKeys(int key, int x1, int y1)
+{
+	switch (key)
+	{
+	case GLUT_KEY_ALT_R:
+		model_angle += 2;
+		break;
+	case GLUT_KEY_ALT_L:
+		model_angle -= 2;
+		break;
+	case GLUT_KEY_CTRL_L:
+		is_ahead = 1;
+		break;
+	case GLUT_KEY_CTRL_R:
+		is_back = 1;
+		break;
+	}
+
+	if (is_ahead)
+	{
+		x += 0.01 * gr_sin(model_angle);
+		z += 0.01 * gr_cos(model_angle);
+		is_ahead = 0;
+	}
+	if (is_back)
+	{
+		x -= 0.01 * gr_sin(model_angle);
+		z -= 0.01 * gr_cos(model_angle);
+		is_back = 0;
+	}
+
+	glutPostRedisplay();
+}
+
 int main(int argc, char **argv)
 {
 	glutInit(&argc, argv);
@@ -302,11 +318,13 @@ int main(int argc, char **argv)
 	//! Инициализация
 	initGL();
 	loadOBJ("D:\\Документы\\OneDrive\\Документы\\7 семестр\\комп. графика\\MMCS_332\\Module12\\Task1\\vase.obj");
+
 	initVBO();
 	initShader();
 
 	glutReshapeFunc(resizeWindow);
-	glutDisplayFunc(render);
+	glutSpecialFunc(specialKeys);
+	glutDisplayFunc(draw);
 	glutMainLoop();
 
 	//! Освобождение ресурсов, хотя в нашем случаи сюда выполнение никогда не дойдет,

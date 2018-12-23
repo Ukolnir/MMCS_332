@@ -15,7 +15,7 @@ public:
 
   ~GlShader();
 
-  GLuint loadFiles(const string& vertex_file_name, const string& fragment_file_name);
+  GLuint loadFiles(string& vertex_file_name,string& fragment_file_name);
   GLuint load(const string& vertex_source, const string& fragment_source);
   GLuint load(const GLchar* vertex_source, const GLchar* fragment_source);
 
