@@ -142,7 +142,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="GlShader.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -150,10 +149,6 @@
     <None Include="fragment_oneText.shader" />
     <None Include="fragment_twoText.shader" />
     <None Include="vertex.shader" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="GlShader.h" />
-    <ClInclude Include="OBJ_Loader.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

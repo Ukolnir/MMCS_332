@@ -1,34 +1,48 @@
-#include<Windows.h>    
-// first include Windows.h header file which is required    
-#include<stdio.h>
-#include "glew.h"
-#include<gl/GL.h>   // GL.h header file    
-#include<gl/GLU.h> // GLU.h header file    
-#include <freeglut.h>  // glut.h header file from freeglut\include\GL folder    
-#include<conio.h>
-#include<math.h>
-#include<string>
-#include <vector>
-#include <glm.hpp>
-#include <string>
-#include <sstream>
-#include <fstream>
+#define _CRT_SECURE_NO_WARNINGS
 #include <iostream>
-#include <map>
-#include <SOIL.h>
+#include <Windows.h>
+#include "glew.h"
+#include "wglew.h"
+#include "freeglut.h"
+#include <string>
+#include <vector>
+#include <fstream>
+#include "SOIL.h"
+#include "glm.hpp"
 #include <gtc/matrix_transform.hpp>
-#include "GlShader.h"
-
+#include <sstream>
+#include <map>
 using namespace std;
 
-std::string objname = "C:\\Users\\Эллоне\\Desktop\\cubetext.obj";
+//-----------------------------SHADER_MODE
+//-------------------------- 0 - oneTexture, 1 - mix with Color, 2 - twoTextures
+int shader_mode = 0;
+
+//-----------------------------FACTOR MIX
+float factor = 0.2f;
+
+//-----------------------------TEXTURES
+
+string texPath3 = "D:\\4nqnbO1WtYI.jpg";
+
+string objname = "C:\\Users\\Эллоне\\Desktop\\cubetext.obj";
+
+
+
+///----------------------------------------------------------------------------
+GLuint textureID;
+
+void _LoadImage() {
+	textureID = SOIL_load_OGL_texture(texPath3.c_str(), SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_MIPMAPS | SOIL_FLAG_INVERT_Y | SOIL_FLAG_NTSC_SAFE_RGB | SOIL_FLAG_COMPRESS_TO_DXT);
+}
 
 string vsPath = "C:\\Users\\Эллоне\\Desktop\\Task 3\\vertex.shader";
-string fsPath = "C:\\Users\\Эллоне\\Desktop\\Task 3\\fragment_oneText.shader";
+string fsPath1 = "C:\\Users\\Эллоне\\Desktop\\Task 3\\fragment_oneText.shader";
+string fsPath2 = "C:\\Users\\Эллоне\\Desktop\\Task 3\\fragment_mixColor.shader";
+string fsPath3 = "C:\\Users\\Эллоне\\Desktop\\Task 3\\fragment_twoText.shader";
 
-string texPath = "D:\\4nqnbO1WtYI.jpg";
-//string texPath = "road.bmp";
-
+int w, h;
+GLuint Program;
 
 string loadFile(string path) {
 	ifstream fs(path, ios::in);
@@ -39,87 +53,54 @@ string loadFile(string path) {
 	return fsS;
 }
 
-GLuint textureID;
-
-void _LoadImage() {
-	textureID = SOIL_load_OGL_texture(texPath.c_str(), SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_MIPMAPS | SOIL_FLAG_INVERT_Y | SOIL_FLAG_NTSC_SAFE_RGB | SOIL_FLAG_COMPRESS_TO_DXT);
-}
-
-// Наш класс шейдера
-GlShader shader;
-//! Переменные с индентификаторами ID
-//! ID атрибута вершин
-GLint  Attrib_vertex;
-
-GLint  Attrib_normal;
-
-//! ID атрибута цветов
-GLint  Unif_color;
-//! ID юниформ матрицы проекции
-GLint  Unif_matrix;
-//! Матрица проекции
-mat4 Matrix_projection;
-
-GLint smp;
-
-std::vector<glm::vec3> indexed_vertices;
-std::vector<glm::vec2> indexed_uvs;
-std::vector<glm::vec3> indexed_normals;
-std::vector<unsigned short> indices;
-GLuint vertexbuffer;
-GLuint uvbuffer;
-GLuint normalbuffer;
-GLuint elementbuffer;
-
-//! Вершина
-struct vertex
-{
-	GLfloat x;
-	GLfloat y;
-	GLfloat z;
-};
-
-//! Инициализация OpenGL, здесь пока по минимальному
-void initGL()
-{
-	glClearColor(0, 0, 0, 0);
-	glEnable(GL_DEPTH_TEST);
-}
-
-//! Проверка ошибок OpenGL, если есть то выводит в консоль тип ошибки
-void checkOpenGLerror()
-{
+void checkOpenGLerror(){
 	GLenum errCode;
 	if ((errCode = glGetError()) != GL_NO_ERROR)
-		std::cout << "OpenGl error! - " << gluErrorString(errCode);
+		cout << "OpenGl error! - " << gluErrorString(errCode);
 }
 
-//! Инициализация шейдеров
-void initShader()
-{
-	string vsSource = loadFile(vsPath), fsSource = loadFile(fsPath);
+void initShader() {
+	string _f = loadFile(vsPath);
+	const char* vsSource = _f.c_str();
 
-	if (!shader.load(vsSource, fsSource))
-	{
-		std::cout << "error load shader \n";
-		return;
-	}
+	GLuint vShader, fShader;
 
-	///! Вытягиваем ID атрибута из собранной программы 
-	//Attrib_vertex = shader.getAttribLocation("coord");
+	vShader = glCreateShader(GL_VERTEX_SHADER);
+	glShaderSource(vShader, 1, &vsSource, NULL);
+	glCompileShader(vShader);
 
-	//Attrib_normal = shader.getAttribLocation("normal");
+	_f = loadFile(fsPath1);
 
-	//! Вытягиваем ID юниформ
-	//Unif_color = shader.getUniformLocation("fragmentColor");
 
-	//! Вытягиваем ID юниформ матрицы проекции
-	Unif_matrix = shader.getUniformLocation("matrix");
+	const char* fsSource = _f.c_str();
 
-	smp = shader.getUniformLocation("myTextureSampler");
+	fShader = glCreateShader(GL_FRAGMENT_SHADER);
+	glShaderSource(fShader, 1, &fsSource, NULL);
+	glCompileShader(fShader);
+
+	//----
+
+	Program = glCreateProgram();
+	glAttachShader(Program, vShader);
+	glAttachShader(Program, fShader);
+
+	glLinkProgram(Program);
+	int link_ok;
+	glGetProgramiv(Program, GL_LINK_STATUS, &link_ok);
+	if (!link_ok) { std::cout << "error attach shaders \n";   return; }
 
 	checkOpenGLerror();
 }
+
+void freeShader() {
+	glUseProgram(0);
+	glDeleteProgram(Program);
+}
+
+void resizeWindow(int width, int height) { glViewport(0, 0, width, height); }
+
+GLuint colorbuffer;
+GLuint texturebuffer;
 
 void loadOBJ(const std::string & path, std::vector<glm::vec3> & out_vertices, std::vector<glm::vec2> & out_uvs, std::vector<glm::vec3> & out_normals)
 {
@@ -130,9 +111,9 @@ void loadOBJ(const std::string & path, std::vector<glm::vec3> & out_vertices, st
 
 	std::ifstream infile(path);
 	std::string line;
-	
+
 	int obj_scale = 1;
-	
+
 	while (getline(infile, line))
 	{
 		std::stringstream ss(line);
@@ -262,18 +243,22 @@ void indexVBO(
 	}
 }
 
-//! Инициализация VBO_vertex
-void initVBO()
-{
-	// Read our .obj file
+std::vector<glm::vec3> indexed_vertices;
+std::vector<glm::vec2> indexed_uvs;
+std::vector<glm::vec3> indexed_normals;
+std::vector<unsigned short> indices;
+GLuint vertexbuffer;
+GLuint uvbuffer;
+GLuint normalbuffer;
+GLuint elementbuffer;
+
+void initVBO() {
 	std::vector<glm::vec3> vertices;
 	std::vector<glm::vec2> uvs;
 	std::vector<glm::vec3> normals;
 	loadOBJ(objname.c_str(), vertices, uvs, normals);
 	indexVBO(vertices, uvs, normals, indices, indexed_vertices, indexed_uvs, indexed_normals);
-
-	cout << indexed_vertices.size();
-
+	
 	glGenBuffers(1, &vertexbuffer);
 	glGenBuffers(1, &uvbuffer);
 	glGenBuffers(1, &normalbuffer);
@@ -288,122 +273,90 @@ void initVBO()
 	glBindBuffer(GL_ARRAY_BUFFER, uvbuffer);
 	glBufferData(GL_ARRAY_BUFFER, indexed_uvs.size() * sizeof(glm::vec2), &indexed_uvs[0], GL_STATIC_DRAW);
 
-	glBindBuffer(GL_ARRAY_BUFFER, normalbuffer);
-	glBufferData(GL_ARRAY_BUFFER, indexed_normals.size() * sizeof(glm::vec3), &indexed_normals[0], GL_STATIC_DRAW);
-
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementbuffer);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned short), &indices[0], GL_STATIC_DRAW);
+}
+
+void render1() {
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glm::mat4 Projection = glm::perspective(glm::radians(45.0f), 4.0f / 3.0f, 0.1f, 100.0f);
+	glm::mat4 View = glm::lookAt(
+		glm::vec3(4, 3, 3),
+		glm::vec3(0, 0, 0), 
+		glm::vec3(0, 1, 0) 
+	);
+	glm::mat4 Model = glm::mat4(1.0f);
+	glm::mat4 MVP = Projection * View * Model;
+
+	glUseProgram(Program);
 
 	glEnableVertexAttribArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
-	
-	glEnableVertexAttribArray(1);
-	glBindBuffer(GL_ARRAY_BUFFER, uvbuffer);
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, 0);
-	
-
-
-	// 3rd attribute buffer : normals
-	//glBindBuffer(GL_ARRAY_BUFFER, normalbuffer);
-	//glVertexAttribPointer(Attrib_normal, 3, GL_FLOAT, GL_FALSE, 0, 0);
-	//glEnableVertexAttribArray(Attrib_normal);
-
-
-	checkOpenGLerror();
-}
-
-void freeVBO()
-{
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-}
-
-void resizeWindow(int width, int height)
-{
-	glViewport(0, 0, width, height);
-
-	height = height > 0 ? height : 1;
-	const GLfloat aspectRatio = (GLfloat)width / (GLfloat)height;
-
-	Matrix_projection = glm::perspective(45.0f, aspectRatio, 0.00001f, 500.0f);
-	// Перемещаем центр нашей оси координат для того чтобы увидеть куб
-	Matrix_projection = glm::translate(Matrix_projection, vec3(-1.0f, 0.0f, -10.0f));
-	// Поворачиваем ось координат(тоесть весь мир), чтобы развернуть отрисованное
-	Matrix_projection = glm::rotate(Matrix_projection, 100.0f, vec3(1.0f, 1.0f, 0.0f));
-
-	glm::mat4 View = glm::lookAt(
-		glm::vec3(1, 0, 3),
-		glm::vec3(0, 0, 0),
-		glm::vec3(0, 1, 0)
+	glVertexAttribPointer(
+		0,   
+		3,             
+		GL_FLOAT,          
+		GL_FALSE,        
+		0,              
+		(void*)0        
 	);
 
-	Matrix_projection *= View;
-}
+	glEnableVertexAttribArray(1);
+	glBindBuffer(GL_ARRAY_BUFFER, uvbuffer);
+	glVertexAttribPointer(
+		1,
+		2,
+		GL_FLOAT,
+		GL_FALSE,
+		0,
+		(void*)0
+	);
 
-//! Отрисовка
-void render()
-{
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-	//! Устанавливаем шейдерную программу текущей
-	shader.use();
-	//! Передаем матрицу в шейдер
-	shader.setUniform(Unif_matrix, Matrix_projection);
+	GLuint MatrixID = glGetUniformLocation(Program, "MVP");
+	glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &MVP[0][0]);
 
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, textureID);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 
-	glEnable(GL_TEXTURE_2D);
-
-	shader.setUniform(smp, textureID);
-
+	glUniform1i(glGetUniformLocation(Program,"myTextureSampler"), 0);
 
 	glBindVertexArray(VAO);
 	glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_SHORT, 0);
+
+	//glDrawArrays(GL_TRIANGLES, 0, 12 * 3);
+
+	glDisableVertexAttribArray(0);
+
+	glFlush();
+
+	glUseProgram(0);
 
 	checkOpenGLerror();
 
 	glutSwapBuffers();
 }
 
-int main(int argc, char **argv)
-{
+int main(int argc, char **argv) {
 	glutInit(&argc, argv);
-	glutInitDisplayMode(GLUT_RGBA | GLUT_ALPHA | GLUT_DOUBLE);
-	glutInitWindowSize(800, 600);
+	glutInitDisplayMode(GLUT_DEPTH | GLUT_RGBA | GLUT_ALPHA | GLUT_DOUBLE);
+	glutInitWindowSize(1000, 800);
 	glutCreateWindow("Simple shaders");
-
-	//! Обязательно перед инициализации шейдеров
+	glClearColor(0, 0, 0, 0);
+	glEnable(GL_DEPTH_TEST);
+	glDepthFunc(GL_LESS);
 	GLenum glew_status = glewInit();
-	if (GLEW_OK != glew_status)
-	{
-		//! GLEW не проинициализировалась
-		std::cout << "Error: " << glewGetErrorString(glew_status) << "\n";
-		return 1;
-	}
 
-	//! Проверяем доступность OpenGL 2.0
-	if (!GLEW_VERSION_2_0)
-	{
-		//! OpenGl 2.0 оказалась не доступна
-		std::cout << "No support for OpenGL 2.0 found\n";
-		return 1;
-	}
-
-	//! Инициализация
-	initGL();
-	_LoadImage();
-	initVBO();
 	initShader();
 
+	_LoadImage();
+
+	initVBO();
+
 	glutReshapeFunc(resizeWindow);
-	glutDisplayFunc(render);
+	glutDisplayFunc(render1);
 	glutMainLoop();
 
-	//! Освобождение ресурсов, хотя в нашем случаи сюда выполнение никогда не дойдет,
-	// так, как управление не выйдет из glutMainLoop цикла
-	freeVBO();
+	freeShader();
 }
