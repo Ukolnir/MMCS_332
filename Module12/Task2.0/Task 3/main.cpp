@@ -27,16 +27,13 @@ float factor = 0.2f;
 
 //-----------------------------TEXTURES AND MODELS
 
-//string texPath3 = "D:\\Документы\\OneDrive\\Документы\\7 семестр\\комп. графика\\MMCS_332\\Module12\\Task2.0\\textures\\ROUND SOFA 1.jpg";
-
-//string objname = "D:\\Документы\\OneDrive\\Документы\\7 семестр\\комп. графика\\MMCS_332\\Module12\\Task2.0\\ROUND SOFA.obj";
+//string texPath3 = "D:\\Документы\\OneDrive\\Документы\\7 семестр\\комп. графика\\MMCS_332\\Module12\\Task2.0\\textures\\african_head_SSS.jpg";
+//string objname = "D:\\Документы\\OneDrive\\Документы\\7 семестр\\комп. графика\\MMCS_332\\Module12\\Task2.0\\african_head.obj";
 
 //string texPath3 = "D:\\Документы\\OneDrive\\Документы\\7 семестр\\комп. графика\\MMCS_332\\Module12\\Task2.0\\textures\\elefantefull.png";
-
 //string objname = "D:\\Документы\\OneDrive\\Документы\\7 семестр\\комп. графика\\MMCS_332\\Module12\\Task2.0\\elefante.obj";
 
 string texPath3 = "D:\\Документы\\OneDrive\\Документы\\7 семестр\\комп. графика\\MMCS_332\\Module12\\Task2.0\\textures\\Pig.png";
-
 string objname = "D:\\Документы\\OneDrive\\Документы\\7 семестр\\комп. графика\\MMCS_332\\Module12\\Task2.0\\Pig.obj";
 
 
@@ -54,7 +51,8 @@ string fsPath3 = "D:\\Документы\\OneDrive\\Документы\\7 семестр\\комп. графика\\
 
 int w, h;
 GLuint Program;
-float x, y, z, model_angle;
+float x, y, z, angle_X, angle_Y, angle_Z;
+
 string loadFile(string path) {
 	ifstream fs(path, ios::in);
 	if (!fs) cerr << "Cannot open " << path << endl;
@@ -123,11 +121,11 @@ void loadOBJ(const std::string & path, std::vector<glm::vec3> & out_vertices, st
 
 	int obj_scale = 1;
 
-	while (getline(infile, line)){
+	while (getline(infile, line)) {
 		std::stringstream ss(line);
 		std::string lineHeader;
 		getline(ss, lineHeader, ' ');
-		if (lineHeader == "v"){
+		if (lineHeader == "v") {
 			glm::vec3 vertex;
 			ss >> vertex.x >> vertex.y >> vertex.z;
 
@@ -136,23 +134,34 @@ void loadOBJ(const std::string & path, std::vector<glm::vec3> & out_vertices, st
 			vertex.z *= obj_scale;
 			temp_vertices.push_back(vertex);
 		}
-		else if (lineHeader == "vt"){
+		else if (lineHeader == "vt") {
 			glm::vec2 uv;
 			ss >> uv.x >> uv.y;
 			temp_uvs.push_back(uv);
 		}
-		else if (lineHeader == "vn"){
+		else if (lineHeader == "vn") {
 			glm::vec3 normal;
 			ss >> normal.x >> normal.y >> normal.z;
 			temp_normals.push_back(normal);
 		}
-		else if (lineHeader == "f"){
+		else if (lineHeader == "f")
+		{
 			int vertex_index, uv_index, normal_index;
 			char slash;
-			while (ss >> vertex_index >> slash >> uv_index >> slash >> normal_index){
+			int cnt = 0;
+			while (ss >> vertex_index >> slash >> uv_index >> slash >> normal_index)
+			{
 				vertex_indices.push_back(vertex_index);
 				uv_indices.push_back(uv_index);
 				normal_indices.push_back(normal_index);
+				cnt++;
+			}
+
+			if (cnt == 3)
+			{
+				vertex_indices.push_back(vertex_index);
+				uv_indices.push_back(uv_index);
+				normal_indices.push_back(normal_index); cnt++;
 			}
 		}
 	}
@@ -282,6 +291,9 @@ void render1() {
 		glm::vec3(0, 1, 0) 
 	);
 	glm::mat4 Model = glm::mat4(1.0f);
+	Model = glm::rotate(Model, angle_X, glm::vec3(1.0f, 0.0f, 0.0f));
+	Model = glm::rotate(Model, angle_Y, glm::vec3(0.0f, 1.0f, 0.0f));
+	Model = glm::rotate(Model, angle_Z, glm::vec3(0.0f, 0.0f, 1.0f));
 	glm::mat4 MVP = Projection * View * Model;
 
 	glUseProgram(Program);
@@ -309,8 +321,8 @@ void render1() {
 	glUniform1i(glGetUniformLocation(Program,"myTextureSampler"), 0);
 
 	glBindVertexArray(VAO);
-	glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_SHORT, 0); //голова, поросенок
-	//glDrawElements(GL_QUADS, indices.size(), GL_UNSIGNED_SHORT, 0); //слон, диван
+	//glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_SHORT, 0); //голова, поросенок
+	glDrawElements(GL_QUADS, indices.size(), GL_UNSIGNED_SHORT, 0); //слон, диван
 	glDisableVertexAttribArray(0);
 
 	glFlush();
@@ -339,22 +351,28 @@ void specialKeys(int key, int x1, int y1)
 	switch (key)
 	{
 	case GLUT_KEY_ALT_R:
-		x += 2;
+		angle_X += 0.2;
 		break;
 	case GLUT_KEY_ALT_L:
-		x -= 2;
+		angle_X -= 0.2;
 		break;
 	case GLUT_KEY_CTRL_L:
-		y += 2;
+		angle_Y += 0.2;
 		break;
 	case GLUT_KEY_CTRL_R:
-		y -= 2;
+		angle_Y -= 0.2;
 		break;
 	case GLUT_KEY_SHIFT_L:
-		z += 2;
+		angle_Z += 0.2;
 		break;
 	case GLUT_KEY_SHIFT_R:
-		z -= 2;
+		angle_Z -= 0.2;
+		break;
+	case GLUT_KEY_F1:
+		x -= 2; y -= 2; z -= 2;
+		break;
+	case GLUT_KEY_F2:
+		x += 2; y += 2; z += 2;
 		break;
 	}
 
@@ -379,7 +397,7 @@ int main(int argc, char **argv) {
 	//glm::vec3(2000, 600, 1700), // sofa
 	//glm::vec3(14, 3, 10), // слон
 	//glm::vec3(45, 7, 45), // поросенок
-	x = 45; y = 10; z = 45; model_angle = 0;
+	x = 45; y = 10; z = 45; angle_X = angle_Y = angle_Z = 0;
 	_LoadImage();
 
 	initVBO();
