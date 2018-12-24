@@ -8,8 +8,10 @@
 #include <vector>
 #include <fstream>
 #include "SOIL.h"
+#define GLM_ENABLE_EXPERIMENTAL
 #include "glm.hpp"
 #include <gtc/matrix_transform.hpp>
+#include <gtx/transform.hpp>
 #include <sstream>
 #include <map>
 using namespace std;
@@ -18,16 +20,22 @@ using namespace std;
 //-------------------------- 0 - oneTexture, 1 - mix with Color, 2 - twoTextures
 int shader_mode = 0;
 
-//-----------------------------FACTOR MIX
-float factor = 0.2f;
-
 //-----------------------------TEXTURES AND MODELS
 
 string texPath3 = "D:\\4nqnbO1WtYI.jpg";
+//string texPath3 = "D:\\lotus_textures\\lotus_petal_diffuse.jpg"; 
+//string objname = "C:\\Users\\Ёллоне\\Desktop\\alien glyder\\alien glyder.obj";
 
-string objname = "C:\\Users\\Ёллоне\\Desktop\\cubetext.obj";
+string objname = "C:\\Users\\Ёллоне\\Desktop\\lotus_OBJ_low.obj";
 
 
+//---------------------------MOVES
+
+float X = 0.0f, Y = 0.0f, Z = 0.0f;
+
+float angle_X = 0.0f;
+float angle_Y = 0.0f;
+float angle_Z = 0.0f;
 
 ///----------------------------------------------------------------------------
 GLuint textureID;
@@ -267,13 +275,20 @@ void initVBO() {
 
 void render1() {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glm::mat4 Projection = glm::perspective(glm::radians(45.0f), 4.0f / 3.0f, 0.1f, 100.0f);
+	glm::mat4 Projection = glm::perspective(glm::radians(45.0f), 4.0f / 3.0f, 0.1f, 1000.0f);
 	glm::mat4 View = glm::lookAt(
-		glm::vec3(4, 3, 3),
+		glm::vec3(4, 7, -5),
 		glm::vec3(0, 0, 0), 
 		glm::vec3(0, 1, 0) 
 	);
-	glm::mat4 Model = glm::mat4(1.0f);
+
+	glm::mat4 Model;
+
+	Model = glm::translate(glm::mat4(1.0f), glm::vec3(X, Y, Z));
+	Model = glm::rotate(Model, angle_X, glm::vec3(1.0f, 0.0f, 0.0f));
+	Model = glm::rotate(Model, angle_Y, glm::vec3(0.0f, 1.0f, 0.0f));
+	Model = glm::rotate(Model, angle_Z, glm::vec3(0.0f, 0.0f, 1.0f));
+
 	glm::mat4 MVP = Projection * View * Model;
 
 	glUseProgram(Program);
@@ -322,28 +337,69 @@ void render1() {
 	glUniform1i(glGetUniformLocation(Program,"myTextureSampler"), 0);
 
 	glBindVertexArray(VAO);
-	glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_SHORT, 0);
-
+	glDrawElements(GL_QUADS, indices.size(), GL_UNSIGNED_SHORT, 0);
+	//GL_QUADS   GL_TRIANGLES
 	glDisableVertexAttribArray(0);
 
-	glFlush();
-
 	glUseProgram(0);
+
+	glFlush();
 
 	checkOpenGLerror();
 
 	glutSwapBuffers();
 }
 
+/*void keyboard(unsigned char key, int x, int y)
+{
+	switch (key)
+	{
+	case 'w':
+		rotateX += 10;
+		break;
+	case 's':
+		rotateX -= 10;
+		break;
+	case 'a':
+		rotateY -= 10;
+		break;
+	case 'd':
+		rotateY += 10;
+		break;
+	default:
+		break;
+	}
+
+	glutPostRedisplay();
+}
+
+void specialKeys(int key, int x, int y) {
+	switch ((int)key) {
+	case GLUT_KEY_UP: rotate_x += 5; break;
+	case GLUT_KEY_DOWN: rotate_x -= 5; break;
+	case GLUT_KEY_RIGHT: rotate_y += 5; break;
+	case GLUT_KEY_LEFT: rotate_y -= 5; break;
+	case GLUT_KEY_PAGE_UP: rotate_z += 5; break;
+	case GLUT_KEY_PAGE_DOWN: rotate_z -= 5; break;
+	case GLUT_KEY_F1: rotate_x = rotate_y = rotate_z = mode = 0; break;
+	case GLUT_KEY_F2: rotate_x = rotate_y = rotate_z = 0; mode = 1; break;
+	case GLUT_KEY_F3: rotate_x = rotate_y = rotate_z = 0; mode = 2; break;
+	case GLUT_KEY_SHIFT_L: rotate_x = rotate_y = rotate_z = 0; projection = 0; break;
+	case GLUT_KEY_CTRL_L: rotate_x = rotate_y = rotate_z = 0; projection = 1; break;
+	}
+	glutPostRedisplay();
+}
+*/
+
 int main(int argc, char **argv) {
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DEPTH | GLUT_RGBA | GLUT_ALPHA | GLUT_DOUBLE);
 	glutInitWindowSize(1000, 800);
 	glutCreateWindow("Simple shaders");
+	GLenum glew_status = glewInit();
 	glClearColor(0, 0, 0, 0);
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LESS);
-	GLenum glew_status = glewInit();
 
 	initShader();
 
@@ -353,6 +409,7 @@ int main(int argc, char **argv) {
 
 	glutReshapeFunc(resizeWindow);
 	glutDisplayFunc(render1);
+	//glutKeyboardFunc(keyboard);
 	glutMainLoop();
 
 	freeShader();

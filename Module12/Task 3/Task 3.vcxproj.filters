@@ -18,13 +18,7 @@
     <None Include="vertex.shader">
       <Filter>Файлы ресурсов</Filter>
     </None>
-    <None Include="fragment_mixColor.shader">
-      <Filter>Файлы ресурсов</Filter>
-    </None>
     <None Include="fragment_oneText.shader">
-      <Filter>Файлы ресурсов</Filter>
-    </None>
-    <None Include="fragment_twoText.shader">
       <Filter>Файлы ресурсов</Filter>
     </None>
   </ItemGroup>
