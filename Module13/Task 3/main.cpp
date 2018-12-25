@@ -1,33 +1,36 @@
 #define _CRT_SECURE_NO_WARNINGS
 #include <iostream>
 #include <Windows.h>
-#include "glew.h"
-#include "wglew.h"
-#include "freeglut.h"
+#include "D:\Документы\OneDrive\Документы\7 семестр\комп. графика\MMCS_332\glew-2.1.0\include\GL\glew.h"
+#include "D:\Документы\OneDrive\Документы\7 семестр\комп. графика\MMCS_332\glew-2.1.0\include\GL\wglew.h"
+#include "D:\Документы\OneDrive\Документы\7 семестр\комп. графика\MMCS_332\Module10\lib\freeglut.h"
+#include "D:\Документы\OneDrive\Документы\7 семестр\комп. графика\MMCS_332\Module10\lib\freeglut_std.h"
+#include "D:\Документы\OneDrive\Документы\7 семестр\комп. графика\MMCS_332\Module10\lib\freeglut_ext.h"
+#include "D:\Документы\OneDrive\Документы\7 семестр\комп. графика\MMCS_332\Module10\lib\SOIL.h"
 #include <string>
 #include <vector>
 #include <fstream>
-#include "SOIL.h"
 #define GLM_ENABLE_EXPERIMENTAL
-#include "glm.hpp"
-#include <gtc/matrix_transform.hpp>
-#include <gtx/transform.hpp>
-#include <gtc/matrix_inverse.hpp>
-#include <gtc/type_ptr.hpp>
+#include "D:\Документы\OneDrive\Документы\7 семестр\комп. графика\MMCS_332\glm\glm\glm.hpp"
+#include "D:\Документы\OneDrive\Документы\7 семестр\комп. графика\MMCS_332\glm\glm\gtc\matrix_transform.hpp"
+#include "D:\Документы\OneDrive\Документы\7 семестр\комп. графика\MMCS_332\glm\glm\gtx\transform.hpp"
+#include "D:\Документы\OneDrive\Документы\7 семестр\комп. графика\MMCS_332\glm\glm\gtc\matrix_inverse.hpp"
+#include "D:\Документы\OneDrive\Документы\7 семестр\комп. графика\MMCS_332\glm\glm\gtc\type_ptr.hpp"
 #include <sstream>
 #include <map>
 using namespace std;
 
+
 //-----------------------------SHADER_MODE
-//-------------------------- 0 - oneTexture, 1 - mix with Color, 2 - twoTextures
-int shader_mode = 1;
+//-------------------------- 0, 2 - witout texture; 1,3 - with texture.
+int shader_mode = 2;
 
 //-----------------------------TEXTURES AND MODELS
 
-//string texPath3 = "D:\\4nqnbO1WtYI.jpg";
-string texPath3 = "D:\\lotus_textures\\lotus_petal_diffuse.jpg"; 
+//string texPath3 = "D:\\Документы\\OneDrive\\Документы\\7 семестр\\комп. графика\\MMCS_332\\Module13\\Task 3\\textures\\4nqnbO1WtYI.jpg";
+string texPath3 = "D:\\Документы\\OneDrive\\Документы\\7 семестр\\комп. графика\\MMCS_332\\Module13\\Task 3\\textures\\lotus_textures\\lotus_petal_diffuse.jpg";
 
-string objname = "C:\\Users\\Эллоне\\Desktop\\lotus_OBJ_low.obj";
+string objname = "D:\\Документы\\OneDrive\\Документы\\7 семестр\\комп. графика\\MMCS_332\\Module13\\Task 3\\lotus_OBJ_low.obj";
 
 
 //---------------------------MOVES
@@ -38,6 +41,13 @@ float angle_X = 0.0f;
 float angle_Y = 0.0f;
 float angle_Z = 0.0f;
 
+
+float L_X = 10.0f, L_Y = -10.0f, L_Z = -10.0f;
+
+float L_angle_X = 0.0f;
+float L_angle_Y = 0.0f;
+float L_angle_Z = 0.0f;
+
 ///----------------------------------------------------------------------------
 GLuint textureID;
 
@@ -45,13 +55,12 @@ void _LoadImage() {
 	textureID = SOIL_load_OGL_texture(texPath3.c_str(), SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_MIPMAPS | SOIL_FLAG_INVERT_Y | SOIL_FLAG_NTSC_SAFE_RGB | SOIL_FLAG_COMPRESS_TO_DXT);
 }
 
-
 GLint use = shader_mode % 2;
 
-string vsPath = "C:\\Users\\Эллоне\\Desktop\\Task 3\\vertex.shader";
-string fsPath = "C:\\Users\\Эллоне\\Desktop\\Task 3\\fragment_oneText.shader";
-string vsPath1 = "C:\\Users\\Эллоне\\Desktop\\Task 3\\fragment_mixColor.shader";
-string fsPath1 = "C:\\Users\\Эллоне\\Desktop\\Task 3\\fragment_twoText.shader";
+string vsPath = "D:\\Документы\\OneDrive\\Документы\\7 семестр\\комп. графика\\MMCS_332\\Module13\\Task 3\\vertex.shader";
+string fsPath = "D:\\Документы\\OneDrive\\Документы\\7 семестр\\комп. графика\\MMCS_332\\Module13\\Task 3\\fragment_oneText.shader";
+string vsPath1 = "D:\\Документы\\OneDrive\\Документы\\7 семестр\\комп. графика\\MMCS_332\\Module13\\Task 3\\vertexPhong.shader";
+string fsPath1 = "D:\\Документы\\OneDrive\\Документы\\7 семестр\\комп. графика\\MMCS_332\\Module13\\Task 3\\fragmentPhong.shader";
 
 int w, h;
 GLuint Program;
@@ -62,13 +71,9 @@ glm::vec3 light_attenuation;
 glm::vec4 material_ambient, material_diffuse, material_specular, material_emission;
 float material_shininess;
 
-float lightZ = -5;
-float lightX = 10;
-float lightAngle = 0;
-
 void set_light() {
 
-	light_position = { 10,-10,-10,1 };
+	light_position = {L_X, L_Y, L_Z ,1 };
 	light_ambient = { 1,1,1,1 };
 	light_diffuse = { 1,1,1,1 };
 	light_specular = { 1,1,1,1 };
@@ -107,7 +112,11 @@ void checkOpenGLerror(){
 }
 
 void initShader() {
-	string _f = loadFile(vsPath);
+	string _f;
+	if (shader_mode == 2 || shader_mode == 3)
+		_f = loadFile(vsPath1);
+	else
+		_f = loadFile(vsPath);
 	const char* vsSource = _f.c_str();
 
 	GLuint vShader, fShader;
@@ -116,7 +125,10 @@ void initShader() {
 	glShaderSource(vShader, 1, &vsSource, NULL);
 	glCompileShader(vShader);
 
-	_f = loadFile(fsPath);
+	if (shader_mode == 2 || shader_mode == 3)
+		_f = loadFile(fsPath1);
+	else
+		_f = loadFile(fsPath);
 	const char* fsSource = _f.c_str();
 
 	fShader = glCreateShader(GL_FRAGMENT_SHADER);
@@ -178,18 +190,25 @@ void loadOBJ(const std::string & path, std::vector<glm::vec3> & out_vertices, st
 		else if (lineHeader == "vn"){
 			glm::vec3 normal;
 			ss >> normal.x >> normal.y >> normal.z;
-			//normal.x *= -1;
-			//normal.y *= -1;
-			//normal.z *= -1;
 			temp_normals.push_back(normal);
 		}
 		else if (lineHeader == "f"){
 			int vertex_index, uv_index, normal_index;
 			char slash;
-			while (ss >> vertex_index >> slash >> uv_index >> slash >> normal_index){
+			int cnt = 0;
+			while (ss >> vertex_index >> slash >> uv_index >> slash >> normal_index)
+			{
 				vertex_indices.push_back(vertex_index);
 				uv_indices.push_back(uv_index);
 				normal_indices.push_back(normal_index);
+				cnt++;
+			}
+
+			if (cnt == 3)
+			{
+				vertex_indices.push_back(vertex_index);
+				uv_indices.push_back(uv_index);
+				normal_indices.push_back(normal_index); cnt++;
 			}
 		}
 	}
@@ -327,9 +346,9 @@ void resizeWindow(int width, int height) {
 void render1() {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	
-	glm::vec4  lp = { lightX,0,0,1 };
-	glm::mat4  m = glm::translate(glm::vec3(0, 0, lightZ));
-	m = glm::rotate(m, lightAngle, glm::vec3(0, 0, 1));
+	glm::mat4  m = glm::rotate(glm::mat4(1.0f), L_angle_X, glm::vec3(1, 0,0));
+    m = glm::rotate(m, L_angle_Y, glm::vec3(0, 1, 0));
+	m = glm::rotate(m, L_angle_Z, glm::vec3(0, 0, 1));
 	light_position = m * light_position;
 
 	glm::mat4 Model;
@@ -419,46 +438,107 @@ void render1() {
 	glutSwapBuffers();
 }
 
-/*void keyboard(unsigned char key, int x, int y)
+double gr_cos(float angle) noexcept
+{
+	return cos(angle / 180 * 3.1415926535);
+}
+
+double gr_sin(float angle) noexcept
+{
+	return sin(angle / 180 * 3.1415926535);
+}
+
+void specialKeys(int key, int x1, int y1)
 {
 	switch (key)
 	{
-	case 'w':
-		rotateX += 10;
+	case GLUT_KEY_ALT_R:
+		angle_X += 0.2;
 		break;
-	case 's':
-		rotateX -= 10;
+	case GLUT_KEY_ALT_L:
+		angle_X -= 0.2;
 		break;
-	case 'a':
-		rotateY -= 10;
+	case GLUT_KEY_CTRL_L:
+		angle_Y += 0.2;
 		break;
-	case 'd':
-		rotateY += 10;
+	case GLUT_KEY_CTRL_R:
+		angle_Y -= 0.2;
 		break;
-	default:
+	case GLUT_KEY_SHIFT_L:
+		angle_Z += 0.2;
+		break;
+	case GLUT_KEY_SHIFT_R:
+		angle_Z -= 0.2;
+		break;
+	case GLUT_KEY_F1:
+		X += 2;
+		break;
+	case GLUT_KEY_F2:
+		X -= 2;
+		break;
+	case GLUT_KEY_F3:
+		Y += 2;
+		break;
+	case GLUT_KEY_F4:
+		Y -= 2;
+		break;
+	case GLUT_KEY_F5:
+		Z += 2;
+		break;
+	case GLUT_KEY_F6:
+		Z -= 2;
+		break;
+
+		//cвет
+	case GLUT_KEY_RIGHT:
+		L_angle_X += 2;
+		L_Y += 0.5 * gr_sin(L_angle_X);
+		L_Z += 0.5 * gr_cos(L_angle_X);
+		break;
+	case GLUT_KEY_LEFT:
+		L_angle_X += 2;
+		L_Y -= 0.5 * gr_sin(L_angle_X);
+		L_Z -= 0.5 * gr_cos(L_angle_X);
+		break;
+	case GLUT_KEY_UP:
+		L_angle_X -= 2;
+		L_Y += 0.5 * gr_sin(L_angle_X);
+		L_Z += 0.5 * gr_cos(L_angle_X);
+		break;
+	case GLUT_KEY_DOWN:
+		L_angle_X -= 2;
+		L_Y -= 0.5 * gr_sin(L_angle_X);
+		L_Z -= 0.5 * gr_cos(L_angle_X);
+		break;
+	case GLUT_KEY_PAGE_UP:
+		L_angle_Z += 2;
+		break;
+	case GLUT_KEY_PAGE_DOWN:
+		L_angle_Z -= 2;
+		break;
+	case GLUT_KEY_F7:
+		L_X += 2;
+		break;
+	case GLUT_KEY_F8:
+		L_X -= 2;
+		break;
+	case GLUT_KEY_F9:
+		L_Y += 2;
+		break;
+	case GLUT_KEY_F10:
+		L_Y -= 2;
+		break;
+	case GLUT_KEY_HOME:
+		L_Z += 2;
+		break;
+	case GLUT_KEY_END:
+		L_Z -= 2;
 		break;
 	}
 
 	glutPostRedisplay();
 }
 
-void specialKeys(int key, int x, int y) {
-	switch ((int)key) {
-	case GLUT_KEY_UP: rotate_x += 5; break;
-	case GLUT_KEY_DOWN: rotate_x -= 5; break;
-	case GLUT_KEY_RIGHT: rotate_y += 5; break;
-	case GLUT_KEY_LEFT: rotate_y -= 5; break;
-	case GLUT_KEY_PAGE_UP: rotate_z += 5; break;
-	case GLUT_KEY_PAGE_DOWN: rotate_z -= 5; break;
-	case GLUT_KEY_F1: rotate_x = rotate_y = rotate_z = mode = 0; break;
-	case GLUT_KEY_F2: rotate_x = rotate_y = rotate_z = 0; mode = 1; break;
-	case GLUT_KEY_F3: rotate_x = rotate_y = rotate_z = 0; mode = 2; break;
-	case GLUT_KEY_SHIFT_L: rotate_x = rotate_y = rotate_z = 0; projection = 0; break;
-	case GLUT_KEY_CTRL_L: rotate_x = rotate_y = rotate_z = 0; projection = 1; break;
-	}
-	glutPostRedisplay();
-}
-*/
 
 int main(int argc, char **argv) {
 	glutInit(&argc, argv);
@@ -477,6 +557,7 @@ int main(int argc, char **argv) {
 	initVBO();
 
 	glutReshapeFunc(resizeWindow);
+	glutSpecialFunc(specialKeys);
 	glutDisplayFunc(render1);
 	//glutKeyboardFunc(keyboard);
 	glutMainLoop();
