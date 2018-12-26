@@ -63,9 +63,6 @@ string fsPath4 = "C:\\Users\\Ёллоне\\Desktop\\Task 3\\fragmentToonShading.shader
 string fsPath5 = "C:\\Users\\Ёллоне\\Desktop\\Task 3\\fragmentAmiGooch.shader";
 string fsPath6 = "C:\\Users\\Ёллоне\\Desktop\\Task 3\\fragmentRim.shader";
 
-
-GLuint Program;
-
 GLuint Lambert, Minnaert, Blinn, ToonShading, AmiGooch, Rim;
 
 glm::vec4 light_position, light_ambient, light_diffuse, light_specular;
@@ -90,8 +87,6 @@ void set_material() {
 	material_specular = { 0.9, 0.9, 0.9, 1.0 };
 	material_shininess = 100.0;
 }
-
-
 
 string loadFile(string path) {
 	ifstream fs(path, ios::in);
@@ -144,7 +139,6 @@ GLuint initShader(string fsPath) {
 
 void freeShader() {
 	glUseProgram(0);
-	glDeleteProgram(Program);
 }
 
 GLuint colorbuffer;
@@ -338,7 +332,22 @@ void resizeWindow(int width, int height) {
 
 void render1() {
 	
-	GLuint shader_prog = Program;
+	GLuint shader_prog;
+
+	switch (shader_mode) {
+	case 0: shader_prog = Lambert;
+		break;
+	case 1: shader_prog = Minnaert;
+		break;
+	case 2: shader_prog = Blinn;
+		break;
+	case 3: shader_prog = ToonShading;
+		break;
+	case 4: shader_prog = AmiGooch;
+		break;
+	case 5: shader_prog = Rim;
+		break;
+	}
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glm::mat4  m = glm::rotate(glm::mat4(1.0f), L_angle_X, glm::vec3(1, 0,0));
@@ -485,11 +494,11 @@ void specialKeys(int key, int x1, int y1)
 		break;
 
 		//cвет
-	case GLUT_KEY_RIGHT:
-		L_angle_X += 2;
-		L_Y += 0.5 * gr_sin(L_angle_X);
-		L_Z += 0.5 * gr_cos(L_angle_X);
-		break;
+	//case GLUT_KEY_RIGHT:
+		//L_angle_X += 2;
+		//L_Y += 0.5 * gr_sin(L_angle_X);
+		//L_Z += 0.5 * gr_cos(L_angle_X);
+		//break;
 	case GLUT_KEY_LEFT:
 		L_angle_X += 2;
 		L_Y -= 0.5 * gr_sin(L_angle_X);
@@ -529,11 +538,12 @@ void specialKeys(int key, int x1, int y1)
 	case GLUT_KEY_END:
 		L_Z -= 2;
 		break;
+	case GLUT_KEY_RIGHT:
+		shader_mode = (++shader_mode) % 6;
 	}
 
 	glutPostRedisplay();
 }
-
 
 int main(int argc, char **argv) {
 	glutInit(&argc, argv);
@@ -545,7 +555,12 @@ int main(int argc, char **argv) {
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LESS);
 
-	Program = initShader(fsPath4);
+	Lambert = initShader(fsPath1);
+	Minnaert = initShader(fsPath2);
+	Blinn = initShader(fsPath3);
+	ToonShading = initShader(fsPath4);
+	AmiGooch = initShader(fsPath5);
+	Rim = initShader(fsPath6);
 
 	_LoadImage();
 
