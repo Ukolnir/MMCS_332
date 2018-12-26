@@ -1,21 +1,19 @@
 #define _CRT_SECURE_NO_WARNINGS
 #include <iostream>
 #include <Windows.h>
-#include "D:\Документы\OneDrive\Документы\7 семестр\комп. графика\MMCS_332\glew-2.1.0\include\GL\glew.h"
-#include "D:\Документы\OneDrive\Документы\7 семестр\комп. графика\MMCS_332\glew-2.1.0\include\GL\wglew.h"
-#include "D:\Документы\OneDrive\Документы\7 семестр\комп. графика\MMCS_332\Module10\lib\freeglut.h"
-#include "D:\Документы\OneDrive\Документы\7 семестр\комп. графика\MMCS_332\Module10\lib\freeglut_std.h"
-#include "D:\Документы\OneDrive\Документы\7 семестр\комп. графика\MMCS_332\Module10\lib\freeglut_ext.h"
-#include "D:\Документы\OneDrive\Документы\7 семестр\комп. графика\MMCS_332\Module10\lib\SOIL.h"
+#include "glew.h"
+#include "wglew.h"
+#include "freeglut.h"
+#include "SOIL.h"
 #include <string>
 #include <vector>
 #include <fstream>
 #define GLM_ENABLE_EXPERIMENTAL
-#include "D:\Документы\OneDrive\Документы\7 семестр\комп. графика\MMCS_332\glm\glm\glm.hpp"
-#include "D:\Документы\OneDrive\Документы\7 семестр\комп. графика\MMCS_332\glm\glm\gtc\matrix_transform.hpp"
-#include "D:\Документы\OneDrive\Документы\7 семестр\комп. графика\MMCS_332\glm\glm\gtx\transform.hpp"
-#include "D:\Документы\OneDrive\Документы\7 семестр\комп. графика\MMCS_332\glm\glm\gtc\matrix_inverse.hpp"
-#include "D:\Документы\OneDrive\Документы\7 семестр\комп. графика\MMCS_332\glm\glm\gtc\type_ptr.hpp"
+#include "glm/glm.hpp"
+#include "glm/gtc/matrix_transform.hpp"
+#include "glm/gtx/transform.hpp"
+#include "glm/gtc/matrix_inverse.hpp"
+#include "glm/gtc/type_ptr.hpp"
 #include <sstream>
 #include <map>
 using namespace std;
@@ -23,14 +21,14 @@ using namespace std;
 
 //-----------------------------SHADER_MODE
 //-------------------------- 0, 2 - witout texture; 1,3 - with texture.
-int shader_mode = 2;
+int shader_mode = 0;
 
 //-----------------------------TEXTURES AND MODELS
 
-//string texPath3 = "D:\\Документы\\OneDrive\\Документы\\7 семестр\\комп. графика\\MMCS_332\\Module13\\Task 3\\textures\\4nqnbO1WtYI.jpg";
-string texPath3 = "D:\\Документы\\OneDrive\\Документы\\7 семестр\\комп. графика\\MMCS_332\\Module13\\Task 3\\textures\\lotus_textures\\lotus_petal_diffuse.jpg";
+//string texPath3 = "DC:\\Users\\Эллоне\\Desktop\\Task 3\\Task 3\\textures\\4nqnbO1WtYI.jpg";
+string texPath3 = "C:\\Users\\Эллоне\\Desktop\\Task 3\\textures\\lotus_textures\\lotus_petal_diffuse.jpg";
 
-string objname = "D:\\Документы\\OneDrive\\Документы\\7 семестр\\комп. графика\\MMCS_332\\Module13\\Task 3\\lotus_OBJ_low.obj";
+string objname = "C:\\Users\\Эллоне\\Desktop\\Task 3\\lotus_OBJ_low.obj";
 
 
 //---------------------------MOVES
@@ -42,7 +40,7 @@ float angle_Y = 0.0f;
 float angle_Z = 0.0f;
 
 
-float L_X = 10.0f, L_Y = -10.0f, L_Z = -10.0f;
+float L_X = 0.0f, L_Y = 25.0f, L_Z = -10.0f;
 
 float L_angle_X = 0.0f;
 float L_angle_Y = 0.0f;
@@ -57,13 +55,18 @@ void _LoadImage() {
 
 GLint use = shader_mode % 2;
 
-string vsPath = "D:\\Документы\\OneDrive\\Документы\\7 семестр\\комп. графика\\MMCS_332\\Module13\\Task 3\\vertex.shader";
-string fsPath = "D:\\Документы\\OneDrive\\Документы\\7 семестр\\комп. графика\\MMCS_332\\Module13\\Task 3\\fragment_oneText.shader";
-string vsPath1 = "D:\\Документы\\OneDrive\\Документы\\7 семестр\\комп. графика\\MMCS_332\\Module13\\Task 3\\vertexPhong.shader";
-string fsPath1 = "D:\\Документы\\OneDrive\\Документы\\7 семестр\\комп. графика\\MMCS_332\\Module13\\Task 3\\fragmentPhong.shader";
+string vsPath = "C:\\Users\\Эллоне\\Desktop\\Task 3\\vertex.shader";
+string fsPath1 = "C:\\Users\\Эллоне\\Desktop\\Task 3\\fragmentLambert.shader";
+string fsPath2 = "C:\\Users\\Эллоне\\Desktop\\Task 3\\fragmentMinnaert.shader";
+string fsPath3 = "C:\\Users\\Эллоне\\Desktop\\Task 3\\fragmentBlinn.shader";
+string fsPath4 = "C:\\Users\\Эллоне\\Desktop\\Task 3\\fragmentToonShading.shader";
+string fsPath5 = "C:\\Users\\Эллоне\\Desktop\\Task 3\\fragmentAmiGooch.shader";
+string fsPath6 = "C:\\Users\\Эллоне\\Desktop\\Task 3\\fragmentRim.shader";
 
-int w, h;
+
 GLuint Program;
+
+GLuint Lambert, Minnaert, Blinn, ToonShading, AmiGooch, Rim;
 
 glm::vec4 light_position, light_ambient, light_diffuse, light_specular;
 glm::vec3 light_attenuation;
@@ -81,19 +84,13 @@ void set_light() {
 }
 
 void set_material() {
-	if (use) {
-		material_ambient = { 1.0, 1.0, 1.0, 1.0 };
-		material_emission = { 0.0, 0.0, 0.0, 1.0 };
-	}
-	else {
-		material_ambient = { 0.0, 0.0, 0.0, 1.0 };
-		material_emission = { 1.0, 0.0, 0.0, 1.0 };
-	}
-	
-	material_diffuse = { 0.64, 0.64, 0.64, 1.0 };
+	material_ambient = { 0.0, 0.0, 0.0, 1.0 };
+	material_emission = { 1.0, 0.0, 0.0, 1.0 };
+	material_diffuse = { 0.64, 0.2, 0.2, 1.0 };
 	material_specular = { 0.9, 0.9, 0.9, 1.0 };
 	material_shininess = 100.0;
 }
+
 
 
 string loadFile(string path) {
@@ -111,12 +108,10 @@ void checkOpenGLerror(){
 		cout << "OpenGl error! - " << gluErrorString(errCode);
 }
 
-void initShader() {
+GLuint initShader(string fsPath) {
+	GLuint name_shader;
 	string _f;
-	if (shader_mode == 2 || shader_mode == 3)
-		_f = loadFile(vsPath1);
-	else
-		_f = loadFile(vsPath);
+	_f = loadFile(vsPath);
 	const char* vsSource = _f.c_str();
 
 	GLuint vShader, fShader;
@@ -125,10 +120,7 @@ void initShader() {
 	glShaderSource(vShader, 1, &vsSource, NULL);
 	glCompileShader(vShader);
 
-	if (shader_mode == 2 || shader_mode == 3)
-		_f = loadFile(fsPath1);
-	else
-		_f = loadFile(fsPath);
+	_f = loadFile(fsPath);
 	const char* fsSource = _f.c_str();
 
 	fShader = glCreateShader(GL_FRAGMENT_SHADER);
@@ -137,16 +129,17 @@ void initShader() {
 
 	//----
 
-	Program = glCreateProgram();
-	glAttachShader(Program, vShader);
-	glAttachShader(Program, fShader);
+	name_shader = glCreateProgram();
+	glAttachShader(name_shader, vShader);
+	glAttachShader(name_shader, fShader);
 
-	glLinkProgram(Program);
+	glLinkProgram(name_shader);
 	int link_ok;
-	glGetProgramiv(Program, GL_LINK_STATUS, &link_ok);
-	if (!link_ok) { std::cout << "error attach shaders \n";   return; }
+	glGetProgramiv(name_shader, GL_LINK_STATUS, &link_ok);
+	if (!link_ok) { std::cout << "error attach shaders \n";   return -1; }
 
 	checkOpenGLerror();
+	return name_shader;
 }
 
 void freeShader() {
@@ -344,8 +337,10 @@ void resizeWindow(int width, int height) {
 }
 
 void render1() {
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	
+	GLuint shader_prog = Program;
+
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glm::mat4  m = glm::rotate(glm::mat4(1.0f), L_angle_X, glm::vec3(1, 0,0));
     m = glm::rotate(m, L_angle_Y, glm::vec3(0, 1, 0));
 	m = glm::rotate(m, L_angle_Z, glm::vec3(0, 0, 1));
@@ -363,7 +358,7 @@ void render1() {
 	set_light();
 	set_material();
 
-	glUseProgram(Program);
+	glUseProgram(shader_prog);
 
 	glEnableVertexAttribArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
@@ -398,31 +393,31 @@ void render1() {
 		(void*)0
 	);
 
-	glUniform1i(glGetUniformLocation(Program, "use"),use);
+	glUniform1i(glGetUniformLocation(shader_prog, "use"),use);
 
-	glUniformMatrix4fv(glGetUniformLocation(Program, "transform_model"), 1, GL_FALSE, &Model[0][0]);
-	glUniformMatrix4fv(glGetUniformLocation(Program, "transform_viewProjection"), 1, GL_FALSE, &Projection[0][0]);
-	glUniform3fv(glGetUniformLocation(Program, "transform_viewPosition"), 1, glm::value_ptr(eye));
-	glUniformMatrix3fv(glGetUniformLocation(Program, "transform_normal"), 1, GL_FALSE, &transform_normal[0][0]);
+	glUniformMatrix4fv(glGetUniformLocation(shader_prog, "transform_model"), 1, GL_FALSE, &Model[0][0]);
+	glUniformMatrix4fv(glGetUniformLocation(shader_prog, "transform_viewProjection"), 1, GL_FALSE, &Projection[0][0]);
+	glUniform3fv(glGetUniformLocation(shader_prog, "transform_viewPosition"), 1, glm::value_ptr(eye));
+	glUniformMatrix3fv(glGetUniformLocation(shader_prog, "transform_normal"), 1, GL_FALSE, &transform_normal[0][0]);
 
-	glUniform4fv(glGetUniformLocation(Program, "light_position"), 1, glm::value_ptr(light_position));
-	glUniform4fv(glGetUniformLocation(Program, "light_ambient"), 1, glm::value_ptr(light_ambient));
-	glUniform4fv(glGetUniformLocation(Program, "light_diffuse"), 1, glm::value_ptr(light_diffuse));
-	glUniform4fv(glGetUniformLocation(Program, "light_specular"), 1, glm::value_ptr(light_specular));
-	glUniform3fv(glGetUniformLocation(Program, "light_attenuation"), 1, glm::value_ptr(light_attenuation));
+	glUniform4fv(glGetUniformLocation(shader_prog, "light_position"), 1, glm::value_ptr(light_position));
+	glUniform4fv(glGetUniformLocation(shader_prog, "light_ambient"), 1, glm::value_ptr(light_ambient));
+	glUniform4fv(glGetUniformLocation(shader_prog, "light_diffuse"), 1, glm::value_ptr(light_diffuse));
+	glUniform4fv(glGetUniformLocation(shader_prog, "light_specular"), 1, glm::value_ptr(light_specular));
+	glUniform3fv(glGetUniformLocation(shader_prog, "light_attenuation"), 1, glm::value_ptr(light_attenuation));
 
-	glUniform4fv(glGetUniformLocation(Program, "material_ambient"), 1, glm::value_ptr(material_ambient));
-	glUniform4fv(glGetUniformLocation(Program, "material_diffuse"), 1, glm::value_ptr(material_diffuse));
-	glUniform4fv(glGetUniformLocation(Program, "material_specular"), 1, glm::value_ptr(material_specular));
-	glUniform1f(glGetUniformLocation(Program, "material_shininess"), material_shininess);
-	glUniform4fv(glGetUniformLocation(Program, "material_emission"), 1, glm::value_ptr(material_emission));
+	glUniform4fv(glGetUniformLocation(shader_prog, "material_ambient"), 1, glm::value_ptr(material_ambient));
+	glUniform4fv(glGetUniformLocation(shader_prog, "material_diffuse"), 1, glm::value_ptr(material_diffuse));
+	glUniform4fv(glGetUniformLocation(shader_prog, "material_specular"), 1, glm::value_ptr(material_specular));
+	glUniform1f(glGetUniformLocation(shader_prog, "material_shininess"), material_shininess);
+	glUniform4fv(glGetUniformLocation(shader_prog, "material_emission"), 1, glm::value_ptr(material_emission));
 	
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, textureID);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 
-	glUniform1i(glGetUniformLocation(Program,"myTextureSampler"), 0);
+	glUniform1i(glGetUniformLocation(shader_prog,"myTextureSampler"), 0);
 
 	glBindVertexArray(VAO);
 	glDrawElements(GL_QUADS, indices.size(), GL_UNSIGNED_SHORT, 0);
@@ -546,11 +541,11 @@ int main(int argc, char **argv) {
 	glutInitWindowSize(1000, 800);
 	glutCreateWindow("Simple shaders");
 	GLenum glew_status = glewInit();
-	glClearColor(0, 0, 0, 0);
+	glClearColor(0.0, 0.0, 0.0, 1.0);
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LESS);
 
-	initShader();
+	Program = initShader(fsPath4);
 
 	_LoadImage();
 
@@ -559,7 +554,6 @@ int main(int argc, char **argv) {
 	glutReshapeFunc(resizeWindow);
 	glutSpecialFunc(specialKeys);
 	glutDisplayFunc(render1);
-	//glutKeyboardFunc(keyboard);
 	glutMainLoop();
 
 	freeShader();

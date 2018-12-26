@@ -2,6 +2,8 @@
 in vec2 UV;
 in vec3 norm;
 in vec3 lightDir;
+in vec3 viewDir;
+in float vert_distance;
 
 uniform vec4 light_position;
 uniform vec4 light_ambient;
@@ -21,9 +23,11 @@ in vec4 FragmentColor;
 void main() {
     vec3 normal = normalize(norm);
     vec3 lightDir3 = normalize(lightDir);
+    vec3 viewDir3 = normalize(viewDir);
     
     vec4 colorW = material_emission;
     float Ndot = max(dot(normal, lightDir3), 0.0);
-    
-    gl_FragColor = colorW * Ndot * texture(myTextureSampler, UV);
+    colorW *= Ndot;
+        
+    gl_FragColor = colorW;
 }

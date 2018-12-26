@@ -18,13 +18,25 @@
     <None Include="vertex.shader">
       <Filter>Файлы ресурсов</Filter>
     </None>
-    <None Include="fragment_oneText.shader">
+    <None Include="vertex.shader">
       <Filter>Файлы ресурсов</Filter>
     </None>
-    <None Include="fragmentPhong.shader">
+    <None Include="fragmentMinnaert.shader">
       <Filter>Файлы ресурсов</Filter>
     </None>
-    <None Include="vertexPhong.shader">
+    <None Include="fragmentBlinn.shader">
+      <Filter>Файлы ресурсов</Filter>
+    </None>
+    <None Include="fragmentLambert.shader">
+      <Filter>Файлы ресурсов</Filter>
+    </None>
+    <None Include="fragmentToonShading.shader">
+      <Filter>Файлы ресурсов</Filter>
+    </None>
+    <None Include="fragmentAmiGooch.shader">
+      <Filter>Файлы ресурсов</Filter>
+    </None>
+    <None Include="fragmentRim.shader">
       <Filter>Файлы ресурсов</Filter>
     </None>
   </ItemGroup>
