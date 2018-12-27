@@ -500,7 +500,7 @@ void specialKeys(int key, int x1, int y1)
 	glutPostRedisplay();
 }
 
-vector<GLuint> VBO(11, 0), VAO(11,0), VBT(11,0), VBN(11,0), IBO(11,0), counts(11,0);
+vector<GLuint> VBO(12, 0), VAO(12,0), VBT(12,0), VBN(12,0), IBO(12,0), counts(12,0);
 
 void loadModels()
 {
@@ -509,15 +509,15 @@ void loadModels()
 	counts[0] = initVBO(VBO[0], VBN[0], VBT[0], IBO[0],
 		"D:\\Документы\\OneDrive\\Документы\\7 семестр\\комп. графика\\MMCS_332\\Individual3\\objs\\sofa.obj", v, 3 / 1800.0f);
 
-	v = { 1.3, 0.6, 1 };
+	v = { 1, 0.7, 0.9 };
 
 	counts[10] = initVBO(VBO[10], VBN[10], VBT[10], IBO[10],
-		"D:\\Документы\\OneDrive\\Документы\\7 семестр\\комп. графика\\MMCS_332\\Individual3\\objs\\t.obj", v, 1 / 800.0f);
+		"D:\\Документы\\OneDrive\\Документы\\7 семестр\\комп. графика\\MMCS_332\\Individual3\\objs\\t.obj", v, 1 / 270.0f);
 
 
 	v.x = 0;
 	v.y = 0;
-	v.z = 0;
+	v.z = -0.2;
 	counts[1] = initVBO(VBO[1], VBN[1], VBT[1], IBO[1],
 		"D:\\Документы\\OneDrive\\Документы\\7 семестр\\комп. графика\\MMCS_332\\Individual3\\objs\\Skaph.obj", v, 3 / 200.0f);
 
@@ -553,12 +553,17 @@ void loadModels()
 
 	v = { 3,0,2 };
 	counts[8] = initVBO(VBO[8], VBN[8], VBT[8], IBO[8],
-		"D:\\Документы\\OneDrive\\Документы\\7 семестр\\комп. графика\\MMCS_332\\Individual3\\objs\\carpet.obj", v, 1 / 300.0f);
+		"D:\\Документы\\OneDrive\\Документы\\7 семестр\\комп. графика\\MMCS_332\\Individual3\\objs\\carpet.obj", v, 1 / 750.0f);
 
 	v = { 0,0,0 };
 	counts[9] = initVBO(VBO[9], VBN[9], VBT[9], IBO[9],
 		"D:\\Документы\\OneDrive\\Документы\\7 семестр\\комп. графика\\MMCS_332\\Individual3\\objs\\wals.obj",
 		v, 1.5);
+
+	v = { 0,0,3 };
+	counts[11] = initVBO(VBO[11], VBN[11], VBT[11], IBO[11],
+		"D:\\Документы\\OneDrive\\Документы\\7 семестр\\комп. графика\\MMCS_332\\Individual3\\objs\\Pokemon.obj",
+		v, 1);
 }
 
 void render()
@@ -630,8 +635,13 @@ void render()
 	/*стены*/
 	m.material_diffuse = { 0.4, 0.3, 0.2, 1.0 };
 	m.material_emission = { 0.2, 0.2, 0.2, 1.0 };
-	//_LoadImage("D:\\Документы\\OneDrive\\Документы\\7 семестр\\комп. графика\\MMCS_332\\Individual3\\textures\\12.jpg");
+	_LoadImage("D:\\Документы\\OneDrive\\Документы\\7 семестр\\комп. графика\\MMCS_332\\Individual3\\textures\\12.jpg");
 	render1(Program2, VBO[9], VBN[9], VBT[9], IBO[9], l, m, counts[9], 0);
+
+	m.material_diffuse = { 0.4, 0.3, 0.2, 1.0 };
+	m.material_emission = { 0.2, 0.2, 0.2, 1.0 };
+	_LoadImage("D:\\Документы\\OneDrive\\Документы\\7 семестр\\комп. графика\\MMCS_332\\Individual3\\textures\\33.jpg");
+	render1(Program1, VBO[11], VBN[11], VBT[11], IBO[11], l, m, counts[11], 0);
 
 	glutSwapBuffers();
 }
