@@ -18,7 +18,6 @@
 #include "D:\Документы\OneDrive\Документы\7 семестр\комп. графика\MMCS_332\glm\glm\gtc\type_ptr.hpp"
 #include <sstream>
 #include <map>
-#include <algorithm>
 using namespace std;
 
 
@@ -37,7 +36,7 @@ float angle_Y = 0.0f;
 float angle_Z = 0.0f;
 
 
-float L_X = 1.0f, L_Y = 20.0f, L_Z = 2.0f;
+float L_X = 1.4f, L_Y = 15.0f, L_Z = 0.8f;
 
 float L_angle_X = 0.0f;
 float L_angle_Y = 0.0f;
@@ -53,8 +52,8 @@ void _LoadImage(string texPath3) {
 GLuint Program1, Program2;
 string vsPath1 = "D:\\Документы\\OneDrive\\Документы\\7 семестр\\комп. графика\\MMCS_332\\Individual3\\vertexPhong.shader";
 string fsPath1 = "D:\\Документы\\OneDrive\\Документы\\7 семестр\\комп. графика\\MMCS_332\\Individual3\\fragmentPhong.shader";
-//string vsPath2 = "D:\\Документы\\OneDrive\\Документы\\7 семестр\\комп. графика\\MMCS_332\\Individual3\\vertexText.shader";
-//string fsPath2 = "D:\\Документы\\OneDrive\\Документы\\7 семестр\\комп. графика\\MMCS_332\\Individual3\\fragment_oneText.shader";
+string vsPath2 = "D:\\Документы\\OneDrive\\Документы\\7 семестр\\комп. графика\\MMCS_332\\Individual3\\vertex.shader";
+string fsPath2 = "D:\\Документы\\OneDrive\\Документы\\7 семестр\\комп. графика\\MMCS_332\\Individual3\\fragmentPhong1.shader";
 
 int w, h;
 
@@ -510,23 +509,24 @@ void loadModels()
 	counts[0] = initVBO(VBO[0], VBN[0], VBT[0], IBO[0],
 		"D:\\Документы\\OneDrive\\Документы\\7 семестр\\комп. графика\\MMCS_332\\Individual3\\objs\\sofa.obj", v, 3 / 1800.0f);
 
-	v = { 1.55, 0.5, 0.9 };
+	v = { 1.3, 0.6, 1 };
 
 	counts[10] = initVBO(VBO[10], VBN[10], VBT[10], IBO[10],
-		"D:\\Документы\\OneDrive\\Документы\\7 семестр\\комп. графика\\MMCS_332\\Individual3\\objs\\t.obj", v, 3 / 850.0f);
+		"D:\\Документы\\OneDrive\\Документы\\7 семестр\\комп. графика\\MMCS_332\\Individual3\\objs\\t.obj", v, 1 / 800.0f);
 
 
 	v.x = 0;
-	v.z = -0.2;
+	v.y = 0;
+	v.z = 0;
 	counts[1] = initVBO(VBO[1], VBN[1], VBT[1], IBO[1],
-		"D:\\Документы\\OneDrive\\Документы\\7 семестр\\комп. графика\\MMCS_332\\Individual3\\objs\\Skaph.obj", v, 3 / 220.0f);
+		"D:\\Документы\\OneDrive\\Документы\\7 семестр\\комп. графика\\MMCS_332\\Individual3\\objs\\Skaph.obj", v, 3 / 200.0f);
 
 	v.x = 2.5;
 	v.z = 1.7;
 	counts[2] = initVBO(VBO[2], VBN[2], VBT[2], IBO[2],
 		"D:\\Документы\\OneDrive\\Документы\\7 семестр\\комп. графика\\MMCS_332\\Individual3\\objs\\table.obj", v, 1 / 2.5f);
 
-	v = { 0.1, 2.3, 0 };
+	v = { 0, 2.5, 0 };
 	counts[3] = initVBO(VBO[3], VBN[3], VBT[3], IBO[3],
 		"D:\\Документы\\OneDrive\\Документы\\7 семестр\\комп. графика\\MMCS_332\\Individual3\\objs\\flower.obj",
 		v, 1 / 60.0f);
@@ -553,7 +553,7 @@ void loadModels()
 
 	v = { 3,0,2 };
 	counts[8] = initVBO(VBO[8], VBN[8], VBT[8], IBO[8],
-		"D:\\Документы\\OneDrive\\Документы\\7 семестр\\комп. графика\\MMCS_332\\Individual3\\objs\\carpet.obj", v, 1 / 600.0f);
+		"D:\\Документы\\OneDrive\\Документы\\7 семестр\\комп. графика\\MMCS_332\\Individual3\\objs\\carpet.obj", v, 1 / 300.0f);
 
 	v = { 0,0,0 };
 	counts[9] = initVBO(VBO[9], VBN[9], VBT[9], IBO[9],
@@ -628,8 +628,10 @@ void render()
 	render1(Program1, VBO[8], VBN[8], VBT[8], IBO[8], l, m, counts[8], 1);
 
 	/*стены*/
-	_LoadImage("D:\\Документы\\OneDrive\\Документы\\7 семестр\\комп. графика\\MMCS_332\\Individual3\\textures\\12.jpg");
-	render1(Program1, VBO[9], VBN[9], VBT[9], IBO[9], l, m, counts[9], 1);
+	m.material_diffuse = { 0.4, 0.3, 0.2, 1.0 };
+	m.material_emission = { 0.2, 0.2, 0.2, 1.0 };
+	//_LoadImage("D:\\Документы\\OneDrive\\Документы\\7 семестр\\комп. графика\\MMCS_332\\Individual3\\textures\\12.jpg");
+	render1(Program2, VBO[9], VBN[9], VBT[9], IBO[9], l, m, counts[9], 0);
 
 	glutSwapBuffers();
 }
@@ -645,7 +647,7 @@ int main(int argc, char **argv) {
 	glDepthFunc(GL_LESS);
 
 	initShader(vsPath1, fsPath1, Program1);
-//	initShader(vsPath2, fsPath2, Program2);
+	initShader(vsPath1, fsPath2, Program2);
 	loadModels();
 
 	glutReshapeFunc(resizeWindow);

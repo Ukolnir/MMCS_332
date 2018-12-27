@@ -34,6 +34,16 @@ void main() {
     colorW += material_diffuse * light_diffuse * Ndot * attenuation;
     float RdotVpow = max(pow(dot(reflect(-lightDir, normal), viewDir3), material_shininess), 0.0);
     colorW += material_specular * light_specular * RdotVpow * attenuation;
-    
+	
+	if (UV.x > 0.5 && UV.y > 0.5)
+		colorW *= vec4(0.8, 0.8, 0.8, 1.0);
+	else
+		{
+			if (UV.x > 0.3 && UV.y > 0.3)
+				colorW *= vec4(0.6, 0.6, 0.6, 1.0);
+				else
+				colorW *= vec4(0.4, 0.4, 0.4, 1.0);
+		}
+		
     gl_FragColor = colorW;
 }
