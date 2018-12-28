@@ -8,23 +8,31 @@ int object_index = 1;
 int shader_mode = 3;
 //-----------------------------TEXTURES AND MODELS
 
-string texPath1 = "C:\\Users\\Ёллоне\\Desktop\\grass\\445.png";
+string texPath1 = "C:\\Users\\Ёллоне\\Desktop\\grass\\12.jpg";
 string texPath2 = "C:\\Users\\Ёллоне\\Desktop\\grass\\42.jpg";
-string texPath3 = "C:\\Users\\Ёллоне\\Desktop\\cottage\\cottage_diffuse.png";
+string texPath3 = "C:\\Users\\Ёллоне\\Desktop\\grass\\14.jpg";
 string texPath4 = "C:\\Users\\Ёллоне\\Desktop\\grass\\43.jpg";
-
+string texPath5 = "C:\\Users\\Ёллоне\\Desktop\\grass\\Ўапка.png";
+string texPath6 = "C:\\Users\\Ёллоне\\Desktop\\grass\\√лаз.png";
+string texPath7 = "C:\\Users\\Ёллоне\\Desktop\\grass\\7.jpg";
+string texPath8 = "C:\\Users\\Ёллоне\\Desktop\\grass\\6.jpg";
+string texPath9 = "C:\\Users\\Ёллоне\\Desktop\\grass\\8.jpg";
+string texPath10 = "C:\\Users\\Ёллоне\\Desktop\\grass\\1.jpg";
 
 string objname1 = "C:\\Users\\Ёллоне\\Desktop\\e1.obj";
 string objname2 = "C:\\Users\\Ёллоне\\Desktop\\grass.obj";
-string objname3 = "C:\\Users\\Ёллоне\\Desktop\\cottage\\cottage_obj.obj";
+string objname3 = "C:\\Users\\Ёллоне\\Desktop\\plane.obj";
 string objname4 = "C:\\Users\\Ёллоне\\Desktop\\ifh1.obj";
-
-
+string objname5 = "C:\\Users\\Ёллоне\\Desktop\\шапка.obj";
+string objname6 = "C:\\Users\\Ёллоне\\Desktop\\√лаз.obj";
+string objname7 = "C:\\Users\\Ёллоне\\Desktop\\ѕодарок1.obj";
+string objname8 = "C:\\Users\\Ёллоне\\Desktop\\ѕодарок2.obj";
+string objname9 = "C:\\Users\\Ёллоне\\Desktop\\≈лочный шарик.obj";
 
 
 //---------------------------MOVES
 
-float L_X = 10.0f, L_Y = 10.0f, L_Z = -10.0f;
+float L_X = -5.0f, L_Y = 0.0f, L_Z = -10.0f;
 
 float L_angle_X = 0.0f;
 float L_angle_Y = 0.0f;
@@ -314,7 +322,7 @@ int main(int argc, char **argv) {
 	glutInitWindowSize(1000, 800);
 	glutCreateWindow("Simple shaders");
 	GLenum glew_status = glewInit();
-	glClearColor(0, 0, 0, 1);
+	glClearColor(213/255.0, 243/255.0, 1.0, 1);
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LESS);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -324,22 +332,101 @@ int main(int argc, char **argv) {
 	Object grass = Object(objname2, texPath2, 10,
 		2.0, 0.0, 0.6,
 		0.4, 0.0, 0.2,
-		{ 1.0, 1.0, 1.0, 1.0 }, { 0.34128, 0.64, 0.281118, 1.0 }, { 0.0, 0.0, 0.0, 1.0 }, { 0.0, 0.0, 0.0, 1.0 });
+		{ 1.0, 1.0, 1.0, 1.0 }, { 0.9, 0.9, 0.9, 1.0 }, { 0.9, 0.9, 0.9, 1.0 }, { 0.0, 0.0, 0.0, 1.0 });
 
 	Object dragon = Object(objname4, texPath4, 1,
-		0.0, 1.0, -1.0,
-		0.0, 0.0, 0.0,
+		0.0, 1.5, -2.0,
+		0.0, -0.3, 0.0,
 		{ 1.0, 1.0, 1.0, 1.0 }, { 0.64, 0.64, 0.64, 1.0 }, { 0.1, 0.1, 0.1, 1.0 }, { 0.0, 0.0, 0.0, 1.0 });
 
-	Object tree = Object(objname1, texPath1, 1,
+	Object tree1 = Object(objname1, texPath1, 1,
 		5.0, 1.0, 2.0,
 		0.0, 0.0, 0.2,
 		{ 1.0, 1.0, 1.0, 1.0 }, { 0.64, 0.64, 0.64, 1.0 }, { 0.1, 0.1, 0.1, 1.0 }, { 0.0, 0.0, 0.0, 1.0 });
 
+	Object tree2 = Object(objname1, texPath1, 1,
+		2.0, 0.0, 2.0,
+		0.0, 0.0, 0.2,
+		{ 1.0, 1.0, 1.0, 1.0 }, { 0.64, 0.64, 0.64, 1.0 }, { 0.1, 0.1, 0.1, 1.0 }, { 0.0, 0.0, 0.0, 1.0 });
+
+	Object tree3 = Object(objname1, texPath1, 1,
+		0.0, -0.2, 2.0,
+		0.0, 0.0, 0.0,
+		{ 1.0, 1.0, 1.0, 1.0 }, { 0.64, 0.64, 0.64, 1.0 }, { 0.1, 0.1, 0.1, 1.0 }, { 0.0, 0.0, 0.0, 1.0 });
+
+	Object tree4 = Object(objname1, texPath1, 1,
+		-5.0, 0.5, -3.0,
+		0.1, 0.0, -0.2,
+		{ 1.0, 1.0, 1.0, 1.0 }, { 0.64, 0.64, 0.64, 1.0 }, { 0.1, 0.1, 0.1, 1.0 }, { 0.0, 0.0, 0.0, 1.0 });
+
+	Object tree5 = Object(objname1, texPath1, 0.5,
+		3.0, 3.0, -5.0,
+		0.0, 0.0, 0.0,
+		{ 1.0, 1.0, 1.0, 1.0 }, { 0.64, 0.64, 0.64, 1.0 }, { 0.1, 0.1, 0.1, 1.0 }, { 0.0, 0.0, 0.0, 1.0 });
+
+	Object lplane = Object(objname3, texPath3, 12,
+		8.0, 8.0, 10.0,
+		-1.3, 0.0, 0.2,
+		{ 1.0, 1.0, 1.0, 1.0 }, { 0.1, 0.1, 0.1, 1.0 }, { 0.1, 0.1, 0.1, 1.0 }, { 0.0, 0.0, 0.0, 1.0 });
+
+	Object rplane = Object(objname3, texPath3, 14,
+		-4.0, 5.0, 12.0,
+		-1.3, -0.2, -0.9,
+		{ 1.0, 1.0, 1.0, 1.0 }, { 0.1, 0.1, 0.1, 1.0 }, { 0.1, 0.1, 0.1, 1.0 }, { 0.0, 0.0, 0.0, 1.0 });
+
+	Object cap = Object(objname5, texPath5, 2.5,
+		0.0, 3.0, -2.0,
+		0.3, 0.0, 0.4,
+		{ 1.0, 1.0, 1.0, 1.0 }, { 0.8, 0.8, 0.8, 1.0 }, { 0.4, 0.4, 0.4, 1.0 }, { 0.0, 0.0, 0.0, 1.0 });
+
+	Object eye1 = Object(objname6, texPath6, 1,
+		0.1, 3.0, -2.6,
+		0.1, 1.9, 0.4,
+		{ 1.0, 1.0, 1.0, 1.0 }, { 0.64, 0.64, 0.64, 1.0 }, { 0.9, 0.9, 0.9, 1.0 }, { 0.5, 0.5, 0.5, 1.0 });
+
+	Object eye2 = Object(objname6, texPath6, 1,
+		0.45, 3.1, -2.6,
+		0.1, 1.9, 0.4,
+		{ 1.0, 1.0, 1.0, 1.0 }, { 0.64, 0.64, 0.64, 1.0 }, { 0.9, 0.9, 0.9, 1.0 }, { 0.5, 0.5, 0.5, 1.0 });
+
+	Object gift1 = Object(objname7, texPath7, 1,
+		-0.2, 1.3, -3.5,
+		0.2, 0.0, 0.0,
+		{ 1.0, 1.0, 1.0, 1.0 }, { 0.9, 0.9, 0.9, 1.0 }, { 0.9, 0.9, 0.9, 1.0 }, { 0.0, 0.0, 0.0, 1.0 });
+
+	Object gift2 = Object(objname8, texPath8, 1,
+		-0.2, 1.8, -5.0,
+		0.2, 0.0, 0.0,
+		{ 1.0, 1.0, 1.0, 1.0 }, { 0.9, 0.9, 0.9, 1.0 }, { 0.9, 0.9, 0.9, 1.0 }, { 0.0, 0.0, 0.0, 1.0 });
+
+	Object gift3 = Object(objname8, texPath9, 1,
+		-0.2, 2.8, -6.0,
+		0.2, 0.0, 0.0,
+		{ 1.0, 1.0, 1.0, 1.0 }, { 0.9, 0.9, 0.9, 1.0 }, { 0.9, 0.9, 0.9, 1.0 }, { 0.0, 0.0, 0.0, 1.0 });
+
+	Object toy1 = Object(objname9, texPath10, 1,
+		1.0, 2, -5.0,
+		0.2, 0.0, 0.0,
+		{ 1.0, 1.0, 1.0, 1.0 }, { 0.9, 0.9, 0.9, 1.0 }, { 0.9, 0.9, 0.9, 1.0 }, { 0.0, 0.0, 0.0, 1.0 });
+
 	scene = vector<Object>();
 	scene.push_back(grass);
 	scene.push_back(dragon);
-	scene.push_back(tree);
+	scene.push_back(tree1);
+	scene.push_back(tree2);
+	scene.push_back(tree3);
+	scene.push_back(tree4);
+	scene.push_back(tree5);
+	scene.push_back(lplane);
+	scene.push_back(rplane);
+	scene.push_back(cap);
+	scene.push_back(eye1);
+	scene.push_back(eye2);
+	scene.push_back(gift1);
+	scene.push_back(gift2);
+	scene.push_back(gift3);
+	scene.push_back(toy1);
+
 	for (int i = 0; i < scene.size(); ++i) {
 		scene[i]._LoadImage();
 		scene[i].initDataBuffers();
